@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'screens/start_screen.dart';
+import 'utils/supabase_client.dart'; // Supabase Client Manager
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseClientManager.init(); // Supabase initialisieren
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,7 +21,7 @@ class MyApp extends StatelessWidget {
           secondary: Colors.deepPurpleAccent,
         ),
         scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           elevation: 2,
@@ -30,14 +34,14 @@ class MyApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
-            textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            minimumSize: Size(250, 55),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            minimumSize: const Size(250, 55),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
           headlineSmall: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -46,16 +50,73 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.deepPurple),
+            borderSide: const BorderSide(color: Colors.deepPurple),
             borderRadius: BorderRadius.circular(10),
           ),
-          labelStyle: TextStyle(color: Colors.deepPurple),
+          labelStyle: const TextStyle(color: Colors.deepPurple),
         ),
       ),
-      home: StartScreen(),
+      home: const SupabaseTestScreen(),
+      // Zum normalen Startscreen wechseln, wenn Test fertig:
+      // home: StartScreen(),
     );
   }
 }
+
+class SupabaseTestScreen extends StatelessWidget {
+  const SupabaseTestScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Supabase Test')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Teste Supabase Verbindung'),
+          onPressed: () async {
+            try {
+              final data = await SupabaseClientManager.client
+                  .from('users')
+                  .select()
+                  .maybeSingle();  // Oder nur .select() für mehrere
+
+              if (data == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Keine Nutzer gefunden')),
+                );
+              } else if (data is List) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erfolg! Anzahl Nutzer: ${data.length}')),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Erfolg! Nutzer gefunden')),
+                );
+              }
+            } catch (error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Fehler: $error')),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
