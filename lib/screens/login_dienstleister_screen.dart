@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dienstleister_dashboard_screen.dart';  // Importieren!
+import 'dienstleister_dashboard_screen.dart';
+import 'registrierung_screen.dart'; // Import für Registrierung
 
 class LoginDienstleisterScreen extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       final email = _emailController.text;
       final passwort = _passwortController.text;
 
-      // TODO: Hier Login-Logik einbauen (z.B. Backend prüfen)
+      // TODO: Hier Login-Logik mit Supabase etc. einbauen
 
       print('Login als Dienstleister: $email / $passwort');
 
@@ -24,7 +25,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         SnackBar(content: Text('Login erfolgreich (Demo)')),
       );
 
-      // Navigation zum Dienstleister-Dashboard
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DienstleisterDashboardScreen()),
@@ -33,23 +33,15 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Bitte E-Mail eingeben';
-    }
+    if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Bitte eine gültige E-Mail eingeben';
-    }
+    if (!emailRegex.hasMatch(value)) return 'Bitte eine gültige E-Mail eingeben';
     return null;
   }
 
   String? _validatePasswort(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Bitte Passwort eingeben';
-    }
-    if (value.length < 6) {
-      return 'Passwort muss mindestens 6 Zeichen lang sein';
-    }
+    if (value == null || value.isEmpty) return 'Bitte Passwort eingeben';
+    if (value.length < 6) return 'Passwort muss mindestens 6 Zeichen lang sein';
     return null;
   }
 
@@ -84,8 +76,9 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Registrierung folgt später')),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrierungScreen()),
                   );
                 },
                 child: Text('Noch kein Konto? Jetzt registrieren'),
@@ -97,5 +90,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     );
   }
 }
+
 
 

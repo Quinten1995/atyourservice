@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'utils/supabase_client.dart'; // Supabase Client Manager
+import 'screens/start_screen.dart';  // StartScreen importieren
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,9 +57,9 @@ class MyApp extends StatelessWidget {
           labelStyle: const TextStyle(color: Colors.deepPurple),
         ),
       ),
-      home: const SupabaseTestScreen(),
-      // Zum normalen Startscreen wechseln, wenn Test fertig:
-      // home: StartScreen(),
+      home: const StartScreen(), // Hier StartScreen als Startseite nutzen
+      // Zum Testen kannst du vorübergehend wechseln auf:
+      // home: const SupabaseTestScreen(),
     );
   }
 }
@@ -78,7 +79,7 @@ class SupabaseTestScreen extends StatelessWidget {
               final data = await SupabaseClientManager.client
                   .from('users')
                   .select()
-                  .maybeSingle();  // Oder nur .select() für mehrere
+                  .maybeSingle();
 
               if (data == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +105,7 @@ class SupabaseTestScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 
