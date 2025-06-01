@@ -1,34 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
-import 'registrierung_screen.dart'; // Import für Registrierung
+import 'registrierung_screen.dart';
 
 class LoginDienstleisterScreen extends StatefulWidget {
+  const LoginDienstleisterScreen({Key? key}) : super(key: key);
+
   @override
   _LoginDienstleisterScreenState createState() => _LoginDienstleisterScreenState();
 }
 
 class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
-  final _emailController = TextEditingController();
-  final _passwortController = TextEditingController();
+  final _emailController = TextEditingController(text: 'walterlangengries@gmail.com');
+  final _passwortController = TextEditingController(text: 'password123');
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  final supabase = Supabase.instance.client;
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text;
-      final passwort = _passwortController.text;
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      // TODO: Hier Login-Logik mit Supabase etc. einbauen
+    setState(() => _isLoading = true);
 
-      print('Login als Dienstleister: $email / $passwort');
+    try {
+      final AuthResponse response = await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwortController.text,
+      );
+      final user = response.user;
+      if (user == null) {
+        throw AuthException('Login fehlgeschlagen. Bitte überprüfe Deine Daten oder bestätige Deine E-Mail.');
+      }
+
+      try {
+        await supabase.from('users').upsert({
+          'id': user.id,
+          'email': user.email,
+          'rolle': 'dienstleister',
+          'erstellt_am': DateTime.now().toIso8601String(),
+        });
+      } catch (e) {
+        print('[DEBUG] Upsert in users schlug fehl: $e');
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login erfolgreich (Demo)')),
+        const SnackBar(content: Text('Login erfolgreich!')),
       );
-
+      // ❌ const entfernt
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DienstleisterDashboardScreen()),
       );
+    } on AuthException catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login fehlgeschlagen: ${error.message}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unbekannter Fehler: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -48,7 +80,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login für Dienstleister')),
+      appBar: AppBar(title: const Text('Login für Dienstleister')),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -58,30 +90,32 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'E-Mail'),
+                decoration: const InputDecoration(labelText: 'E-Mail'),
                 keyboardType: TextInputType.emailAddress,
                 validator: _validateEmail,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _passwortController,
-                decoration: InputDecoration(labelText: 'Passwort'),
+                decoration: const InputDecoration(labelText: 'Passwort'),
                 obscureText: true,
                 validator: _validatePasswort,
               ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text('Login'),
-              ),
+              const SizedBox(height: 30),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: _login,
+                      child: const Text('Login'),
+                    ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegistrierungScreen()),
+                    MaterialPageRoute(builder: (context) => const RegistrierungScreen()),
                   );
                 },
-                child: Text('Noch kein Konto? Jetzt registrieren'),
+                child: const Text('Noch kein Konto? Jetzt registrieren'),
               ),
             ],
           ),
@@ -90,6 +124,3 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     );
   }
 }
-
-
-

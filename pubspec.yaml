@@ -13,7 +13,11 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  supabase_flutter: ^2.9.0   # <-- auf Version 2.x aktualisiert
+  # Supabase-Client für Flutter
+  supabase_flutter: ^2.9.0
+
+  # UUID-Generator für eindeutige IDs
+  uuid: ^3.0.6
 
 dev_dependencies:
   flutter_test:
@@ -23,5 +27,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-

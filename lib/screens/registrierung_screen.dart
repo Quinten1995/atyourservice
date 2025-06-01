@@ -10,62 +10,62 @@ class RegistrierungScreen extends StatefulWidget {
 
 class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  // ✅ VORAUSGEFÜLLTE LOGIN-DATEN:
-  final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
-  final _passwordController = TextEditingController(text: 'test1234');
-
+  final _emailController = TextEditingController(text: 'walterlangengries@gmail.com');
+  final _passwordController = TextEditingController(text: 'password123');
   String _rolle = 'kunde';
   bool _isLoading = false;
 
   final supabase = Supabase.instance.client;
 
   Future<void> _registrieren() async {
-    if (!_formKey.currentState!.validate()) return;
+    print('[DEBUG] _registrieren() aufgerufen');
+    if (!_formKey.currentState!.validate()) {
+      print('[DEBUG] Form nicht valide, Abbruch');
+      return;
+    }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
+    print('[DEBUG] _isLoading = true');
 
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     try {
-      final response = await supabase.auth.signUp(
+      print('[DEBUG] Versuche signUp() für $email');
+      final AuthResponse response = await supabase.auth.signUp(
         email: email,
         password: password,
       );
+      print('[DEBUG] signUp() zurück: user=${response.user}, session=${response.session}');
 
-      // 📩 Wenn Email-Verifizierung aktiv ist, ist response.user != null, aber keine Session
-      final userId = response.user?.id;
-
-      if (userId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrierung erfolgreich! Bitte bestätige deine E-Mail.')),
-        );
-        setState(() => _isLoading = false);
-        Navigator.of(context).pop();
-        return;
-      }
-
-      // ✅ Nutzerprofil in Tabelle "users" speichern
-      await supabase.from('users').insert({
-        'id': userId,
-        'email': email,
-        'rolle': _rolle,
-        'erstellt_am': DateTime.now().toIso8601String(),
-      });
-
+      // Wenn signUp erfolgreich (auch wenn E-Mail-Verifizierung noch aussteht),
+      // zeigen wir eine Erfolgsmeldung und navigieren zurück.
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registrierung erfolgreich! Bitte bestätige deine E-Mail.')),
+        const SnackBar(
+          content: Text(
+            'Registrierung erfolgreich! Bitte überprüfe deine E-Mail und bestätige sie.',
+          ),
+        ),
       );
-
+      print('[DEBUG] Snackbar gezeigt, Navigator.pop()');
       Navigator.of(context).pop();
-    } catch (error) {
+    } on AuthException catch (authError) {
+      // AuthException fängt z.B. "E-Mail existiert bereits", "Passwort zu schwach" o.Ä.
+      print('[DEBUG] AuthException: ${authError.message}');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler: $error')),
+        SnackBar(
+          content: Text('Registrierung fehlgeschlagen: ${authError.message}'),
+        ),
       );
+    } catch (e) {
+      // Alle anderen Fehler (Netzwerk, unerwartete Zustände, etc.)
+      print('[DEBUG] Allgemeine Exception: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unbekannter Fehler: $e')),
+      );
+    } finally {
       setState(() => _isLoading = false);
+      print('[DEBUG] _isLoading = false');
     }
   }
 
@@ -86,6 +86,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Rollenwahl (kunden/​dienstleister) – optional
               DropdownButtonFormField<String>(
                 value: _rolle,
                 decoration: const InputDecoration(labelText: 'Rolle auswählen'),
@@ -95,24 +96,28 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                 ],
                 onChanged: (value) {
                   if (value != null) {
-                    setState(() {
-                      _rolle = value;
-                    });
+                    setState(() => _rolle = value);
                   }
                 },
               ),
               const SizedBox(height: 16),
+
+              // E-Mail-Feld
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'E-Mail'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
-                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) return 'Bitte gültige E-Mail eingeben';
+                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                    return 'Bitte gültige E-Mail eingeben';
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
+
+              // Passwort-Feld
               TextFormField(
                 controller: _passwordController,
                 decoration: const InputDecoration(labelText: 'Passwort'),
@@ -124,6 +129,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                 },
               ),
               const SizedBox(height: 32),
+
+              // Registrieren-Button
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
@@ -137,14 +144,3 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
