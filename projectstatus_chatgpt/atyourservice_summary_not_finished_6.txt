@@ -1,0 +1,218 @@
+Projektüberblick
+Du baust eine Flutter-App namens atyourservice mit einem Supabase-Backend, in der sich Kunden und Dienstleister registrieren können. Kunden legen Aufträge an, Dienstleister sehen offene Aufträge in ihrer Nähe, nehmen sie an und schließen sie ab.
+
+1. Flutter-Seite
+1.1 Ordnerstruktur & wichtigste Dateien
+- lib/main.dart
+  • Initialisiert Supabase (mit URL + anonKey)
+  • Setzt StartScreen als Home
+- /utils/supabase_client.dart
+  • Enthält SupabaseClientManager.init()
+- /models
+  • auftrag.dart (Klasse Auftrag mit Feldern id, kundeId, titel, beschreibung, kategorie, adresse, latitude, longitude, status, erstelltAm, aktualisiertAm + fromJson()/toJson())
+  • dienstleister.dart (Klasse Dienstleister mit Feldern id, name, kategorie, latitude, longitude, zuletztOnline)
+- /screens
+  1. start_screen.dart
+     • Buttons: „Ich suche Hilfe (Kunde)“ → LoginKundeScreen, „Ich biete Hilfe an (Dienstleister)“ → LoginDienstleisterScreen
+  2. login_kunde_screen.dart / login_dienstleister_screen.dart
+     • E-Mail/Passwort-Felder, signInWithPassword(), prüft vorhandenen Eintrag in users (Upsert bei erstem Login), navigiert je nach Rolle zum jeweiligen Dashboard
+  3. registrierung_screen.dart
+     • Dropdown für Rolle (Kunde/Dienstleister), E-Mail, Passwort, signUp(), Snackbar, Pop zurück zum Login
+  4. kunden_dashboard_screen.dart
+     • Buttons: „Neuen Auftrag erstellen“ → AuftragErstellenScreen, „Meine Aufträge“ → MeineAuftraegeScreen
+  5. dienstleister_dashboard_screen.dart
+     • Lädt Profil (Kategorie + Koordinaten) aus dienstleister_details
+     • Holt alle Aufträge mit .eq('kategorie', kategorie).eq('status', 'offen'), wandelt in Auftrag.fromJson(), filtert nach Entfernung ≤ 50 km (Haversine-Formel)
+     • ListView mit passenden Aufträgen, Klick → AuftragDetailScreen
+  6. auftrag_erstellen_screen.dart
+     • Formular: Titel, Beschreibung, Kategorie, Adresse (optional), Latitude, Longitude (optional)
+     • _auftragAbschicken():
+       - Validiert Felder
+       - Upsert in users (rolle = 'kunde')
+       - insert in auftraege mit Feldern inkl. status = 'offen', erstellt_am, aktualisiert_am
+  7. meine_auftraege_screen.dart
+     • Listet alle Aufträge des Kunden (.select().eq('kunde_id', user.id).order('erstellt_am', ascending: false)), Klick → AuftragDetailScreen
+  8. auftrag_detail_screen.dart
+     • Zeigt Details eines Auftrag (Titel, Beschreibung, Kategorie, Adresse, Koordinaten, Status)
+     • Buttons (abhängig vom Status/Kontext):
+       - Wenn Status = 'offen' und eingeloggter User Dienstleister ist: „Auftrag annehmen“ → setzt status = 'in bearbeitung', dienstleister_id = auth.uid()
+       - Wenn Status = 'in bearbeitung' und eingeloggter Dienstleister = dienstleister_id: „Auftrag abschliessen“ → setzt status = 'abgeschlossen'
+     • Beim Annehmen/Abschließen werden die Supabase-Update-Aufrufe via Postgrest getriggert.
+  9. profil_dienstleister_screen.dart
+     • Form zum Anlegen/Bearbeiten des Dienstleister-Profils (Name, Kategorie, Beschreibung, Latitude, Longitude)
+     • Bei Speichern: upsert in dienstleister_details mit user_id = auth.uid()
+
+1.2 Status-Strings
+- Flutter-Code legt Aufträge immer mit status = 'offen' an (Kleinbuchstaben), später im Update ruft es status = 'in bearbeitung' bzw. status = 'abgeschlossen' auf. Es ist also wichtig, dass die Supabase-Policies dieselben Kleinschreibweisen verwenden.
+
+2. Datenbank-Schema (Supabase/PostgreSQL)
+2.1 Tabellen
+- users
+  CREATE TABLE public.users (
+    id UUID PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    rolle TEXT NOT NULL CHECK (rolle IN ('kunde', 'dienstleister')),
+    erstellt_am TIMESTAMP WITH TIME ZONE DEFAULT now()
+  );
+
+- dienstleister_details
+  CREATE TABLE public.dienstleister_details (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    kategorie TEXT NOT NULL,
+    beschreibung TEXT,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    zuletzt_online TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    erstellt_am TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    aktualisiert_am TIMESTAMP WITH TIME ZONE DEFAULT now()
+  );
+
+- auftraege
+  CREATE TABLE public.auftraege (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    kunde_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    dienstleister_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    titel TEXT NOT NULL,
+    beschreibung TEXT,
+    kategorie TEXT NOT NULL,
+    adresse TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    status TEXT NOT NULL CHECK (status IN ('offen', 'in bearbeitung', 'abgeschlossen')),
+    erstellt_am TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    aktualisiert_am TIMESTAMP WITH TIME ZONE DEFAULT now()
+  );
+
+2.2 RLS (Row Level Security)
+- Für jede Tabelle wurde RLS aktiviert:
+  ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE public.dienstleister_details ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY;
+- Anschließend wurden alle vorhandenen Policies per DROP POLICY IF EXISTS ... gelöscht, um von einem sauberen Zustand zu starten.
+
+2.3 Policies für users und dienstleister_details
+- select_user_policy, insert_user_data_policy, update_user_data_policy → nur auth.uid() = id
+- select_dienstleister_policy (lesend für alle: USING (true)), insert_dienstleister_details_policy, update_dienstleister_details_policy, delete_dienstleister_details_policy (nur eigene Profil-Zeile)
+
+2.4 Policies für auftraege (ursprünglich)
+- INSERT (insert_auftrag_policy): nur Kunde (auth.uid() = kunde_id AND users.rolle = 'kunde')
+- SELECT (select_auftrag_policy):
+  1. Kunde sieht eigene Aufträge (auth.uid() = kunde_id)
+  2. Dienstleister (users.rolle = 'dienstleister') sieht alle Aufträge mit status = 'Offen'
+  3. Dienstleister sieht auch Aufträge, bei denen er bereits in dienstleister_id eingetragen ist (egal ob in bearbeitung oder abgeschlossen)
+- DELETE (delete_auftrag_policy): nur Kunde darf eigenen Auftrag löschen solange status = 'offen'
+- UPDATE (update_auftrag_policy) (ursprünglich als ein Block für drei Szenarien):
+  A. Kunde darf eigenen Auftrag verändern (aber nicht status oder dienstleister_id → OLD.status = NEW.status und OLD.dienstleister_id IS NOT DISTINCT FROM NEW.dienstleister_id)
+  B. Dienstleister übernimmt offenen Auftrag (status: 'Offen' → 'In Bearbeitung', dienstleister_id: NULL → auth.uid())
+  C. Dienstleister schließt eigenen in Bearbeitung befindlichen Auftrag ab (status: 'In Bearbeitung' → 'Abgeschlossen')
+
+3. Bisheriger Workflow & Fehler
+3.1 RLS-Aktivierung & Policy-Erstellung
+- Zuerst wurde RLS für alle Tabellen aktiviert (mehrere ALTER TABLE … ENABLE ROW LEVEL SECURITY; in einem SQL-Block).
+- Dann sollten alle Policies (für users, dienstleister_details, auftraege) per DROP POLICY IF EXISTS … gelöscht werden.
+- Anschließend wurden neue Policies in einem großen Skript definiert (inklusive update_auftrag_policy mit OLD.status/NEW.status usw.).
+
+3.2 Fehler „missing FROM-clause entry für table old“
+- Beim Ausführen des großen Skripts – speziell beim CREATE POLICY update_auftrag_policy … USING (… AND OLD.status = 'Offen' …) … – trat dieser Fehler auf.
+- Ursache: Obwohl ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY; in demselben Skript stand, hat PostgreSQL CREATE POLICY noch nicht im Kontext eines aktiven RLS geparst. Weil beides in einem Block lief, hat es zum Zeitpunkt des Parsens nicht erkannt, dass RLS auf auftraege aktiv sein soll, und OLD/NEW waren nicht bekannt.
+
+3.3 Weitere Probleme bei den Status-Strings
+- Im ursprünglichen Skript wurden Policies mit Großschreibung ('Offen', 'In Bearbeitung', 'Abgeschlossen') definiert, während Flutter tatsächlich status = 'offen', status = 'in bearbeitung', status = 'abgeschlossen' (klein) schreibt. Ein Case-Mismatch verhindert, dass die Bedingungen jemals greifen, selbst wenn die Policy definiert wurde.
+
+3.4 Tabelle nicht gefunden?
+- Bei SELECT relrowsecurity FROM pg_class WHERE relname = 'auftraege'; kam „No rows returned“. Das deutet darauf hin, dass möglicherweise die Tabelle unter einem anderen Namen (z. B. "Aufträge" mit Umlaut oder Großbuchstaben) existiert. Daraufhin wurde geprüft, wie die Tabelle wirklich heißt (SELECT table_schema, table_name FROM information_schema.tables WHERE table_name ILIKE 'auftraege';).
+
+3.5 Schlüssel zum Erfolg
+- RLS nur einzeln aktivieren: ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY; in einer eigenen Abfrage (kein großes Skript).
+- Alte Policies einzeln löschen: jeweils DROP POLICY IF EXISTS … als eigene Abfrage.
+- UPDATE-Policies strikt getrennt anlegen (jeweils einzeln, ohne andere SQL-Zeilen davor):
+  1. Policy für „Auftrag annehmen“ mit klein geschriebenen Statusstrings ('offen', 'in bearbeitung').
+  2. Policy für „Auftrag abschliessen“ ebenfalls mit 'in bearbeitung' → 'abgeschlossen'.
+- Tabellenname exakt verwenden (ggf. in Anführungszeichen, wenn es z. B. "Aufträge" heißt).
+
+4. Nächste Schritte
+4.1 Name der auftraege-Tabelle definitiv klären
+- Führe einzeln aus:
+  SELECT table_schema, table_name FROM information_schema.tables WHERE table_name ILIKE '%auftrag%';
+  Merke dir den genauen Namen und das Schema.
+
+4.2 RLS aktivieren (nur für diese Tabelle)
+- Beispiel (wenn Tabellenname wirklich auftraege ist):
+  ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY;
+- Wenn Name "Aufträge" wäre, musst du schreiben:
+  ALTER TABLE public."Aufträge" ENABLE ROW LEVEL SECURITY;
+
+4.3 Alte UPDATE-Policies einzeln löschen
+- DROP POLICY IF EXISTS update_auftrag_policy ON public.auftraege;
+- DROP POLICY IF EXISTS allow_dienstleister_finish ON public.auftraege;
+- (Optional) DROP POLICY IF EXISTS update_auftrag_kunde ON public.auftraege;
+
+4.4 UPDATE-Policy „Auftrag annehmen“ (strikt getrennt, mit lowercase-Strings)
+  CREATE POLICY update_auftrag_policy
+    ON public.auftraege
+    FOR UPDATE
+    TO public
+    USING (
+      EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.rolle = 'dienstleister')
+      AND old.status = 'offen'
+      AND new.status = 'in bearbeitung'
+      AND new.dienstleister_id = auth.uid()
+      AND old.dienstleister_id IS NULL
+    )
+    WITH CHECK (
+      EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.rolle = 'dienstleister')
+      AND old.status = 'offen'
+      AND new.status = 'in bearbeitung'
+      AND new.dienstleister_id = auth.uid()
+      AND old.dienstleister_id IS NULL
+    );
+
+4.5 UPDATE-Policy „Auftrag abschliessen“
+  CREATE POLICY allow_dienstleister_finish
+    ON public.auftraege
+    FOR UPDATE
+    TO public
+    USING (
+      EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.rolle = 'dienstleister')
+      AND old.status = 'in bearbeitung'
+      AND old.dienstleister_id = auth.uid()
+    )
+    WITH CHECK (
+      EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.rolle = 'dienstleister')
+      AND new.status = 'abgeschlossen'
+      AND new.dienstleister_id = auth.uid()
+    );
+
+4.6 Optional: UPDATE-Policy für Kunden (ohne Statusänderung)
+  CREATE POLICY update_auftrag_kunde
+    ON public.auftraege
+    FOR UPDATE
+    TO public
+    USING (
+      auth.uid() = kunde_id
+      AND old.status = new.status
+      AND old.dienstleister_id IS NOT DISTINCT FROM new.dienstleister_id
+    )
+    WITH CHECK (
+      auth.uid() = kunde_id
+      AND old.status = new.status
+      AND old.dienstleister_id IS NOT DISTINCT FROM new.dienstleister_id
+    );
+
+4.7 Policies prüfen
+  SELECT p.polname, p.polcmd
+  FROM pg_policy AS p
+  JOIN pg_class AS c ON c.oid = p.polrelid
+  JOIN pg_namespace AS n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public'
+    AND c.relname = 'auftraege';
+
+4.8 Flutter erneut testen
+- Ohne RLS (zwischenschalten), um zu prüfen, ob das Einfügen und Updaten prinzipiell funktioniert.
+- Dann mit aktivierten Policies:
+  1. Auftrag anlegen (Status 'offen')
+  2. Dienstleister loggt sich ein, klickt auf „Auftrag annehmen“ → Status von 'offen'→'in bearbeitung'
+  3. Dann auf „Auftrag abschliessen“ → Status 'in bearbeitung'→'abgeschlossen'
+- Es darf kein RLS-Fehler bei old/new mehr auftreten.
