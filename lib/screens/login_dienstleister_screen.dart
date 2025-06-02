@@ -1,3 +1,5 @@
+// login_dienstleister_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
@@ -23,30 +25,49 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final AuthResponse response = await supabase.auth.signInWithPassword(
+      final AuthResponse authRes = await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwortController.text,
       );
-      final user = response.user;
+      final user = authRes.user;
       if (user == null) {
-        throw AuthException('Login fehlgeschlagen. Bitte überprüfe Deine Daten oder bestätige Deine E-Mail.');
+        throw AuthException('Login fehlgeschlagen. Bitte überprüfe deine Daten oder bestätige deine E-Mail.');
       }
 
-      try {
-        await supabase.from('users').upsert({
-          'id': user.id,
-          'email': user.email,
-          'rolle': 'dienstleister',
-          'erstellt_am': DateTime.now().toIso8601String(),
-        });
-      } catch (e) {
-        print('[DEBUG] Upsert in users schlug fehl: $e');
+      // 1. Prüfen, ob es bereits einen Eintrag in 'users' gibt
+      final fetched = await supabase
+          .from('users')
+          .select('rolle')
+          .eq('id', user.id)
+          .maybeSingle(); // Rückgabe: Map<String, dynamic>? oder null
+
+      if (fetched == null) {
+        // Kein Eintrag in 'users' → erster Login: Insert mit Rolle 'dienstleister'
+        try {
+          await supabase.from('users').insert({
+            'id': user.id,
+            'email': user.email,
+            'rolle': 'dienstleister',
+            'erstellt_am': DateTime.now().toIso8601String(),
+          });
+        } catch (e) {
+          print('[DEBUG] Insert in users schlug fehl: $e');
+        }
+      } else if (fetched['rolle'] != 'dienstleister') {
+        // Eintrag existiert, aber Rolle passt nicht
+        await supabase.auth.signOut();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Dieser Account ist kein Dienstleister. Bitte nutze den Kunden-Login.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login erfolgreich!')),
       );
-      // ❌ const entfernt
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DienstleisterDashboardScreen()),

@@ -1,121 +1,103 @@
+// lib/screens/auftrag_erstellen_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class AuftragErstellenScreen extends StatefulWidget {
   const AuftragErstellenScreen({Key? key}) : super(key: key);
 
   @override
-  State<AuftragErstellenScreen> createState() =>
-      _AuftragErstellenScreenState();
+  _AuftragErstellenScreenState createState() => _AuftragErstellenScreenState();
 }
 
 class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
+  final _supabase = Supabase.instance.client;
+  final _formKey = GlobalKey<FormState>();
+
+  // Controller für Formular-Felder
   final _titelController = TextEditingController();
   final _beschreibungController = TextEditingController();
-  String? _ausgewaehlteKategorie;
-
-  final List<String> _kategorien = [
-    'Elektriker',
-    'Klempner',
-    'Maler',
-    'Tischler',
-    'Gartenbau',
-    'IT-Service',
-  ];
+  String _selectedKategorie = 'Elektriker'; // Standard-Kategorie
+  final _adresseController = TextEditingController();
+  final _latitudeController = TextEditingController();  // neu: Latitude-Feld
+  final _longitudeController = TextEditingController(); // neu: Longitude-Feld
 
   bool _isLoading = false;
-  final supabase = Supabase.instance.client;
+  String? _errorMessage;
 
   Future<void> _auftragAbschicken() async {
-    print('[DEBUG] _auftragAbschicken() wurde aufgerufen');
+    if (!_formKey.currentState!.validate()) return;
 
-    final titel = _titelController.text.trim();
-    final beschreibung = _beschreibungController.text.trim();
-    final kategorie = _ausgewaehlteKategorie;
-
-    print('[DEBUG] Eingaben → titel="$titel", beschreibung="$beschreibung", kategorie="$kategorie"');
-
-    if (titel.isEmpty || beschreibung.isEmpty || kategorie == null) {
-      print('[DEBUG] Abbruch: Felder unvollständig');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bitte alle Felder ausfüllen')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    print('[DEBUG] set _isLoading = true');
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
     try {
-      // 1. Prüfen, ob ein User eingeloggt ist
-      final currentUser = supabase.auth.currentUser;
-      print('[DEBUG] currentUser = $currentUser');
-
-      if (currentUser == null) {
-        print('[DEBUG] Abbruch: Kein eingeloggter Benutzer');
-        throw Exception('Kein eingeloggter Benutzer gefunden.');
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('Bitte zuerst einloggen');
       }
 
-      // 2. Sicherstellen, dass der User in der Tabelle "users" existiert (Upsert)
+      // Koordinaten parsen (optionales Feld)
+      double? lat;
+      double? lon;
+      if (_latitudeController.text.trim().isNotEmpty &&
+          _longitudeController.text.trim().isNotEmpty) {
+        lat = double.tryParse(_latitudeController.text.trim());
+        lon = double.tryParse(_longitudeController.text.trim());
+        if (lat == null || lon == null) {
+          throw Exception('Bitte gültige Zahlen für Latitude und Longitude eingeben');
+        }
+      }
+
+      // Upsert in users (falls noch nicht vorhanden)
       try {
-        await supabase.from('users').upsert({
-          'id': currentUser.id,
-          'email': currentUser.email,
+        await _supabase.from('users').upsert({
+          'id': user.id,
+          'email': user.email,
           'rolle': 'kunde',
-          'erstellt_am': DateTime.now().toIso8601String(),
+          'erstellt_am': DateTime.now().toUtc().toIso8601String(),
         });
-        print('[DEBUG] Upsert in "users" erfolgreich');
-      } catch (e) {
-        print('[DEBUG] Upsert in "users" fehlgeschlagen: $e');
-        // Wir fahren trotzdem fort, weil der Fremdschlüssel‐Eintrag
-        // vermutlich schon existiert oder wir ihn nicht dringend brauchen.
+      } catch (_) {
+        // Ignoriere Fehler, falls schon vorhanden
       }
 
-      // 3. Neue UUID generieren
-      final neueId = const Uuid().v4();
-      print('[DEBUG] neueId = $neueId');
+      final String id = const Uuid().v4();
+      final timestamp = DateTime.now().toUtc().toIso8601String();
 
-      // 4. Zeitstempel
-      final jetzt = DateTime.now().toIso8601String();
-      print('[DEBUG] jetzt = $jetzt');
+      // Insert in auftraege mit status = 'offen' (kleingeschrieben)
+      await _supabase.from('auftraege').insert({
+        'id': id,
+        'kunde_id': user.id,
+        'titel': _titelController.text.trim(),
+        'beschreibung': _beschreibungController.text.trim(),
+        'kategorie': _selectedKategorie,
+        'adresse': _adresseController.text.trim().isEmpty
+            ? null
+            : _adresseController.text.trim(),
+        'latitude': lat,
+        'longitude': lon,
+        'status': 'offen',
+        'erstellt_am': timestamp,
+        'aktualisiert_am': timestamp,
+      });
 
-      // 5. Auftrag einfügen – jetzt, da der FK-Eintrag garantiert existiert (oder zumindest der Versuch lief)
-      final result = await supabase
-          .from('auftraege')
-          .insert({
-            'id': neueId,
-            'kunde_id': currentUser.id,
-            'titel': titel,
-            'beschreibung': beschreibung,
-            'kategorie': kategorie,
-            'status': 'offen',            // Kleinbuchstaben, um Check-Constraint zu erfüllen
-            'erstellt_am': jetzt,
-            'aktualisiert_am': jetzt,
-          })
-          .select();
-      print('[DEBUG] Insert-Result: $result');
-
-      // 6. Bei Erfolg Snackbar & Navigation
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Auftrag wurde erfolgreich gespeichert!')),
       );
       Navigator.pop(context);
-    } on PostgrestException catch (error) {
-      // Fängt Postgres-spezifische Fehler (z. B. Constraint-Verletzungen) ab
-      print('[DEBUG] PostgrestException: ${error.message}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Speichern fehlgeschlagen: ${error.message}')),
-      );
+    } on PostgrestException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+        _isLoading = false;
+      });
     } catch (e) {
-      // Alle anderen Fehler
-      print('[DEBUG] Exception: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unbekannter Fehler: $e')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-      print('[DEBUG] set _isLoading = false');
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
@@ -123,7 +105,24 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
   void dispose() {
     _titelController.dispose();
     _beschreibungController.dispose();
+    _adresseController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
     super.dispose();
+  }
+
+  String? _validateLatitude(String? value) {
+    if (value == null || value.isEmpty) return null; // optional
+    final v = double.tryParse(value);
+    if (v == null || v < -90 || v > 90) return 'Ungültige Latitude';
+    return null;
+  }
+
+  String? _validateLongitude(String? value) {
+    if (value == null || value.isEmpty) return null; // optional
+    final v = double.tryParse(value);
+    if (v == null || v < -180 || v > 180) return 'Ungültige Longitude';
+    return null;
   }
 
   @override
@@ -131,48 +130,83 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Neuen Auftrag erstellen')),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _titelController,
-                decoration:
-                    const InputDecoration(labelText: 'Titel des Auftrags'),
+        padding: const EdgeInsets.all(16.0),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _titelController,
+                        decoration: const InputDecoration(labelText: 'Titel'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Bitte Titel eingeben';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _beschreibungController,
+                        decoration: const InputDecoration(labelText: 'Beschreibung'),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedKategorie,
+                        decoration: const InputDecoration(labelText: 'Kategorie'),
+                        items: const [
+                          DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
+                          DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
+                          DropdownMenuItem(value: 'Maler', child: Text('Maler')),
+                          // Weitere Kategorien nach Bedarf
+                        ],
+                        onChanged: (wert) {
+                          if (wert != null) {
+                            setState(() {
+                              _selectedKategorie = wert;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _adresseController,
+                        decoration: const InputDecoration(labelText: 'Adresse (optional)'),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _latitudeController,
+                        decoration: const InputDecoration(labelText: 'Latitude (z. B. 50.9375)'),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: _validateLatitude,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _longitudeController,
+                        decoration: const InputDecoration(labelText: 'Longitude (z. B. 6.9603)'),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: _validateLongitude,
+                      ),
+                      const SizedBox(height: 24),
+                      if (_errorMessage != null) ...[
+                        Text(
+                          'Fehler: $_errorMessage',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      ElevatedButton(
+                        onPressed: _auftragAbschicken,
+                        child: const Text('Auftrag abschicken'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _beschreibungController,
-                decoration: const InputDecoration(labelText: 'Beschreibung'),
-                maxLines: 5,
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _ausgewaehlteKategorie,
-                items: _kategorien.map((kategorie) {
-                  return DropdownMenuItem(
-                    value: kategorie,
-                    child: Text(kategorie),
-                  );
-                }).toList(),
-                onChanged: (wert) {
-                  setState(() {
-                    _ausgewaehlteKategorie = wert;
-                  });
-                },
-                decoration: const InputDecoration(labelText: 'Kategorie wählen'),
-              ),
-              const SizedBox(height: 30),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _auftragAbschicken,
-                      child: const Text('Auftrag erstellen'),
-                    ),
-            ],
-          ),
-        ),
       ),
     );
   }

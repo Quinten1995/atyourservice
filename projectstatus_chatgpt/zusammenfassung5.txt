@@ -1,0 +1,207 @@
+
+Projektüberblick
+„atyourservice“ ist eine Flutter‐App, die Supabase als Backend verwendet. Nutzer (Kunden und Dienstleister) können sich registrieren, einloggen und Aufträge erstellen bzw. einsehen. Supabase verwaltet Authentifizierung, RLS‐geschützte Tabellen (users, auftraege) und speichert Daten in PostgreSQL.
+
+1. Flutter‐Ordnerstruktur und Hauptdateien
+
+/lib
+│
+├── main.dart
+│   • Initialisiert Supabase (SupabaseClientManager.init())
+│   • Startet die App mit StartScreen als Home
+│
+├── /utils
+│   ├─ supabase_client.dart
+│   │   • Klasse SupabaseClientManager
+│   │   • init(): Supabase.initialize(url, anonKey)
+│   •
+│   ├─ entfernung_utils.dart
+│   │   • berechneEntfernung(lat1, lon1, lat2, lon2) → Haversine‐Formel
+│   │   • Hilfsfunktion _gradZuBogenmass
+│   •
+│   └─ dienstleister_filter.dart
+│       • Funktion findePassendeDienstleister({alleDienstleister, kategorie, auftragLat, auftragLon, maxEntfernungKm})
+│       • Filtert anhand gleicher Kategorie und Distanz ≤ maxEntfernungKm
+│
+├── /models
+│   ├─ dienstleister.dart
+│   │   • Klasse Dienstleister (id, name, kategorie, latitude, longitude, zuletztOnline)
+│   │
+│   └─ auftrag.dart
+│       • Klasse Auftrag (id, kundeId, titel, beschreibung, kategorie, adresse?, latitude?, longitude?, status, erstelltAm, aktualisiertAm)
+│       • fromJson() und toJson() für Map‐↔Objekt
+│
+├── /data
+│   └─ dienstleister_daten.dart
+│       • Statische Liste <Dienstleister> dienstleisterDaten mit 4 Beispieldatensätzen
+│
+└── /screens
+    ├─ start_screen.dart
+    │   • Buttons:
+    │     – „Ich suche Hilfe (Kunde)“ → LoginKundeScreen
+    │     – „Ich biete Hilfe an (Dienstleister)“ → LoginDienstleisterScreen
+    │     – Optional: Test‐Button („Dienstleister testen“) zeigt Snackbar
+    │
+    ├─ login_kunde_screen.dart
+    │   • Formular: E-Mail + Passwort (vorausgefüllt)
+    │   • _login():
+    │     1. signInWithPassword(...)
+    │     2. Wenn user != null, upsert in users mit {id: user.id, email, rolle: 'kunde', erstellt_am}
+    │     3. Snackbar „Login erfolgreich!“ + Navigator → KundenDashboardScreen
+    │   • Validierung Email/Passwort, Fehler‐Snackbar bei Ausnahme
+    │
+    ├─ login_dienstleister_screen.dart
+    │   • Gleiches wie login_kunde_screen.dart, aber rolle: 'dienstleister' und Ziel ist DienstleisterDashboardScreen
+    │
+    ├─ registrierung_screen.dart
+    │   • Formular: Dropdown Rolle ('kunde' oder 'dienstleister'), E-Mail, Passwort (vorausgefüllt)
+    │   • _registrieren():
+    │     1. signUp(email, password) → AuthResponse
+    │     2. Snackbar „Registrierung erfolgreich! Bitte überprüfe deine E-Mail …“
+    │     3. Navigator.pop() (zurück zum Login)
+    │   • Kein Insert in users hier – erst nach Verifizierung + Login
+    │   • Debug‐Prints, um Ablauf in Konsole zu sehen
+    │
+    ├─ kunden_dashboard_screen.dart
+    │   • Zwei Buttons:
+    │     – „Neuen Auftrag erstellen“ → AuftragErstellenScreen
+    │     – „Meine Aufträge“ → MeineAuftraegeScreen
+    │
+    ├─ dienstleister_dashboard_screen.dart
+    │   • Horizontal scrollbare ActionChips mit Kategorien (Demo‐Placeholder)
+    │   • Placeholder‐Text „Hier werden passende Aufträge angezeigt“
+    │   • Button „Meine Aufträge“ → MeineAuftraegeScreen
+    │
+    ├─ auftrag_erstellen_screen.dart
+    │   • Formular: Titel, Beschreibung, Kategorie (Dropdown)
+    │   • _auftragAbschicken():
+    │     1. Prüft Eingaben, holt currentUser = supabase.auth.currentUser; falls null, Exception
+    │     2. Upsert in users (Damit FK existiert; falls fehlschlägt, trotzdem fortfahren)
+    │     3. Uuid().v4(), timestamp
+    │     4. insert in auftraege mit {id, kunde_id, titel, beschreibung, kategorie, status: 'offen', erstellt_am, aktualisiert_am}
+    │     5. Snackbar „Auftrag wurde erfolgreich gespeichert!“ + Navigator.pop()
+    │   • Fangt PostgrestException und allgemeine Fehler ab, zeigt korrekte Fehlermeldung
+    │
+    └─ meine_auftraege_screen.dart
+        • Stateful Widget
+        • initState() → _ladeAuftraege():
+        │   1. Holt user = supabase.auth.currentUser (muss existieren).
+        │   2. select().eq('kunde_id', user.id).order('erstellt_am', descending)
+        │   3. Wandelt List<dynamic> in List<Map<String,dynamic>> _auftraege.
+        │   4. Setzt _isLoading=false oder _errorMessage.
+        • build() zeigt:
+        │   – Progress‐Indicator, solange _isLoading == true
+        │   – Fehler‐Text bei _errorMessage != null
+        │   – „Keine Aufträge gefunden.“ bei leerer Liste
+        │   – Sonst ListView.builder, ListTile für jeden Auftrag (Titel, Kategorie, Status)
+        │     • onTap: Snackbar „Auftragsdetails: <titel>“
+        │   – AppBar mit Refresh‐Icon (_ladeAuftraege())
+
+2. Supabase‐Backend: Tabellen & RLS‐Policies
+
+2.1 Tabelle users
+
+CREATE TABLE public.users (
+  id UUID PRIMARY KEY,
+  email TEXT NOT NULL,
+  rolle TEXT NOT NULL,
+  erstellt_am TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY insert_user_data_policy
+  ON public.users FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+CREATE POLICY select_user_policy
+  ON public.users FOR SELECT
+  USING (auth.uid() = id);
+
+CREATE POLICY update_user_data_policy
+  ON public.users FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+2.2 Tabelle auftraege
+
+CREATE TABLE public.auftraege (
+  id UUID PRIMARY KEY,
+  kunde_id UUID NOT NULL REFERENCES public.users (id),
+  titel TEXT NOT NULL,
+  beschreibung TEXT NOT NULL,
+  kategorie TEXT NOT NULL,
+  adresse TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  status TEXT NOT NULL CHECK (status IN ('offen', 'in bearbeitung', 'abgeschlossen')),
+  erstellt_am TIMESTAMP NOT NULL DEFAULT NOW(),
+  aktualisiert_am TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY insert_auftrag_policy
+  ON public.auftraege FOR INSERT
+  WITH CHECK (auth.uid() = kunde_id);
+
+CREATE POLICY select_auftrag_policy
+  ON public.auftraege FOR SELECT
+  USING (auth.uid() = kunde_id);
+
+CREATE POLICY update_auftrag_policy
+  ON public.auftraege FOR UPDATE
+  USING (auth.uid() = kunde_id)
+  WITH CHECK (auth.uid() = kunde_id);
+
+CREATE POLICY delete_auftrag_policy
+  ON public.auftraege FOR DELETE
+  USING (auth.uid() = kunde_id);
+
+3. Wichtige Abläufe im Detail
+
+1. Registrierung (Sign-Up‐Flow):
+   – Formular in RegistrierungScreen: Rolle, E-Mail, Passwort.
+   – signUp(); Snackbar „Registrierung erfolgreich! …“; Navigator.pop().
+   – In Supabase: Auth‐User mit „waiting for verification“.
+
+2. E-Mail‐Verifizierung:
+   – Nutzer klickt Verifikationslink, Auth‐User wird bestätigt („confirmed“).
+
+3. Erster Login (Sign-In‐Flow):
+   – LoginKundeScreen/ LoginDienstleisterScreen: signInWithPassword().
+   – Upsert in users {id: user.id, email, rolle, erstellt_am}.
+   – Snackbar „Login erfolgreich!“, Navigator → Dashboard.
+
+4. Kunden‐Dashboard:
+   – Two buttons: „Neuen Auftrag erstellen“ → AuftragErstellenScreen; „Meine Aufträge“ → MeineAuftraegeScreen.
+
+5. Auftrag erstellen:
+   – AuftragErstellenScreen: Formular + _auftragAbschicken()
+   – currentUser prüfen, Upsert in users, Insert in auftraege, Snackbar + pop.
+
+6. Meine Aufträge anzeigen:
+   – MeineAuftraegeScreen: _ladeAuftraege() in initState(), danach ListView mit Aufträgen.
+
+7. Dienstleister‐Dashboard:
+   – ActionChips, Placeholder, Button „Meine Aufträge“.
+
+4. Was bereits implementiert ist
+
+– Registrierung + E-Mail‐Verifizierung + Login mit Upsert in users.
+– Auftragserstellung mit Status 'offen'.
+– Anzeige „Meine Aufträge“ (RLS‐geschütztes SELECT).
+– RLS‐Policies für users & auftraege komplett.
+– Debug‐Prints und Snackbar‐Feedback in allen wichtigen Schritten.
+
+5. Offene To-Dos / Nächste Schritte
+
+1. Merge in master: supabase-final → master via Pull‐Request.
+2. Detailansicht für Aufträge (Detail‐Screen, Status‐Update, DELETE).
+3. Status‐Änderung & DELETE in auftraege per UPDATE/DELETE.
+4. Dienstleister‐Profile & -Registrierung (Tabelle dienstleister_details, Profil-UI).
+5. Push‐Notifications & Realtime (z. B. Supabase Realtime für Benachrichtigungen).
+6. Refactoring: Wiederverwendbare Widgets, zentrale Fehler‐Handling‐Klassen.
+
+Fazit:
+Funktionierender Flutter‐Supabase‐App mit vollständigem Registrierungs‐/Login‐/Auftrags‐Flow und RLS. Weiterentwicklung: Details, Status, Profil, Notifications. 
