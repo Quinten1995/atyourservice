@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:atyourservice/utils/geocoding_service.dart';
 
 class AuftragErstellenScreen extends StatefulWidget {
   const AuftragErstellenScreen({Key? key}) : super(key: key);
@@ -20,8 +21,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
   final _beschreibungController = TextEditingController();
   String _selectedKategorie = 'Elektriker'; // Standard-Kategorie
   final _adresseController = TextEditingController();
-  final _latitudeController = TextEditingController();  // neu: Latitude-Feld
-  final _longitudeController = TextEditingController(); // neu: Longitude-Feld
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -40,16 +39,19 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
         throw Exception('Bitte zuerst einloggen');
       }
 
-      // Koordinaten parsen (optionales Feld)
+      final adresse = _adresseController.text.trim();
       double? lat;
       double? lon;
-      if (_latitudeController.text.trim().isNotEmpty &&
-          _longitudeController.text.trim().isNotEmpty) {
-        lat = double.tryParse(_latitudeController.text.trim());
-        lon = double.tryParse(_longitudeController.text.trim());
-        if (lat == null || lon == null) {
-          throw Exception('Bitte gültige Zahlen für Latitude und Longitude eingeben');
+
+      if (adresse.isNotEmpty) {
+        // Adresse per Geocoding in Koordinaten umwandeln
+        // "Koeln" statt "Köln" ist in der Regel in Ordnung
+        final coords = await GeocodingService().getCoordinates(adresse);
+        if (coords == null) {
+          throw Exception('Adresse nicht gefunden. Bitte prüfen.');
         }
+        lat = coords['lat'];
+        lon = coords['lng'];
       }
 
       // Upsert in users (falls noch nicht vorhanden)
@@ -67,16 +69,14 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       final String id = const Uuid().v4();
       final timestamp = DateTime.now().toUtc().toIso8601String();
 
-      // Insert in auftraege mit status = 'offen' (kleingeschrieben)
+      // Führe den Insert aus, ohne response.error zu prüfen
       await _supabase.from('auftraege').insert({
         'id': id,
         'kunde_id': user.id,
         'titel': _titelController.text.trim(),
         'beschreibung': _beschreibungController.text.trim(),
         'kategorie': _selectedKategorie,
-        'adresse': _adresseController.text.trim().isEmpty
-            ? null
-            : _adresseController.text.trim(),
+        'adresse': adresse.isEmpty ? null : adresse,
         'latitude': lat,
         'longitude': lon,
         'status': 'offen',
@@ -88,14 +88,14 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
         const SnackBar(content: Text('Auftrag wurde erfolgreich gespeichert!')),
       );
       Navigator.pop(context);
-    } on PostgrestException catch (e) {
+    } on Exception catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = 'Unbekannter Fehler: $e';
         _isLoading = false;
       });
     }
@@ -106,23 +106,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
     _titelController.dispose();
     _beschreibungController.dispose();
     _adresseController.dispose();
-    _latitudeController.dispose();
-    _longitudeController.dispose();
     super.dispose();
-  }
-
-  String? _validateLatitude(String? value) {
-    if (value == null || value.isEmpty) return null; // optional
-    final v = double.tryParse(value);
-    if (v == null || v < -90 || v > 90) return 'Ungültige Latitude';
-    return null;
-  }
-
-  String? _validateLongitude(String? value) {
-    if (value == null || value.isEmpty) return null; // optional
-    final v = double.tryParse(value);
-    if (v == null || v < -180 || v > 180) return 'Ungültige Longitude';
-    return null;
   }
 
   @override
@@ -175,21 +159,13 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _adresseController,
-                        decoration: const InputDecoration(labelText: 'Adresse (optional)'),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _latitudeController,
-                        decoration: const InputDecoration(labelText: 'Latitude (z. B. 50.9375)'),
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        validator: _validateLatitude,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _longitudeController,
-                        decoration: const InputDecoration(labelText: 'Longitude (z. B. 6.9603)'),
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        validator: _validateLongitude,
+                        decoration: const InputDecoration(
+                          labelText: 'Adresse (z. B. Alter Markt 76, 50667 Koeln)',
+                        ),
+                        validator: (value) {
+                          // Adresse ist optional
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 24),
                       if (_errorMessage != null) ...[

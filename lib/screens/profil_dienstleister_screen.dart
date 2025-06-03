@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:atyourservice/utils/geocoding_service.dart';
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -11,18 +12,18 @@ class ProfilDienstleisterScreen extends StatefulWidget {
       _ProfilDienstleisterScreenState();
 }
 
-class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
+class _ProfilDienstleisterScreenState
+    extends State<ProfilDienstleisterScreen> {
   final _supabase = Supabase.instance.client;
   final _formKey = GlobalKey<FormState>();
 
-  // Controller für die Eingabefelder
+  // Controller für Formular-Felder
   final _nameController = TextEditingController();
-  String _selectedKategorie = 'Elektriker'; // Standard-Wert
   final _beschreibungController = TextEditingController();
-  final _latitudeController = TextEditingController();
-  final _longitudeController = TextEditingController();
+  String _selectedKategorie = 'Elektriker';
+  final _adresseController = TextEditingController();
 
-  bool _isLoading = true;
+  bool _isLoading = false;
   String? _errorMessage;
 
   @override
@@ -39,39 +40,34 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception('Bitte zuerst einloggen');
 
-      // Profil abrufen (wenn vorhanden)
-      final dynamic data = await _supabase
+      // Tabelle: dienstleister_details
+      final result = await _supabase
           .from('dienstleister_details')
           .select()
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .maybeSingle();
-      if (data != null && data is Map<String, dynamic>) {
-        _nameController.text = data['name'] as String;
-        _selectedKategorie = data['kategorie'] as String;
-        _beschreibungController.text = data['beschreibung'] as String? ?? '';
-        _latitudeController.text = data['latitude']?.toString() ?? '';
-        _longitudeController.text = data['longitude']?.toString() ?? '';
-      }
 
-      setState(() {
-        _isLoading = false;
-      });
-    } on PostgrestException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-        _isLoading = false;
-      });
+      if (result != null) {
+        final data = result;
+        _nameController.text = data['name'] as String? ?? '';
+        _beschreibungController.text = data['beschreibung'] as String? ?? '';
+        _selectedKategorie = data['kategorie'] as String? ?? 'Elektriker';
+        _adresseController.text = data['adresse'] as String? ?? '';
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = 'Fehler beim Laden des Profils: $e';
+      });
+    } finally {
+      setState(() {
         _isLoading = false;
       });
     }
   }
 
-  Future<void> _speichereProfil() async {
+  Future<void> _profilSpeichern() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -81,38 +77,43 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception('Bitte zuerst einloggen');
 
-      final lat = double.tryParse(_latitudeController.text.trim());
-      final lon = double.tryParse(_longitudeController.text.trim());
+      final name = _nameController.text.trim();
+      final beschreibung = _beschreibungController.text.trim();
+      final kategorie = _selectedKategorie;
+      final adresse = _adresseController.text.trim();
 
-      // Upsert mit Konflikt auf user_id, damit bestehender Datensatz aktualisiert wird
-      await _supabase
-          .from('dienstleister_details')
-          .upsert({
-            'user_id': user.id,
-            'name': _nameController.text.trim(),
-            'kategorie': _selectedKategorie,
-            'beschreibung': _beschreibungController.text.trim(),
-            'latitude': lat,
-            'longitude': lon,
-            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          }, onConflict: 'user_id');
+      double? lat;
+      double? lon;
+
+      if (adresse.isNotEmpty) {
+        final coords = await GeocodingService().getCoordinates(adresse);
+        if (coords == null) throw Exception('Adresse nicht gefunden. Bitte prüfen.');
+        lat = coords['lat'];
+        lon = coords['lng'];
+      }
+
+      await _supabase.from('dienstleister_details').upsert({
+        'id': user.id,
+        'name': name,
+        'beschreibung': beschreibung,
+        'kategorie': kategorie,
+        'adresse': adresse.isEmpty ? null : adresse,
+        'latitude': lat,
+        'longitude': lon,
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil gespeichert!')),
+        const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
       );
-      setState(() {
-        _isLoading = false;
-      });
-    } on PostgrestException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-        _isLoading = false;
-      });
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      setState(() {
         _isLoading = false;
       });
     }
@@ -122,88 +123,90 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   void dispose() {
     _nameController.dispose();
     _beschreibungController.dispose();
-    _latitudeController.dispose();
-    _longitudeController.dispose();
+    _adresseController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil (Dienstleister)')),
+      appBar: AppBar(title: const Text('Dienstleister-Profil')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : _errorMessage != null
-                ? Center(child: Text('Fehler: $_errorMessage'))
-                : Form(
-                    key: _formKey,
-                    child: ListView(
-                      children: [
-                        TextFormField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(labelText: 'Name'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Bitte Name eingeben';
-                            }
-                            return null;
-                          },
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Bitte Name eingeben';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _beschreibungController,
+                        decoration:
+                            const InputDecoration(labelText: 'Beschreibung'),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedKategorie,
+                        decoration:
+                            const InputDecoration(labelText: 'Kategorie'),
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'Elektriker', child: Text('Elektriker')),
+                          DropdownMenuItem(
+                              value: 'Klempner', child: Text('Klempner')),
+                          DropdownMenuItem(
+                              value: 'Maler', child: Text('Maler')),
+                        ],
+                        onChanged: (wert) {
+                          if (wert != null) {
+                            setState(() {
+                              _selectedKategorie = wert;
+                            });
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Bitte Kategorie auswählen';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _adresseController,
+                        decoration: const InputDecoration(
+                          labelText: 'Adresse (z. B. Straße, PLZ, Stadt)',
                         ),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: _selectedKategorie,
-                          decoration:
-                              const InputDecoration(labelText: 'Kategorie'),
-                          items: const [
-                            DropdownMenuItem(
-                                value: 'Elektriker', child: Text('Elektriker')),
-                            DropdownMenuItem(
-                                value: 'Klempner', child: Text('Klempner')),
-                            DropdownMenuItem(
-                                value: 'Maler', child: Text('Maler')),
-                            // Weitere Kategorien nach Bedarf
-                          ],
-                          onChanged: (wert) {
-                            if (wert != null) {
-                              setState(() {
-                                _selectedKategorie = wert;
-                              });
-                            }
-                          },
+                      ),
+                      const SizedBox(height: 24),
+                      if (_errorMessage != null) ...[
+                        Text(
+                          'Fehler: $_errorMessage',
+                          style: const TextStyle(color: Colors.red),
                         ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _beschreibungController,
-                          decoration:
-                              const InputDecoration(labelText: 'Beschreibung'),
-                          maxLines: 3,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _latitudeController,
-                          decoration: const InputDecoration(
-                              labelText: 'Latitude (z.B. 50.9375)'),
-                          keyboardType:
-                              TextInputType.numberWithOptions(decimal: true),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _longitudeController,
-                          decoration: const InputDecoration(
-                              labelText: 'Longitude (z.B. 6.9603)'),
-                          keyboardType:
-                              TextInputType.numberWithOptions(decimal: true),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: _speichereProfil,
-                          child: const Text('Profil speichern'),
-                        ),
+                        const SizedBox(height: 12),
                       ],
-                    ),
+                      ElevatedButton(
+                        onPressed: _profilSpeichern,
+                        child: const Text('Profil speichern'),
+                      ),
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }
