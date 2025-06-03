@@ -10,7 +10,7 @@ class RegistrierungScreen extends StatefulWidget {
 
 class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'walterlangengries@gmail.com');
+  final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
   final _passwordController = TextEditingController(text: 'password123');
   String _rolle = 'kunde';
   bool _isLoading = false;
@@ -18,28 +18,62 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final supabase = Supabase.instance.client;
 
   Future<void> _registrieren() async {
-    print('[DEBUG] _registrieren() aufgerufen');
     if (!_formKey.currentState!.validate()) {
-      print('[DEBUG] Form nicht valide, Abbruch');
       return;
     }
 
     setState(() => _isLoading = true);
-    print('[DEBUG] _isLoading = true');
-
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     try {
-      print('[DEBUG] Versuche signUp() für $email');
-      final AuthResponse response = await supabase.auth.signUp(
+      // 1. Überprüfen, ob die E-Mail bereits registriert ist:
+      //    Wir versuchen, uns mit einem Dummy-Passwort einzuloggen.
+      //    Wenn AuthException geworfen wird:
+      //      - "Invalid login credentials" ⇒ E-Mail existiert, aber falsches Passwort.
+      //      - "User not found" ⇒ E-Mail existiert nicht (kann neu registriert werden).
+      //      - andere Fehlermeldung ⇒ entsprechend behandeln.
+      await supabase.auth.signInWithPassword(
         email: email,
-        password: password,
+        password: '••••••••', // Dummy-Passwort für den Existenz-Check
       );
-      print('[DEBUG] signUp() zurück: user=${response.user}, session=${response.session}');
+      // Wenn kein AuthException geworfen wurde, konnte man sich tatsächlich einloggen ⇒ Konto existiert mit diesem Passwort.
+      // Wir loggen den Nutzer sofort wieder aus und zeigen eine Fehlermeldung an.
+      await supabase.auth.signOut();
 
-      // Wenn signUp erfolgreich (auch wenn E-Mail-Verifizierung noch aussteht),
-      // zeigen wir eine Erfolgsmeldung und navigieren zurück.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Diese E-Mail ist bereits registriert. Bitte einloggen.')),
+      );
+    } on AuthException catch (authError) {
+      final err = authError.message.toLowerCase();
+      if (err.contains('invalid login credentials')) {
+        // E-Mail existiert, aber falsches Passwort
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Diese E-Mail ist bereits registriert. Passwort vergessen?')),
+        );
+      } else if (err.contains('user not found')) {
+        // E-Mail existiert nicht ⇒ sicher zum Signup weitermachen
+        await _signUpFlow(email, password);
+      } else {
+        // andere AuthException (z.B. Netzwerkfehler)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fehler beim Überprüfen: ${authError.message}')),
+        );
+      }
+    } catch (e) {
+      // Alle anderen Fehler (z. B. Netzwerk-Timeout)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unbekannter Fehler: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _signUpFlow(String email, String password) async {
+    try {
+      await supabase.auth.signUp(email: email, password: password);
+      // Registrierung erfolgreich (egal ob Bestätigungsmail verschickt wurde oder nicht)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -47,25 +81,29 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
           ),
         ),
       );
-      print('[DEBUG] Snackbar gezeigt, Navigator.pop()');
       Navigator.of(context).pop();
     } on AuthException catch (authError) {
-      // AuthException fängt z.B. "E-Mail existiert bereits", "Passwort zu schwach" o.Ä.
-      print('[DEBUG] AuthException: ${authError.message}');
+      // Sollte normalerweise hier nicht "E-Mail existiert bereits" sein, da wir das vorher abgefangen haben.
+      final err = authError.message.toLowerCase();
+      String userMessage;
+      if (err.contains('already registered') ||
+          err.contains('duplicate') ||
+          err.contains('user exists')) {
+        userMessage = 'Diese E-Mail ist bereits registriert.';
+      } else if (err.contains('invalid email')) {
+        userMessage = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+      } else if (err.contains('password')) {
+        userMessage = 'Passwort muss mindestens 6 Zeichen haben.';
+      } else {
+        userMessage = 'Registrierung fehlgeschlagen: ${authError.message}';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Registrierung fehlgeschlagen: ${authError.message}'),
-        ),
+        SnackBar(content: Text(userMessage)),
       );
     } catch (e) {
-      // Alle anderen Fehler (Netzwerk, unerwartete Zustände, etc.)
-      print('[DEBUG] Allgemeine Exception: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unbekannter Fehler: $e')),
       );
-    } finally {
-      setState(() => _isLoading = false);
-      print('[DEBUG] _isLoading = false');
     }
   }
 
@@ -86,7 +124,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
           key: _formKey,
           child: Column(
             children: [
-              // Rollenwahl (kunden/​dienstleister) – optional
+              // Rollenwahl (Kunde / Dienstleister)
               DropdownButtonFormField<String>(
                 value: _rolle,
                 decoration: const InputDecoration(labelText: 'Rolle auswählen'),

@@ -1,0 +1,78 @@
+Zusammenfassung des aktuellen Projektstands:
+
+1. Allgemeiner Aufbau
+   - Flutter-Projekt "atyourservice" mit Supabase-Integration.
+   - Zeigt zwei Hauptrollen: Kunde und Dienstleister.
+   - Datenbanktabellen:
+     - users (enthält id, email, rolle (kunde/dienstleister), erstellt_am)
+     - auftraege (enthält id, kunde_id, dienstleister_id, titel, beschreibung, kategorie, adresse, latitude, longitude, status, erstellt_am, aktualisiert_am)
+     - dienstleister_details (enthält user_id, name, beschreibung, kategorie, adresse, latitude, longitude, aktualisiert_am)
+
+2. Registrierung und Login
+   - `lib/screens/registrierung_screen.dart`
+     - prüft, ob E-Mail bereits existiert (Dummy-Login), unterscheidet Fehlermeldungen.
+     - registriert neuen Nutzer mit `supabase.auth.signUp()`.
+   - `lib/screens/login_dienstleister_screen.dart` und `login_kunde_screen.dart`
+     - verwenden `signInWithPassword` für Anmeldung.
+     - Legen in Tabelle `users` bei erstmaligem Login einen Eintrag mit entsprechender Rolle an.
+
+3. Auftragserstellung mit Geodaten
+   - `lib/screens/auftrag_erstellen_screen.dart`
+     - Felder: Titel, Beschreibung, Kategorie, Adresse.
+     - Bei Eingabe einer Adresse → `GeocodingService` (OpenStreetMap Nominatim) bestimmt `latitude` und `longitude`.
+     - Speichert neuen Auftrag per `supabase.from('auftraege').insert(...)` mit optionalen Geokoordinaten.
+
+4. Auftragsliste und Detailseite für Dienstleister
+   - `lib/screens/dienstleister_dashboard_screen.dart`
+     - Lädt Profildaten (Kategorie, Latitude, Longitude) aus `dienstleister_details`.
+     - Lädt alle Aufträge gleicher Kategorie mit Status "offen".
+     - Filtert lokal nach Entfernung (≤ 50 km) mit `entfernung_utils.dart`.
+     - Zeigt passende Aufträge in einer Liste an.
+     - Navigiert zum `AuftragDetailScreen`.
+   - `lib/screens/auftrag_detail_screen.dart`
+     - Zeigt alle Details eines Auftrags.
+     - Dienstleister kann Auftrag annehmen (setzt `status = "in bearbeitung"`, füllt `dienstleister_id`).
+     - Dienstleister kann Auftrag abschließen (setzt `status = "abgeschlossen"`).
+
+5. Profilscreen Dienstleister mit Geodaten
+   - `lib/screens/profil_dienstleister_screen.dart`
+     - Felder: Name, Beschreibung, Kategorie, Adresse.
+     - Bei Eingabe einer Adresse → `GeocodingService` bestimmt `latitude` und `longitude`.
+     - Upsert in Tabelle `dienstleister_details` mit `user_id`, statt `id`.
+     - Wurde angepasst, um Row Level Security (RLS) zu erfüllen.
+
+6. RLS-Policies für Tabelle `dienstleister_details`
+   ```
+   alter policy "select_dienstleister_policy"
+     on "public"."dienstleister_details"
+     to public
+     using ( true );
+
+   alter policy "insert_dienstleister_details_policy"
+     on "public"."dienstleister_details"
+     to public
+     with check (
+       (auth.uid() = user_id)
+       AND
+       (EXISTS (
+         SELECT 1 FROM users u
+         WHERE (u.id = auth.uid()) AND (u.rolle = 'dienstleister')
+       ))
+     );
+
+   alter policy "update_dienstleister_details_policy"
+     on "public"."dienstleister_details"
+     to public
+     using ( auth.uid() = user_id )
+     with check ( auth.uid() = user_id );
+
+   alter policy "delete_dienstleister_details_policy"
+     on "public"."dienstleister_details"
+     to public
+     using ( auth.uid() = user_id );
+   ```
+   - Wichtig: Wir haben die Abfrage/Upsert-Keys zu `user_id` angepasst, damit `auth.uid() = user_id` erfüllt ist und keine „violates row policy“-Fehler auftreten.
+
+7. Nächste Schritte
+   - RLS-Policies überprüfen und bei Bedarf anpassen, damit Dienstleister ihr Profil mit Adresse speichern kann, ohne RLS deaktiviert zu haben.
+   - Gesamtes Projekt ist aktuell commitet im Branch `supabase-final` auf GitHub.

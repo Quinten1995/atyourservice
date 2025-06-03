@@ -1,0 +1,39 @@
+
+Projekt: atyourservice (Branch: supabase-final)
+
+Stand der Dinge:
+- RLS (Row-Level Security) und Policies für die Tabelle `auftraege` wurden erfolgreich eingerichtet.
+- Flutter-Client: Profil-Update für Dienstleister verwendet nun `upsert(..., onConflict: 'user_id')`.
+  Dadurch können Koordinaten und Profilinformationen überschrieben werden, statt Duplikate anzulegen.
+- Aktuelle Funktionalität:
+  1. Kunde kann Aufträge erstellen (mit Kategorie und optionalen Koordinaten).
+  2. Dienstleister sieht offene Aufträge in passender Kategorie innerhalb von 50 km.
+  3. Dienstleister nimmt Auftrag an („in bearbeitung“) und schließt ihn ab („abgeschlossen“).
+  4. Kunde sieht Statusänderungen in „Meine Aufträge“.
+  5. Profil-Erstellung/Update für Dienstleister testbar und funktionsfähig.
+
+Nächste Schritte:
+- End-to-End-Tests (Registrierung, Login, Auftragserstellung, Annahme, Abschluss).
+- Fehlerbehandlung und Nutzer-Feedback (RLS-Fehlermeldungen) verbessern.
+- Geocoding-API integrieren (Koordinaten aus Adresse).
+- Dokumentation (README) ergänzen, insbesondere SQL-Skripte und Flutter-Änderungen.
+
+Verwendete Dateien (Flutter/Dart):
+- lib/models/dienstleister.dart
+- lib/models/auftrag.dart
+- lib/screens/auftrag_detail_screen.dart
+- lib/screens/auftrag_erstellen_screen.dart
+- lib/screens/dienstleister_dashboard_screen.dart
+- lib/screens/kunden_dashboard_screen.dart
+- lib/screens/login_dienstleister_screen.dart
+- lib/screens/login_kunde_screen.dart
+- lib/screens/meine_auftraege_screen.dart
+- lib/screens/profil_dienstleister_screen.dart
+- lib/screens/registrierung_screen.dart
+- lib/screens/start_screen.dart
+- lib/utils/entfernung_utils.dart
+- lib/utils/finde_passende_dienstleister.dart
+- lib/utils/supabase_client.dart
+- lib/main.dart
+
+Die Quelldateien selbst befinden sich im Projektordner. Dieses Dokument fasst den aktuellen Stand und die nächsten Ziele zusammen.

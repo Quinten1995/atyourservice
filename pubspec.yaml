@@ -19,6 +19,9 @@ dependencies:
   # UUID-Generator für eindeutige IDs
   uuid: ^3.0.6
 
+  # HTTP-Paket für Geocoding-Anfragen
+  http: ^0.13.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

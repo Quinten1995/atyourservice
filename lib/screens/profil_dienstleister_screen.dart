@@ -29,6 +29,15 @@ class _ProfilDienstleisterScreenState
   @override
   void initState() {
     super.initState();
+
+    // JWT in der Konsole ausgeben:
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session != null) {
+      print('––– MEIN JWT-TOKEN: ${session.accessToken}');
+    } else {
+      print('––– KEINE SESSION GEFUNDEN');
+    }
+
     _ladeProfil();
   }
 
@@ -42,15 +51,14 @@ class _ProfilDienstleisterScreenState
       final user = _supabase.auth.currentUser;
       if (user == null) throw Exception('Bitte zuerst einloggen');
 
-      // Tabelle: dienstleister_details
-      final result = await _supabase
+      // Prüfen, ob es schon ein Profil gibt
+      final data = await _supabase
           .from('dienstleister_details')
           .select()
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
 
-      if (result != null) {
-        final data = result;
+      if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
         _selectedKategorie = data['kategorie'] as String? ?? 'Elektriker';
@@ -94,21 +102,27 @@ class _ProfilDienstleisterScreenState
         lon = coords['lng'];
       }
 
-      await _supabase.from('dienstleister_details').upsert({
-        'id': user.id,
-        'name': name,
-        'beschreibung': beschreibung,
-        'kategorie': kategorie,
-        'adresse': adresse.isEmpty ? null : adresse,
-        'latitude': lat,
-        'longitude': lon,
-        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-      });
+      // Lösung A: Nur UPDATE, weil Datensatz bereits existiert
+      // Wir fügen hier .select() ans Ende, damit tatsächlich eine Query ausgeführt wird
+      await _supabase
+          .from('dienstleister_details')
+          .update({
+            'name': name,
+            'beschreibung': beschreibung,
+            'kategorie': kategorie,
+            'adresse': adresse.isEmpty ? null : adresse,
+            'latitude': lat,
+            'longitude': lon,
+            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('user_id', user.id)
+          .select(); // ohne .select() würde keine Anfrage gesendet
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
+        const SnackBar(content: Text('Profil wurde erfolgreich aktualisiert!')),
       );
     } catch (e) {
+      // Wenn Supabase einen Fehler wirft, fangen wir ihn hier ab
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
       });
