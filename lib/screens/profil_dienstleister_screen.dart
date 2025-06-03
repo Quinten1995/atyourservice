@@ -7,7 +7,8 @@ class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfilDienstleisterScreenState createState() => _ProfilDienstleisterScreenState();
+  _ProfilDienstleisterScreenState createState() =>
+      _ProfilDienstleisterScreenState();
 }
 
 class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
@@ -41,13 +42,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       if (user == null) throw Exception('Nicht eingeloggt');
 
       // Profil abrufen (wenn vorhanden)
-      final data = await _supabase
+      final dynamic data = await _supabase
           .from('dienstleister_details')
           .select()
           .eq('user_id', user.id)
-          .maybeSingle() as Map<String, dynamic>?;
-
-      if (data != null) {
+          .maybeSingle();
+      if (data != null && data is Map<String, dynamic>) {
         _nameController.text = data['name'] as String;
         _selectedKategorie = data['kategorie'] as String;
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
@@ -86,15 +86,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final lat = double.tryParse(_latitudeController.text.trim());
       final lon = double.tryParse(_longitudeController.text.trim());
 
-      await _supabase.from('dienstleister_details').upsert({
-        'user_id': user.id,
-        'name': _nameController.text.trim(),
-        'kategorie': _selectedKategorie,
-        'beschreibung': _beschreibungController.text.trim(),
-        'latitude': lat,
-        'longitude': lon,
-        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-      });
+      // Upsert mit Konflikt auf user_id, damit bestehender Datensatz aktualisiert wird
+      await _supabase
+          .from('dienstleister_details')
+          .upsert({
+            'user_id': user.id,
+            'name': _nameController.text.trim(),
+            'kategorie': _selectedKategorie,
+            'beschreibung': _beschreibungController.text.trim(),
+            'latitude': lat,
+            'longitude': lon,
+            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+          }, onConflict: 'user_id');
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil gespeichert!')),
@@ -142,18 +145,24 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                           controller: _nameController,
                           decoration: const InputDecoration(labelText: 'Name'),
                           validator: (value) {
-                            if (value == null || value.isEmpty) return 'Bitte Name eingeben';
+                            if (value == null || value.isEmpty) {
+                              return 'Bitte Name eingeben';
+                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
                           value: _selectedKategorie,
-                          decoration: const InputDecoration(labelText: 'Kategorie'),
+                          decoration:
+                              const InputDecoration(labelText: 'Kategorie'),
                           items: const [
-                            DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
-                            DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
-                            DropdownMenuItem(value: 'Maler', child: Text('Maler')),
+                            DropdownMenuItem(
+                                value: 'Elektriker', child: Text('Elektriker')),
+                            DropdownMenuItem(
+                                value: 'Klempner', child: Text('Klempner')),
+                            DropdownMenuItem(
+                                value: 'Maler', child: Text('Maler')),
                             // Weitere Kategorien nach Bedarf
                           ],
                           onChanged: (wert) {
@@ -167,20 +176,25 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _beschreibungController,
-                          decoration: const InputDecoration(labelText: 'Beschreibung'),
+                          decoration:
+                              const InputDecoration(labelText: 'Beschreibung'),
                           maxLines: 3,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _latitudeController,
-                          decoration: const InputDecoration(labelText: 'Latitude (z.B. 50.9375)'),
-                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(
+                              labelText: 'Latitude (z.B. 50.9375)'),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _longitudeController,
-                          decoration: const InputDecoration(labelText: 'Longitude (z.B. 6.9603)'),
-                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                          decoration: const InputDecoration(
+                              labelText: 'Longitude (z.B. 6.9603)'),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
