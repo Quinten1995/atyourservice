@@ -17,20 +17,23 @@ class DienstleisterDashboardScreen extends StatefulWidget {
 
 class _DienstleisterDashboardScreenState
     extends State<DienstleisterDashboardScreen> {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient supabase = Supabase.instance.client;
 
   bool _isLoading = true;
   String? _errorMessage;
 
-  // Profil-Daten
+  // Profil‐Daten
   String? _meineKategorie;
   double? _meineLatitude;
   double? _meineLongitude;
 
-  // Alle Aufträge aus der DB als Map-Liste
-  List<Map<String, dynamic>> _alleAuftraege = [];
-  // Gefilterte Aufträge als starke Typ-Liste
-  List<Auftrag> _passendeAuftraege = [];
+  // Liste der Aufträge aus der DB (raw Maps)
+  List<Map<String, dynamic>> _alleOffenenAuftraegeRaw = [];
+  List<Map<String, dynamic>> _alleLaufendenAuftraegeRaw = [];
+
+  // Starke Typen‐Listen für die UI
+  List<Auftrag> _offenePassendeAuftraege = [];
+  List<Auftrag> _laufendeAuftraege = [];
 
   @override
   void initState() {
@@ -42,29 +45,23 @@ class _DienstleisterDashboardScreenState
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _alleAuftraege = [];
-      _passendeAuftraege = [];
+      _alleOffenenAuftraegeRaw = [];
+      _alleLaufendenAuftraegeRaw = [];
+      _offenePassendeAuftraege = [];
+      _laufendeAuftraege = [];
     });
 
     try {
       final user = supabase.auth.currentUser;
-
-      // ────────── Debug: Prüfen, welcher User eingeloggt ist ──────────
-      print('--- DEBUG: aktueller Dienstleister user.id = ${user?.id}');
-
       if (user == null) {
         throw Exception('Nicht eingeloggt');
       }
 
-      // ────────── 1) Profil abrufen ──────────
+      // 1) Profil abrufen (kategorie, latitude, longitude)
       final List<dynamic> profilList = await supabase
           .from('dienstleister_details')
           .select('kategorie, latitude, longitude')
           .eq('user_id', user.id);
-
-      // Debug-Ausgabe: Was liefert die Datenbank für das Profil?
-      print('--- DEBUG: profilList aus dienstleister_details:');
-      print(profilList);
 
       if (profilList.isEmpty) {
         throw Exception('Bitte zunächst dein Profil anlegen.');
@@ -72,12 +69,10 @@ class _DienstleisterDashboardScreenState
 
       final profilData = profilList.first as Map<String, dynamic>;
       final String? kategorie = profilData['kategorie'] as String?;
-      final double? latitude = (profilData['latitude'] as num?)?.toDouble();
-      final double? longitude = (profilData['longitude'] as num?)?.toDouble();
-
-      // Debug-Ausgabe: Welche Werte enthält das Profil?
-      print(
-          '--- DEBUG: Gewähltes Profil: kategorie="$kategorie", latitude=$latitude, longitude=$longitude');
+      final double? latitude =
+          (profilData['latitude'] as num?)?.toDouble();
+      final double? longitude =
+          (profilData['longitude'] as num?)?.toDouble();
 
       if (kategorie == null) {
         throw Exception('Kategorie im Profil fehlt.');
@@ -87,48 +82,53 @@ class _DienstleisterDashboardScreenState
       _meineLatitude = latitude;
       _meineLongitude = longitude;
 
-      // ────────── 2) Alle offenen Aufträge derselben Kategorie laden ──────────
-      final List<dynamic> rawAuftragsData = await supabase
+      // 2) Alle offenen Aufträge derselben Kategorie laden
+      final List<dynamic> rawOffen = await supabase
           .from('auftraege')
           .select()
           .eq('kategorie', kategorie)
           .eq('status', 'offen');
 
-      // Debug-Ausgabe: Was liefert die DB für Aufträge?
-      print(
-          '--- DEBUG: rawAuftragsData für kategorie="$kategorie", status="offen":');
-      print(rawAuftragsData);
+      _alleOffenenAuftraegeRaw =
+          rawOffen.cast<Map<String, dynamic>>();
 
-      _alleAuftraege = rawAuftragsData.cast<Map<String, dynamic>>();
+      // 3) Alle laufenden (in bearbeitung) Aufträge laden, die diesem DL gehören
+      final List<dynamic> rawLaufend = await supabase
+          .from('auftraege')
+          .select()
+          .eq('status', 'in bearbeitung')
+          .eq('dienstleister_id', user.id);
 
-      // ────────── 3) Nach Entfernung filtern (≤ 50 km) ──────────
-      if (latitude != null && longitude != null) {
-        _passendeAuftraege = _alleAuftraege
+      _alleLaufendenAuftraegeRaw =
+          rawLaufend.cast<Map<String, dynamic>>();
+
+      // 4) Filtern: nur offene Aufträge, die <= 50 km entfernt sind
+      if (_meineLatitude != null && _meineLongitude != null) {
+        _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
             .map((map) => Auftrag.fromJson(map))
             .where((auftrag) {
-          // Debug-Ausgabe: Jeder Auftrag mit seinen Koordinaten
-          print(
-              '--- Auftrag prüfen: titel="${auftrag.titel}", latitude=${auftrag.latitude}, longitude=${auftrag.longitude}');
-
           if (auftrag.latitude == null || auftrag.longitude == null) {
-            print('   → verworfen, weil latitude oder longitude null');
             return false;
           }
-          final double dist = berechneEntfernung(
-            latitude,
-            longitude,
+          final dist = berechneEntfernung(
+            _meineLatitude!,
+            _meineLongitude!,
             auftrag.latitude!,
             auftrag.longitude!,
           );
-          // Debug-Ausgabe: Berechnete Distanz
-          print('   → berechnete Distanz: ${dist.toStringAsFixed(2)} km');
           return dist <= 50.0;
         }).toList();
       } else {
-        // Wenn keine eigenen Koordinaten vorhanden, dann alle Aufträge anzeigen
-        _passendeAuftraege =
-            _alleAuftraege.map((map) => Auftrag.fromJson(map)).toList();
+        // Ohne Koordinaten: alle offenen Aufträge anzeigen
+        _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
+            .map((map) => Auftrag.fromJson(map))
+            .toList();
       }
+
+      // 5) Alle laufenden Aufträge in starke Typen‐Liste überführen
+      _laufendeAuftraege = _alleLaufendenAuftraegeRaw
+          .map((map) => Auftrag.fromJson(map))
+          .toList();
 
       setState(() {
         _isLoading = false;
@@ -152,6 +152,13 @@ class _DienstleisterDashboardScreenState
       appBar: AppBar(
         title: const Text('Dashboard Dienstleister'),
         actions: [
+          // Refresh‐Button
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Neu laden',
+            onPressed: _ladeProfilUndAuftraege,
+          ),
+          // Profil bearbeiten
           IconButton(
             icon: const Icon(Icons.person),
             tooltip: 'Profil bearbeiten',
@@ -159,9 +166,11 @@ class _DienstleisterDashboardScreenState
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const ProfilDienstleisterScreen()),
+                  builder: (_) => const ProfilDienstleisterScreen(),
+                ),
               );
-              _ladeProfilUndAuftraege(); // Nach Rückkehr neu laden
+              // Nach Rückkehr immer neu laden
+              _ladeProfilUndAuftraege();
             },
           ),
         ],
@@ -171,43 +180,116 @@ class _DienstleisterDashboardScreenState
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Text('Fehler: ${_errorMessage!}'))
-                : _passendeAuftraege.isEmpty
-                    ? const Center(child: Text('Keine passenden Aufträge gefunden.'))
-                    : ListView.builder(
-                        itemCount: _passendeAuftraege.length,
-                        itemBuilder: (context, index) {
-                          final Auftrag auftrag = _passendeAuftraege[index];
-                          String distText = '';
-                          if (_meineLatitude != null &&
-                              _meineLongitude != null &&
-                              auftrag.latitude != null &&
-                              auftrag.longitude != null) {
-                            final double dist = berechneEntfernung(
-                              _meineLatitude!,
-                              _meineLongitude!,
-                              auftrag.latitude!,
-                              auftrag.longitude!,
-                            );
-                            distText = '${dist.toStringAsFixed(1)} km entfernt';
-                          }
-                          return ListTile(
-                            title: Text(auftrag.titel),
-                            subtitle: Text(distText),
-                            trailing:
-                                const Icon(Icons.arrow_forward_ios, size: 16),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      AuftragDetailScreen(initialAuftrag: auftrag),
+                ? Center(child: Text('Fehler: $_errorMessage'))
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1) Bereich: Meine laufenden Aufträge
+                      if (_laufendeAuftraege.isNotEmpty) ...[
+                        const Text(
+                          'Meine laufenden Aufträge',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          // Innerhalb von Column ein Expanded, damit ListView scrollt
+                          child: ListView.builder(
+                            itemCount: _laufendeAuftraege.length,
+                            itemBuilder: (context, index) {
+                              final Auftrag auftrag = _laufendeAuftraege[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                child: ListTile(
+                                  title: Text(auftrag.titel),
+                                  subtitle: Text(
+                                      'Status: ${auftrag.status} • Kunde: ${auftrag.kundeId}'),
+                                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => AuftragDetailScreen(
+                                          initialAuftrag: auftrag,
+                                        ),
+                                      ),
+                                    ).then((_) {
+                                      // Beim Zurückkommen automatisch neu laden
+                                      _ladeProfilUndAuftraege();
+                                    });
+                                  },
                                 ),
                               );
                             },
-                          );
-                        },
+                          ),
+                        ),
+                        const Divider(height: 32),
+                      ],
+
+                      // 2) Bereich: Offene, passende Aufträge
+                      const Text(
+                        'Offene, passende Aufträge',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      const SizedBox(height: 8),
+                      _offenePassendeAuftraege.isEmpty
+                          ? const Center(
+                              child: Text('Keine passenden Aufträge gefunden.'),
+                            )
+                          : Expanded(
+                              child: ListView.builder(
+                                itemCount: _offenePassendeAuftraege.length,
+                                itemBuilder: (context, index) {
+                                  final Auftrag auftrag = _offenePassendeAuftraege[index];
+
+                                  // Entfernungs‐Text berechnen, falls Koordinaten da sind
+                                  String distText = '';
+                                  if (_meineLatitude != null &&
+                                      _meineLongitude != null &&
+                                      auftrag.latitude != null &&
+                                      auftrag.longitude != null) {
+                                    final double dist = berechneEntfernung(
+                                      _meineLatitude!,
+                                      _meineLongitude!,
+                                      auftrag.latitude!,
+                                      auftrag.longitude!,
+                                    );
+                                    distText = '${dist.toStringAsFixed(1)} km entfernt';
+                                  }
+
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(vertical: 6),
+                                    child: ListTile(
+                                      title: Text(auftrag.titel),
+                                      subtitle: Text(distText),
+                                      trailing:
+                                          const Icon(Icons.arrow_forward_ios, size: 16),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => AuftragDetailScreen(
+                                              initialAuftrag: auftrag,
+                                            ),
+                                          ),
+                                        ).then((_) {
+                                          // Nach Rückkehr neu laden, damit ggf. 
+                                          // angenommene Aufträge sofort umsortiert werden
+                                          _ladeProfilUndAuftraege();
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                    ],
+                  ),
       ),
     );
   }

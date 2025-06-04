@@ -30,7 +30,7 @@ class _ProfilDienstleisterScreenState
   void initState() {
     super.initState();
 
-    // JWT in der Konsole ausgeben:
+    // JWT in der Konsole ausgeben (nur Debug):
     final session = Supabase.instance.client.auth.currentSession;
     if (session != null) {
       print('––– MEIN JWT-TOKEN: ${session.accessToken}');
@@ -87,14 +87,13 @@ class _ProfilDienstleisterScreenState
       final user = _supabase.auth.currentUser;
       if (user == null) throw Exception('Bitte zuerst einloggen');
 
-      final name = _nameController.text.trim();
+      final name         = _nameController.text.trim();
       final beschreibung = _beschreibungController.text.trim();
-      final kategorie = _selectedKategorie;
-      final adresse = _adresseController.text.trim();
+      final kategorie    = _selectedKategorie;
+      final adresse      = _adresseController.text.trim();
 
       double? lat;
       double? lon;
-
       if (adresse.isNotEmpty) {
         final coords = await GeocodingService().getCoordinates(adresse);
         if (coords == null) throw Exception('Adresse nicht gefunden. Bitte prüfen.');
@@ -102,27 +101,25 @@ class _ProfilDienstleisterScreenState
         lon = coords['lng'];
       }
 
-      // Lösung A: Nur UPDATE, weil Datensatz bereits existiert
-      // Wir fügen hier .select() ans Ende, damit tatsächlich eine Query ausgeführt wird
+      // → upsert statt update, dabei onConflict als String übergeben
       await _supabase
           .from('dienstleister_details')
-          .update({
-            'name': name,
-            'beschreibung': beschreibung,
-            'kategorie': kategorie,
-            'adresse': adresse.isEmpty ? null : adresse,
-            'latitude': lat,
-            'longitude': lon,
+          .upsert({
+            'user_id':        user.id,  // ganz wichtig: user_id mitgeben
+            'name':           name,
+            'beschreibung':   beschreibung,
+            'kategorie':      kategorie,
+            'adresse':        adresse.isEmpty ? null : adresse,
+            'latitude':       lat,
+            'longitude':      lon,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('user_id', user.id)
-          .select(); // ohne .select() würde keine Anfrage gesendet
+          }, onConflict: 'user_id') // <-- hier nur String, nicht List<String>
+          .select(); // liefert direkt die neue/aktualisierte Zeile zurück
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil wurde erfolgreich aktualisiert!')),
+        const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
       );
     } catch (e) {
-      // Wenn Supabase einen Fehler wirft, fangen wir ihn hier ab
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
       });
@@ -181,8 +178,7 @@ class _ProfilDienstleisterScreenState
                               value: 'Elektriker', child: Text('Elektriker')),
                           DropdownMenuItem(
                               value: 'Klempner', child: Text('Klempner')),
-                          DropdownMenuItem(
-                              value: 'Maler', child: Text('Maler')),
+                          DropdownMenuItem(value: 'Maler', child: Text('Maler')),
                         ],
                         onChanged: (wert) {
                           if (wert != null) {

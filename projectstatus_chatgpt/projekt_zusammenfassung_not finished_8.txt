@@ -1,0 +1,124 @@
+
+Projektübersicht: "atyourservice" Flutter-App mit Supabase-Backend
+
+Ziel:
+- Kunden geben Aufträge (Tasks) auf.
+- Dienstleister (Handwerker) sehen passende Aufträge, können Aufträge annehmen, abschließen und Kontaktinformationen austauschen.
+- Matching basiert auf Kategorie und Entfernung (max. 50 km).
+
+Was funktioniert bisher:
+- Registrierung und Login für Kunden und Dienstleister (Supabase Auth).
+- Rollenzuweisung in Tabelle "users".
+- Dienstleister-Profil: Speichern von Name, Beschreibung, Kategorie, Adresse (mit Geocoding), Telefon und E-Mail in "dienstleister_details".
+- Kunden-Aufträge erstellen: Auftrag mit Titel, Beschreibung, Kategorie, Adresse (Geocoding), Telefonnummer wird in "auftraege" gespeichert.
+- Dienstleister-Dashboard: Lädt Profildaten (Kategorie, Koordinaten), holt alle offenen Aufträge derselben Kategorie, filtert lokal nach Entfernungen ≤ 50 km.
+- Anzeige der passenden Aufträge in einer Liste mit Entfernungsangabe.
+- Auftragsdetails-Screen: Zeigt Auftragsinfos, Kunde kann Aufträge sehen/abbrechen (RLS), Dienstleister kann Aufträge annehmen und abschließen.
+  - Beim Annehmen: Status = "in bearbeitung", dienstleister_id gesetzt, Kontakte (Telefon/E-Mail) beider Parteien werden geladen und angezeigt.
+- Kunden-Dashboard: Buttons zum Erstellen neuer Aufträge und Anzeigen eigener Aufträge ("Meine Aufträge").
+- "Meine Aufträge" Screen: Listet alle Aufträge des aktuellen Kunden, erlaubt Navigation zu Auftragsdetails.
+- Utilities:
+  - EntfernungUtils: Berechnung der Distanz zwischen zwei Koordinaten (Haversine).
+  - GeocodingService: API-Aufruf zu Nominatim, um aus Adresse Koordinaten zu holen.
+  - SupabaseClientManager: Initialisierung des Supabase-Clients.
+
+Bekannte Einschränkungen / Probleme:
+- RLS (Row-Level Security) für Tabelle "dienstleister_details" blockiert INSERT/UPDATE von Telefonnummer und E-Mail. Aktuell übergangsweise deaktiviert, bis passende Policies definiert sind.
+- Bei aktiviertem RLS muss "upsert" mit onConflict 'user_id' korrekt funktionieren; eventuell müssen Policies angepasst werden, um auch UPDATE zu erlauben.
+- Kleinere Dart-Fehler („getter error“, „creation_with_non_type“) in Dashboard-Screen wurden behoben durch Präfix-Importe (z. B. „as p“ bzw. „as a“) und Entfernen unnötiger Casts.
+- Noch keine Bewertungsfunktion nach Abschluss eines Auftrags.
+- Kein Push-Benachrichtigungs-System.
+
+Wichtige Skripte:
+
+1) models/auftrag.dart
+   - Klasse „Auftrag“ (Task): Felder wie id, kundeId, dienstleisterId, titel, beschreibung, kategorie, adresse, latitude, longitude, status, timestamps, telefon.
+   - fromJson/toJson zum Mapping zwischen JSON und Dart-Objekt.
+
+2) models/dienstleister.dart
+   - Klasse „Dienstleister“: id (user_id), Name, Kategorie, latitude, longitude, zuletztOnline, telefon, email.
+   - fromJson/toJson für Datenbank-Mapping.
+
+3) screens/start_screen.dart
+   - Startseite: Auswahl, ob Nutzer Kunde oder Dienstleister ist → Navigation zu jeweiligem Login-Screen.
+
+4) screens/registrierung_screen.dart
+   - Registrierung (Sign-Up) für E-Mail/Passwort, Dropdown für Rolle (kunde/dienstleister).
+   - Prüft per Dummy-Login, ob E-Mail bereits existiert, danach Supabase `signUp`.
+
+5) screens/login_kunde_screen.dart / login_dienstleister_screen.dart
+   - Login-Formulare für beide Benutzerrollen.
+   - Nach erfolgreichem Login: Rolleneintrag in Tabelle „users“ (insert oder Validierung).
+   - Weiterleitung: Kunde → KundenDashboardScreen, Dienstleister → DienstleisterDashboardScreen.
+
+6) screens/kunden_dashboard_screen.dart
+   - Buttons: Neuen Auftrag erstellen (Navigation zu AuftragErstellenScreen), Meine Aufträge (MeineAuftraegeScreen).
+
+7) screens/auftrag_erstellen_screen.dart
+   - Formular: Titel, Beschreibung, Kategorie, Adresse (Geocoding), Telefonnummer.
+   - Insert in Tabelle „auftraege“, inklusive telefon des Kunden.
+
+8) screens/meine_auftraege_screen.dart
+   - Listet alle Aufträge des aktuellen Kunden (SELECT * WHERE kunde_id).
+   - Tippen navigiert zu AuftragDetailScreen.
+
+9) screens/dienstleister_dashboard_screen.dart
+   - Lädt Dienstleister-Profil (Tabelle „dienstleister_details“: Kategorie, Latitude, Longitude).
+   - Holt alle offenen Aufträge derselben Kategorie aus „auftraege“.
+   - Filtert lokal nach Entfernung (≤ 50 km).
+   - ListView mit Aufträgen, Tippen → AuftragDetailScreen.
+
+10) screens/auftrag_detail_screen.dart
+    - Zeigt Detailinfos eines Auftrags (Titel, Beschreibung, Kategorie, Adresse, Koordinaten, Status).
+    - Laden via Join: 
+      - Kundentelefon befindet sich in „auftraege.telefon“.
+      - Kunden-E-Mail aus „users.email“.
+      - Dienstleister-Kontakt (telefon, email) aus „dienstleister_details“ für den zuständigen Dienstleister.
+    - Buttons:
+      - Wenn Dienstleister & Status == "offen": „Auftrag annehmen“ → Update status = "in bearbeitung" & dienstleister_id setzen.
+      - Wenn Dienstleister & Status == "in bearbeitung" & dienstleisterId == aktueller Nutzer: „Auftrag abschliessen“ → Update status = "abgeschlossen".
+    - Bei Status "in bearbeitung":
+      - Dienstleister sieht Kundenkontakt (Telefon, E-Mail).
+      - Kunde sieht Dienstleisterkontakt (Telefon, E-Mail).
+
+11) screens/profil_dienstleister_screen.dart
+    - Formular: Name, Beschreibung, Kategorie (Dropdown), Adresse (Geocoding), Telefon, E-Mail.
+    - Lädt bestehendes Profil (SELECT * FROM dienstleister_details WHERE user_id).
+    - Speichern: upsert in „dienstleister_details“, onConflict 'user_id'.
+    - Bei erfolgreichem Speichern Snackbar-Bestätigung.
+
+12) utils/entfernung_utils.dart
+    - Funktionen: 
+      - berechneEntfernung() mit Haversine-Formel.
+      - Konvertierung Grad → Bogenmaß.
+
+13) utils/geocoding_service.dart
+    - HTTP-Aufruf an OpenStreetMap Nominatim, um Adresse → {lat, lng}.
+
+14) utils/supabase_client.dart (SupabaseClientManager)
+    - Statische Initialisierung des Supabase-Clients (URL, anonKey).
+
+Haupt-Ablauf:
+- StartScreen → Benutzer wählt Rolle.
+- Login / Registrierung → Rollen-verifikation+Eintrag in users.
+- Dienstleister legt Profil an (Name, Kategorie, Standort, Kontakt).
+- Kunde erstellt Auftrag mit Standort und Telefon.
+- Dienstleister-Dashboard: Zeigt passende Aufträge nach Kategorie + Entfernung.
+- Auftragsdetails: Annehmen/Abschließen und gegenseitiger Austausch von Kontaktdaten.
+- Kunde sieht im Detail seine Aufträge und kann den Status verfolgen.
+
+RLS & Sicherheit (Supabase):
+- Tabelle „auftraege“: Policies, die sicherstellen, dass nur Kunde und Dienstleister jeweils auf erlaubte Datensätze zugreifen (z. B. DELETE nur wenn Status = 'offen' und Kunde = auth.uid()).
+- Tabelle „dienstleister_details“: Update/Insert nur wenn auth.uid() = user_id. Aktuell RLS deaktiviert, um Phone/Email eintragen zu ermöglichen.
+- Nach Fertigstellung werden Policies wieder aktiviert und angepasst, um Upserts korrekt zu erlauben.
+
+Ungeklärt / Aufgaben für später:
+- Bewertungen: Nach Auftrag abschließen gegenseitiges Bewerten (Kunde↔Dienstleister).
+- Push-Notifications oder In-App-Benachrichtigungen beim neuen Auftrag.
+- Fehlerhandling & UI-Feedback bei RLS-Fehlern verbessern.
+- Tests für Geocoding-Fälle: Adressen, die nicht gefunden werden.
+- Eventuell Pagination oder infinite scroll für Dashboard-Listen.
+- RLS-Policies finalisieren, damit Dienste „telefon“ und „email“ abgesichert, aber zugänglich sind.
+
+---
+
