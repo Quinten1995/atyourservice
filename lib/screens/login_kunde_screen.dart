@@ -17,6 +17,10 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
   bool _isLoading = false;
   final supabase = Supabase.instance.client;
 
+  // Farben passend zum Startscreen
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -46,7 +50,6 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login erfolgreich!')),
       );
-      // ❌ hier wird kein const vor dem Screen mehr verwendet
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => KundenDashboardScreen()),
@@ -80,44 +83,122 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login für Kunden')),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'E-Mail'),
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwortController,
-                decoration: const InputDecoration(labelText: 'Passwort'),
-                obscureText: true,
-                validator: _validatePasswort,
-              ),
-              const SizedBox(height: 30),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _login,
-                      child: const Text('Login'),
+      backgroundColor: accentColor,
+      appBar: AppBar(
+        title: const Text('Login für Kunden', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: primaryColor,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 18),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Optional: Überschrift
+                  Text(
+                    'Anmelden',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                      letterSpacing: 1.2,
                     ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegistrierungScreen()),
-                  );
-                },
-                child: const Text('Noch kein Konto? Jetzt registrieren'),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Email
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'E-Mail',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: _validateEmail,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Passwort
+                  TextFormField(
+                    controller: _passwortController,
+                    decoration: InputDecoration(
+                      labelText: 'Passwort',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    obscureText: true,
+                    validator: _validatePasswort,
+                  ),
+
+                  const SizedBox(height: 34),
+
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 4,
+                              shadowColor: primaryColor.withOpacity(0.20),
+                            ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+
+                  const SizedBox(height: 14),
+
+                  // Registrierung
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RegistrierungScreen()),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    child: const Text('Noch kein Konto? Jetzt registrieren'),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

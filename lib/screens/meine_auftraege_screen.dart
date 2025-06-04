@@ -1,5 +1,3 @@
-// lib/screens/meine_auftraege_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
@@ -17,6 +15,9 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
   List<Map<String, dynamic>> _auftraege = [];
   bool _isLoading = true;
   String? _errorMessage;
+
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
 
   @override
   void initState() {
@@ -72,18 +73,25 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
         builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
       ),
     );
-    _ladeAuftraege(); // Aktualisiert die Liste nach Rückkehr
+    _ladeAuftraege();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Meine Aufträge'),
+        title: const Text('Meine Aufträge', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _ladeAuftraege,
+            color: primaryColor,
+            tooltip: 'Aktualisieren',
           ),
         ],
       ),
@@ -94,17 +102,46 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
             : _errorMessage != null
                 ? Center(child: Text('Fehler: $_errorMessage'))
                 : _auftraege.isEmpty
-                    ? const Center(child: Text('Keine Aufträge gefunden.'))
-                    : ListView.builder(
+                    ? const Center(
+                        child: Text(
+                          'Keine Aufträge gefunden.',
+                          style: TextStyle(fontSize: 17, color: Colors.black54),
+                        ),
+                      )
+                    : ListView.separated(
                         itemCount: _auftraege.length,
+                        separatorBuilder: (context, idx) => const SizedBox(height: 14),
                         itemBuilder: (context, index) {
                           final auftragMap = _auftraege[index];
                           final auftrag = Auftrag.fromJson(auftragMap);
-                          return ListTile(
-                            title: Text(auftrag.titel),
-                            subtitle: Text('Kategorie: ${auftrag.kategorie}  •  Status: ${auftrag.status}'),
-                            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                            onTap: () => _openDetailScreen(auftrag),
+
+                          return Material(
+                            color: Colors.white,
+                            elevation: 2,
+                            borderRadius: BorderRadius.circular(15),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              leading: Icon(Icons.work_outline, color: primaryColor, size: 30),
+                              title: Text(
+                                auftrag.titel,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  'Kategorie: ${auftrag.kategorie}  •  Status: ${auftrag.status}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),
+                              onTap: () => _openDetailScreen(auftrag),
+                            ),
                           );
                         },
                       ),

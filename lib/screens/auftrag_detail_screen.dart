@@ -1,5 +1,3 @@
-// lib/screens/auftrag_detail_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
@@ -18,6 +16,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   String? _errorMessage;
   bool _isDienstleister = false;
   final SupabaseClient _supabase = Supabase.instance.client;
+
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
 
   @override
   void initState() {
@@ -126,16 +127,15 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // 🟢 NEU: Auftrag lokal für Kunden entfernen
   Future<void> _kundeAuftragEntfernen() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Auftrag entfernen?'),
-        content: Text('Möchten Sie den Auftrag dauerhaft aus Ihrer Übersicht entfernen?'),
+        title: const Text('Auftrag entfernen?'),
+        content: const Text('Möchten Sie den Auftrag dauerhaft aus Ihrer Übersicht entfernen?'),
         actions: [
-          TextButton(child: Text('Abbrechen'), onPressed: () => Navigator.of(ctx).pop(false)),
-          TextButton(child: Text('Entfernen'), onPressed: () => Navigator.of(ctx).pop(true)),
+          TextButton(child: const Text('Abbrechen'), onPressed: () => Navigator.of(ctx).pop(false)),
+          TextButton(child: const Text('Entfernen'), onPressed: () => Navigator.of(ctx).pop(true)),
         ],
       ),
     );
@@ -162,57 +162,137 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Auftragsdetails')),
+      backgroundColor: accentColor,
+      appBar: AppBar(
+        title: const Text('Auftragsdetails', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: primaryColor,
+      ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18.0),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-                ? Center(child: Text('Keine Daten verfügbar'))
+                ? const Center(child: Text('Keine Daten verfügbar'))
                 : SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_auftragDetails!.titel, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 12),
-                        Text('Beschreibung: ${_auftragDetails!.beschreibung}'),
-                        SizedBox(height: 8),
-                        Text('Kategorie: ${_auftragDetails!.kategorie}'),
-                        SizedBox(height: 8),
-                        if (_auftragDetails!.adresse != null) ...[
-                          Text('Adresse: ${_auftragDetails!.adresse!}'),
-                          SizedBox(height: 8),
-                        ],
-                        if (_auftragDetails!.latitude != null && _auftragDetails!.longitude != null) ...[
-                          Text('Standort: ${_auftragDetails!.latitude}, ${_auftragDetails!.longitude}'),
-                          SizedBox(height: 8),
-                        ],
-                        SizedBox(height: 16),
-                        Row(
-                          children: [Text('Status:'), SizedBox(width: 12), Text(_auftragDetails!.status)],
+                        Text(_auftragDetails!.titel,
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor)),
+                        const SizedBox(height: 12),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(13),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primaryColor.withOpacity(0.10),
+                                blurRadius: 7,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Beschreibung:', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800])),
+                              Text(_auftragDetails!.beschreibung, style: const TextStyle(fontSize: 16)),
+                              const SizedBox(height: 14),
+                              Text('Kategorie: ${_auftragDetails!.kategorie}'),
+                              if (_auftragDetails!.adresse != null) ...[
+                                const SizedBox(height: 6),
+                                Text('Adresse: ${_auftragDetails!.adresse!}'),
+                              ],
+                              if (_auftragDetails!.latitude != null && _auftragDetails!.longitude != null) ...[
+                                const SizedBox(height: 6),
+                                Text('Standort: ${_auftragDetails!.latitude}, ${_auftragDetails!.longitude}'),
+                              ],
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  const Text('Status:', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  const SizedBox(width: 10),
+                                  Chip(
+                                    label: Text(
+                                      _auftragDetails!.status.toUpperCase(),
+                                      style: TextStyle(
+                                        color: _auftragDetails!.status == 'abgeschlossen'
+                                            ? Colors.white
+                                            : primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                    backgroundColor: _auftragDetails!.status == 'abgeschlossen'
+                                        ? Colors.green
+                                        : accentColor,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 32),
                         if (_isDienstleister && _auftragDetails!.status == 'offen')
-                          ElevatedButton(
-                            onPressed: _auftragAnnehmen,
-                            child: Text('Auftrag annehmen'),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _auftragAnnehmen,
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text('Auftrag annehmen'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 3,
+                              ),
+                            ),
                           ),
                         if (_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
-                          ElevatedButton(
-                            onPressed: _auftragAbschliessen,
-                            child: Text('Auftrag beenden'),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _auftragAbschliessen,
+                              icon: const Icon(Icons.check),
+                              label: const Text('Auftrag beenden'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 3,
+                              ),
+                            ),
                           ),
-                        // 🟢 Kunden-Button (NEU)
+                        // Kunden-Button (NEU)
                         if (!_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
-                          ElevatedButton(
-                            onPressed: _kundeAuftragEntfernen,
-                            child: Text('Auftrag entfernen'),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _kundeAuftragEntfernen,
+                              icon: const Icon(Icons.delete),
+                              label: const Text('Auftrag entfernen'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey[600],
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 2,
+                              ),
+                            ),
                           ),
                         if (_errorMessage != null) ...[
-                          SizedBox(height: 16),
-                          Text('Fehler: $_errorMessage', style: TextStyle(color: Colors.red)),
+                          const SizedBox(height: 20),
+                          Text('Fehler: $_errorMessage', style: const TextStyle(color: Colors.red)),
                         ],
                       ],
                     ),

@@ -17,6 +17,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
 
   final supabase = Supabase.instance.client;
 
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
+
   Future<void> _registrieren() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -27,18 +30,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     final password = _passwordController.text;
 
     try {
-      // 1. Überprüfen, ob die E-Mail bereits registriert ist:
-      //    Wir versuchen, uns mit einem Dummy-Passwort einzuloggen.
-      //    Wenn AuthException geworfen wird:
-      //      - "Invalid login credentials" ⇒ E-Mail existiert, aber falsches Passwort.
-      //      - "User not found" ⇒ E-Mail existiert nicht (kann neu registriert werden).
-      //      - andere Fehlermeldung ⇒ entsprechend behandeln.
       await supabase.auth.signInWithPassword(
         email: email,
-        password: '••••••••', // Dummy-Passwort für den Existenz-Check
+        password: '••••••••',
       );
-      // Wenn kein AuthException geworfen wurde, konnte man sich tatsächlich einloggen ⇒ Konto existiert mit diesem Passwort.
-      // Wir loggen den Nutzer sofort wieder aus und zeigen eine Fehlermeldung an.
       await supabase.auth.signOut();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,21 +42,17 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     } on AuthException catch (authError) {
       final err = authError.message.toLowerCase();
       if (err.contains('invalid login credentials')) {
-        // E-Mail existiert, aber falsches Passwort
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Diese E-Mail ist bereits registriert. Passwort vergessen?')),
         );
       } else if (err.contains('user not found')) {
-        // E-Mail existiert nicht ⇒ sicher zum Signup weitermachen
         await _signUpFlow(email, password);
       } else {
-        // andere AuthException (z.B. Netzwerkfehler)
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Fehler beim Überprüfen: ${authError.message}')),
         );
       }
     } catch (e) {
-      // Alle anderen Fehler (z. B. Netzwerk-Timeout)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unbekannter Fehler: $e')),
       );
@@ -73,17 +64,13 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
   Future<void> _signUpFlow(String email, String password) async {
     try {
       await supabase.auth.signUp(email: email, password: password);
-      // Registrierung erfolgreich (egal ob Bestätigungsmail verschickt wurde oder nicht)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Registrierung erfolgreich! Bitte überprüfe deine E-Mail und bestätige sie.',
-          ),
+          content: Text('Registrierung erfolgreich! Bitte überprüfe deine E-Mail und bestätige sie.'),
         ),
       );
       Navigator.of(context).pop();
     } on AuthException catch (authError) {
-      // Sollte normalerweise hier nicht "E-Mail existiert bereits" sein, da wir das vorher abgefangen haben.
       final err = authError.message.toLowerCase();
       String userMessage;
       if (err.contains('already registered') ||
@@ -117,65 +104,143 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrierung')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Rollenwahl (Kunde / Dienstleister)
-              DropdownButtonFormField<String>(
-                value: _rolle,
-                decoration: const InputDecoration(labelText: 'Rolle auswählen'),
-                items: const [
-                  DropdownMenuItem(value: 'kunde', child: Text('Kunde')),
-                  DropdownMenuItem(value: 'dienstleister', child: Text('Dienstleister')),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _rolle = value);
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // E-Mail-Feld
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'E-Mail'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
-                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                    return 'Bitte gültige E-Mail eingeben';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Passwort-Feld
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Passwort'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Bitte Passwort eingeben';
-                  if (value.length < 6) return 'Passwort muss mindestens 6 Zeichen haben';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 32),
-
-              // Registrieren-Button
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _registrieren,
-                      child: const Text('Registrieren'),
+      backgroundColor: accentColor,
+      appBar: AppBar(
+        title: const Text('Registrierung', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: primaryColor,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 18),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Text(
+                    'Registrieren',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                      letterSpacing: 1.2,
                     ),
-            ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Rollenwahl (Kunde / Dienstleister)
+                  DropdownButtonFormField<String>(
+                    value: _rolle,
+                    decoration: InputDecoration(
+                      labelText: 'Rolle auswählen',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'kunde', child: Text('Kunde')),
+                      DropdownMenuItem(value: 'dienstleister', child: Text('Dienstleister')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _rolle = value);
+                      }
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // E-Mail-Feld
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'E-Mail',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
+                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                        return 'Bitte gültige E-Mail eingeben';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Passwort-Feld
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Passwort',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: primaryColor, width: 2),
+                      ),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return 'Bitte Passwort eingeben';
+                      if (value.length < 6) return 'Passwort muss mindestens 6 Zeichen haben';
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 34),
+
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _registrieren,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 4,
+                              shadowColor: primaryColor.withOpacity(0.20),
+                            ),
+                            child: const Text(
+                              'Registrieren',
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

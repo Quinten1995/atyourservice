@@ -13,7 +13,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _supabase = Supabase.instance.client;
   final _formKey = GlobalKey<FormState>();
 
-  // Controller für Formular-Felder
   final _nameController = TextEditingController();
   final _beschreibungController = TextEditingController();
   final _telefonController = TextEditingController();
@@ -23,6 +22,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   bool _isLoading = false;
   String? _errorMessage;
+
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
 
   @override
   void initState() {
@@ -47,8 +49,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) throw Exception('Bitte zuerst einloggen');
-
-      // Prüfen, ob es schon ein Profil gibt
       final data = await _supabase
           .from('dienstleister_details')
           .select()
@@ -61,7 +61,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _selectedKategorie = data['kategorie'] as String? ?? 'Elektriker';
         _adresseController.text = data['adresse'] as String? ?? '';
         _telefonController.text = data['telefon'] as String? ?? '';
-        // E-Mail: nur setzen, wenn vorhanden und nicht leer, sonst bleibt Default
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
             ? data['email'] as String
             : _emailController.text;
@@ -145,110 +144,138 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     super.dispose();
   }
 
+  InputDecoration _inputDecoration(String label) => InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dienstleister-Profil')),
+      backgroundColor: accentColor,
+      appBar: AppBar(
+        title: const Text('Dienstleister-Profil', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        foregroundColor: primaryColor,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(labelText: 'Name'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Bitte Name eingeben';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _beschreibungController,
-                        decoration: const InputDecoration(labelText: 'Beschreibung'),
-                        maxLines: 3,
-                      ),
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        value: _selectedKategorie,
-                        decoration: const InputDecoration(labelText: 'Kategorie'),
-                        items: const [
-                          DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
-                          DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
-                          DropdownMenuItem(value: 'Maler', child: Text('Maler')),
-                        ],
-                        onChanged: (wert) {
-                          if (wert != null) {
-                            setState(() {
-                              _selectedKategorie = wert;
-                            });
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Bitte Kategorie auswählen';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _adresseController,
-                        decoration: const InputDecoration(
-                          labelText: 'Adresse (z. B. Straße, PLZ, Stadt)',
+            : Center(
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _telefonController,
-                        decoration: const InputDecoration(
-                          labelText: 'Telefon',
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Bitte Telefonnummer angeben';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'E-Mail',
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Bitte E-Mail angeben';
-                          }
-                          // Optional: rudimentäre E-Mail-Formatprüfung
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                            return 'Bitte gültige E-Mail-Adresse eingeben';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                      if (_errorMessage != null) ...[
-                        Text(
-                          'Fehler: $_errorMessage',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                        const SizedBox(height: 12),
                       ],
-                      ElevatedButton(
-                        onPressed: _profilSpeichern,
-                        child: const Text('Profil speichern'),
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _nameController,
+                            decoration: _inputDecoration('Name'),
+                            validator: (value) =>
+                                (value == null || value.isEmpty) ? 'Bitte Name eingeben' : null,
+                          ),
+                          const SizedBox(height: 18),
+                          TextFormField(
+                            controller: _beschreibungController,
+                            decoration: _inputDecoration('Beschreibung'),
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 18),
+                          DropdownButtonFormField<String>(
+                            value: _selectedKategorie,
+                            decoration: _inputDecoration('Kategorie'),
+                            items: const [
+                              DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
+                              DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
+                              DropdownMenuItem(value: 'Maler', child: Text('Maler')),
+                            ],
+                            onChanged: (wert) {
+                              if (wert != null) {
+                                setState(() {
+                                  _selectedKategorie = wert;
+                                });
+                              }
+                            },
+                            validator: (value) => (value == null || value.isEmpty)
+                                ? 'Bitte Kategorie auswählen'
+                                : null,
+                          ),
+                          const SizedBox(height: 18),
+                          TextFormField(
+                            controller: _adresseController,
+                            decoration: _inputDecoration('Adresse (z. B. Straße, PLZ, Stadt)'),
+                          ),
+                          const SizedBox(height: 18),
+                          TextFormField(
+                            controller: _telefonController,
+                            decoration: _inputDecoration('Telefon'),
+                            keyboardType: TextInputType.phone,
+                            validator: (value) =>
+                                (value == null || value.isEmpty) ? 'Bitte Telefonnummer angeben' : null,
+                          ),
+                          const SizedBox(height: 18),
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: _inputDecoration('E-Mail'),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) return 'Bitte E-Mail angeben';
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                return 'Bitte gültige E-Mail-Adresse eingeben';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 28),
+                          if (_errorMessage != null) ...[
+                            Text(
+                              'Fehler: $_errorMessage',
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                backgroundColor: primaryColor,
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                                elevation: 2,
+                              ),
+                              onPressed: _profilSpeichern,
+                              child: const Text('Profil speichern'),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
