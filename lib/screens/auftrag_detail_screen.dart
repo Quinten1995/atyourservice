@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
+import 'bewertung_dialog.dart'; // Passe ggf. den Pfad an!
 
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
@@ -16,9 +17,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   String? _errorMessage;
   bool _isDienstleister = false;
 
-  // NEU: Kontaktinfos
   String? _kundenTelefonnummer;
   String? _dienstleisterTelefonnummer;
+
+  // Bewertungsinfos Dienstleister
+  double? _dlDurchschnitt;
+  int? _dlAnzahlBewertungen;
 
   final SupabaseClient _supabase = Supabase.instance.client;
 
@@ -29,7 +33,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   void initState() {
     super.initState();
     _auftragDetails = widget.initialAuftrag;
-    _ladeRolleUndAktuellenAuftrag();
+    _ladeRolleUndAktuellenAuftrag().then((_) {
+      _zeigeBewertungsDialogWennNoetig();
+    });
   }
 
   Future<void> _ladeRolleUndAktuellenAuftrag() async {
@@ -38,6 +44,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       _errorMessage = null;
       _kundenTelefonnummer = null;
       _dienstleisterTelefonnummer = null;
+      _dlDurchschnitt = null;
+      _dlAnzahlBewertungen = null;
     });
 
     try {
@@ -77,12 +85,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       // Telefonnummern laden, wenn der Auftrag in Bearbeitung ist und DL zugeordnet
       if (aktuellerAuftrag.status == 'in bearbeitung' && aktuellerAuftrag.dienstleisterId != null) {
         if (isDL) {
-          // Dienstleister sieht Kundentelefon
           setState(() {
             _kundenTelefonnummer = aktuellerAuftrag.telefon;
           });
         } else {
-          // Kunde sieht Dienstleister-Telefon aus dienstleister_details
           final details = await _supabase
               .from('dienstleister_details')
               .select('telefon')
@@ -94,6 +100,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         }
       }
 
+      // Bewertung laden, wenn Dienstleister zugeordnet ist
+      if (aktuellerAuftrag.dienstleisterId != null) {
+        await _ladeDienstleisterBewertung(aktuellerAuftrag.dienstleisterId!);
+      }
+
       setState(() {
         _isLoading = false;
       });
@@ -102,6 +113,59 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _errorMessage = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  // Bewertungs-Infos laden (Durchschnitt, Anzahl)
+  Future<void> _ladeDienstleisterBewertung(String dienstleisterId) async {
+    final res = await _supabase
+        .from('bewertungen')
+        .select('bewertung')
+        .eq('dienstleister_id', dienstleisterId);
+
+    if (res is List && res.isNotEmpty) {
+      final values = res.map((b) => (b['bewertung'] as int?) ?? 0).toList();
+      setState(() {
+        _dlDurchschnitt = values.reduce((a, b) => a + b) / values.length;
+        _dlAnzahlBewertungen = values.length;
+      });
+    } else {
+      setState(() {
+        _dlDurchschnitt = null;
+        _dlAnzahlBewertungen = 0;
+      });
+    }
+  }
+
+  // Bewertungsdialog nur für Kunde nach Abschluss
+  Future<void> _zeigeBewertungsDialogWennNoetig() async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null || _auftragDetails == null || _isDienstleister || _auftragDetails!.status != 'abgeschlossen') {
+      return;
+    }
+
+    final existing = await _supabase
+        .from('bewertungen')
+        .select('id')
+        .eq('auftrag_id', _auftragDetails!.id)
+        .eq('kunde_id', userId)
+        .maybeSingle();
+
+    if (existing == null) {
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => BewertungDialog(
+          auftragId: _auftragDetails!.id,
+          dienstleisterId: _auftragDetails!.dienstleisterId!,
+        ),
+      );
+      if (result == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Danke für deine Bewertung!')),
+        );
+        setState(() {});
+      }
     }
   }
 
@@ -128,7 +192,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _isLoading = false;
       });
 
-      // Nach Annahme Kontaktdaten neu laden
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
       setState(() {
@@ -156,6 +219,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _auftragDetails = Auftrag.fromJson(updated);
         _isLoading = false;
       });
+
+      _zeigeBewertungsDialogWennNoetig();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -196,6 +261,233 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // --- WIDGETS ---
+
+  Widget _auftragInfoCard() {
+    final ad = _auftragDetails!;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.10),
+            blurRadius: 7,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Titel & Bewertung
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  ad.titel,
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (!_isDienstleister &&
+                  ad.dienstleisterId != null &&
+                  (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen')) ...[
+                Icon(Icons.star, color: Colors.amber, size: 22),
+                const SizedBox(width: 3),
+                Text(
+                  _dlDurchschnitt != null
+                      ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
+                      : '—',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
+                  Text(
+                    ' (${_dlAnzahlBewertungen!} Bewertung${_dlAnzahlBewertungen == 1 ? '' : 'en'})',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                  ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Beschreibung
+          Text(
+            'Beschreibung:',
+            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800]),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 2, top: 1, bottom: 7),
+            child: Text(ad.beschreibung, style: const TextStyle(fontSize: 16)),
+          ),
+
+          // Kategorie
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.category, color: primaryColor, size: 19),
+              SizedBox(width: 7),
+              Text('Kategorie:', style: TextStyle(fontWeight: FontWeight.w600)),
+              SizedBox(width: 7),
+              Text(ad.kategorie),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Adresse
+          if (ad.adresse != null && ad.adresse!.isNotEmpty)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.location_on, color: Colors.redAccent, size: 19),
+                SizedBox(width: 7),
+                Text('Adresse:', style: TextStyle(fontWeight: FontWeight.w600)),
+                SizedBox(width: 7),
+                Expanded(child: Text(ad.adresse!, overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+
+          // Standort (Koordinaten)
+          if (ad.latitude != null && ad.longitude != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 32.0, top: 3),
+              child: Text(
+                '(${ad.latitude?.toStringAsFixed(5)}, ${ad.longitude?.toStringAsFixed(5)})',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+            ),
+          const SizedBox(height: 11),
+
+          // Status
+          Row(
+            children: [
+              Text('Status:', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(width: 10),
+              Chip(
+                label: Text(
+                  ad.status.toUpperCase(),
+                  style: TextStyle(
+                    color: ad.status == 'abgeschlossen'
+                        ? Colors.white
+                        : primaryColor,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+                backgroundColor: ad.status == 'abgeschlossen'
+                    ? Colors.green
+                    : accentColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _kontaktBereich() {
+    final ad = _auftragDetails!;
+    if (ad.status == 'in bearbeitung' && ad.dienstleisterId != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 18),
+          Text(
+            'Kontakt:',
+            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800], fontSize: 17),
+          ),
+          if (_isDienstleister && _kundenTelefonnummer != null) ...[
+            Row(
+              children: [
+                const Icon(Icons.phone, size: 18),
+                const SizedBox(width: 7),
+                Text('Kunde: $_kundenTelefonnummer', style: const TextStyle(fontSize: 15)),
+              ],
+            ),
+          ],
+          if (!_isDienstleister && _dienstleisterTelefonnummer != null) ...[
+            Row(
+              children: [
+                const Icon(Icons.phone, size: 18),
+                const SizedBox(width: 7),
+                Text('Dienstleister: $_dienstleisterTelefonnummer', style: const TextStyle(fontSize: 15)),
+              ],
+            ),
+          ],
+        ],
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _actionButtons() {
+    final ad = _auftragDetails!;
+    return Column(
+      children: [
+        const SizedBox(height: 32),
+        if (_isDienstleister && ad.status == 'offen')
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _auftragAnnehmen,
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('Auftrag annehmen'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 3,
+              ),
+            ),
+          ),
+        if (_isDienstleister && ad.status == 'in bearbeitung')
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _auftragAbschliessen,
+              icon: const Icon(Icons.check),
+              label: const Text('Auftrag beenden'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 3,
+              ),
+            ),
+          ),
+        if (!_isDienstleister && ad.status == 'in bearbeitung')
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _kundeAuftragEntfernen,
+              icon: const Icon(Icons.delete),
+              label: const Text('Auftrag entfernen'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[600],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 2,
+              ),
+            ),
+          ),
+        if (_errorMessage != null) ...[
+          const SizedBox(height: 20),
+          Text('Fehler: $_errorMessage', style: const TextStyle(color: Colors.red)),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -217,146 +509,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_auftragDetails!.titel,
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor)),
-                        const SizedBox(height: 12),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withOpacity(0.10),
-                                blurRadius: 7,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Beschreibung:', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800])),
-                              Text(_auftragDetails!.beschreibung, style: const TextStyle(fontSize: 16)),
-                              const SizedBox(height: 14),
-                              Text('Kategorie: ${_auftragDetails!.kategorie}'),
-                              if (_auftragDetails!.adresse != null) ...[
-                                const SizedBox(height: 6),
-                                Text('Adresse: ${_auftragDetails!.adresse!}'),
-                              ],
-                              if (_auftragDetails!.latitude != null && _auftragDetails!.longitude != null) ...[
-                                const SizedBox(height: 6),
-                                Text('Standort: ${_auftragDetails!.latitude}, ${_auftragDetails!.longitude}'),
-                              ],
-                              const SizedBox(height: 14),
-                              Row(
-                                children: [
-                                  const Text('Status:', style: TextStyle(fontWeight: FontWeight.w600)),
-                                  const SizedBox(width: 10),
-                                  Chip(
-                                    label: Text(
-                                      _auftragDetails!.status.toUpperCase(),
-                                      style: TextStyle(
-                                        color: _auftragDetails!.status == 'abgeschlossen'
-                                            ? Colors.white
-                                            : primaryColor,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                    backgroundColor: _auftragDetails!.status == 'abgeschlossen'
-                                        ? Colors.green
-                                        : accentColor,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        // NEU: Kontaktbereich, wenn zugeordnet und in Bearbeitung
-                        if (_auftragDetails!.status == 'in bearbeitung' && _auftragDetails!.dienstleisterId != null) ...[
-                          const SizedBox(height: 18),
-                          Text(
-                            'Kontakt:',
-                            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800], fontSize: 17),
-                          ),
-                          if (_isDienstleister && _kundenTelefonnummer != null) ...[
-                            Row(
-                              children: [
-                                const Icon(Icons.phone, size: 18),
-                                const SizedBox(width: 7),
-                                Text('Kunde: $_kundenTelefonnummer', style: const TextStyle(fontSize: 15)),
-                              ],
-                            ),
-                          ],
-                          if (!_isDienstleister && _dienstleisterTelefonnummer != null) ...[
-                            Row(
-                              children: [
-                                const Icon(Icons.phone, size: 18),
-                                const SizedBox(width: 7),
-                                Text('Dienstleister: $_dienstleisterTelefonnummer', style: const TextStyle(fontSize: 15)),
-                              ],
-                            ),
-                          ],
-                        ],
-                        const SizedBox(height: 32),
-                        if (_isDienstleister && _auftragDetails!.status == 'offen')
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _auftragAnnehmen,
-                              icon: const Icon(Icons.play_arrow),
-                              label: const Text('Auftrag annehmen'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 3,
-                              ),
-                            ),
-                          ),
-                        if (_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _auftragAbschliessen,
-                              icon: const Icon(Icons.check),
-                              label: const Text('Auftrag beenden'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 3,
-                              ),
-                            ),
-                          ),
-                        // Kunden-Button (NEU)
-                        if (!_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _kundeAuftragEntfernen,
-                              icon: const Icon(Icons.delete),
-                              label: const Text('Auftrag entfernen'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey[600],
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 2,
-                              ),
-                            ),
-                          ),
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 20),
-                          Text('Fehler: $_errorMessage', style: const TextStyle(color: Colors.red)),
-                        ],
+                        _auftragInfoCard(),
+                        _kontaktBereich(),
+                        _actionButtons(),
                       ],
                     ),
                   ),

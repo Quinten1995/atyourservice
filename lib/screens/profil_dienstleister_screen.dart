@@ -23,6 +23,10 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // NEU: Bewertungs-Daten
+  double? _durchschnitt;
+  int _anzahlBewertungen = 0;
+
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
@@ -38,6 +42,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     }
 
     _ladeProfil();
+    _ladeBewertungen();
   }
 
   Future<void> _ladeProfil() async {
@@ -72,6 +77,29 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  // NEU: Bewertungen laden
+  Future<void> _ladeBewertungen() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+    final res = await _supabase
+        .from('bewertungen')
+        .select('bewertung')
+        .eq('dienstleister_id', user.id);
+
+    if (res is List && res.isNotEmpty) {
+      final values = res.map((b) => (b['bewertung'] as int?) ?? 0).toList();
+      setState(() {
+        _durchschnitt = values.reduce((a, b) => a + b) / values.length;
+        _anzahlBewertungen = values.length;
+      });
+    } else {
+      setState(() {
+        _durchschnitt = null;
+        _anzahlBewertungen = 0;
       });
     }
   }
@@ -123,6 +151,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
       );
+
+      // Nach dem Speichern auch Bewertungen neu laden (falls z. B. der Dienstleister seinen Account weitergegeben hat)
+      _ladeBewertungen();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -188,6 +219,41 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
+                          // ⭐️ Bewertungs-Widget im Header
+                          if (_durchschnitt != null)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.star, color: Colors.amber, size: 28),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${_durchschnitt!.toStringAsFixed(2)} / 5',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 9),
+                                Text(
+                                  '($_anzahlBewertungen Bewertungen)',
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            const Text(
+                              'Noch keine Bewertungen',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          const SizedBox(height: 26),
                           TextFormField(
                             controller: _nameController,
                             decoration: _inputDecoration('Name'),

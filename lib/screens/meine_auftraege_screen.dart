@@ -41,11 +41,12 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
     });
 
     try {
+      // Jetzt auch abgeschlossene Aufträge anzeigen:
       final response = await supabase
           .from('auftraege')
           .select()
           .eq('kunde_id', user.id)
-          .or('status.eq.offen,status.eq.in bearbeitung')
+          .or('status.eq.offen,status.eq.in bearbeitung,status.eq.abgeschlossen')
           .eq('kunde_auftragsstatus', 'sichtbar')
           .order('erstellt_am', ascending: false);
 
