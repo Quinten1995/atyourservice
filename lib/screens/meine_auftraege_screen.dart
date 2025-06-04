@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
-import 'auftrag_detail_screen.dart';  // <-- Sicherstellen, dass du diesen Import hast
+import 'auftrag_detail_screen.dart';
 
 class MeineAuftraegeScreen extends StatefulWidget {
   const MeineAuftraegeScreen({Key? key}) : super(key: key);
@@ -25,19 +25,29 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
   }
 
   Future<void> _ladeAuftraege() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Nicht eingeloggt';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
       final response = await supabase
           .from('auftraege')
           .select()
           .eq('kunde_id', user.id)
+          .or('status.eq.offen,status.eq.in bearbeitung')
+          .eq('kunde_auftragsstatus', 'sichtbar')
           .order('erstellt_am', ascending: false);
+
       setState(() {
         _auftraege = (response as List).cast<Map<String, dynamic>>();
         _isLoading = false;
@@ -53,6 +63,16 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _openDetailScreen(Auftrag auftrag) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
+      ),
+    );
+    _ladeAuftraege(); // Aktualisiert die Liste nach Rückkehr
   }
 
   @override
@@ -84,15 +104,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                             title: Text(auftrag.titel),
                             subtitle: Text('Kategorie: ${auftrag.kategorie}  •  Status: ${auftrag.status}'),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                            onTap: () {
-                              // Statt Snackbar: Navigiere zum Detail-Screen
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
-                                ),
-                              );
-                            },
+                            onTap: () => _openDetailScreen(auftrag),
                           );
                         },
                       ),

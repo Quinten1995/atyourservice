@@ -1,5 +1,3 @@
-// lib/screens/profil_dienstleister_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:atyourservice/utils/geocoding_service.dart';
@@ -8,18 +6,18 @@ class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfilDienstleisterScreenState createState() =>
-      _ProfilDienstleisterScreenState();
+  _ProfilDienstleisterScreenState createState() => _ProfilDienstleisterScreenState();
 }
 
-class _ProfilDienstleisterScreenState
-    extends State<ProfilDienstleisterScreen> {
+class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _supabase = Supabase.instance.client;
   final _formKey = GlobalKey<FormState>();
 
   // Controller für Formular-Felder
   final _nameController = TextEditingController();
   final _beschreibungController = TextEditingController();
+  final _telefonController = TextEditingController();
+  final _emailController = TextEditingController(text: 'lala@popo.com');
   String _selectedKategorie = 'Elektriker';
   final _adresseController = TextEditingController();
 
@@ -30,7 +28,6 @@ class _ProfilDienstleisterScreenState
   void initState() {
     super.initState();
 
-    // JWT in der Konsole ausgeben (nur Debug):
     final session = Supabase.instance.client.auth.currentSession;
     if (session != null) {
       print('––– MEIN JWT-TOKEN: ${session.accessToken}');
@@ -63,6 +60,11 @@ class _ProfilDienstleisterScreenState
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
         _selectedKategorie = data['kategorie'] as String? ?? 'Elektriker';
         _adresseController.text = data['adresse'] as String? ?? '';
+        _telefonController.text = data['telefon'] as String? ?? '';
+        // E-Mail: nur setzen, wenn vorhanden und nicht leer, sonst bleibt Default
+        _emailController.text = (data['email'] as String?)?.isNotEmpty == true
+            ? data['email'] as String
+            : _emailController.text;
       }
     } catch (e) {
       setState(() {
@@ -89,6 +91,8 @@ class _ProfilDienstleisterScreenState
 
       final name         = _nameController.text.trim();
       final beschreibung = _beschreibungController.text.trim();
+      final telefon      = _telefonController.text.trim();
+      final email        = _emailController.text.trim();
       final kategorie    = _selectedKategorie;
       final adresse      = _adresseController.text.trim();
 
@@ -101,20 +105,21 @@ class _ProfilDienstleisterScreenState
         lon = coords['lng'];
       }
 
-      // → upsert statt update, dabei onConflict als String übergeben
       await _supabase
           .from('dienstleister_details')
           .upsert({
-            'user_id':        user.id,  // ganz wichtig: user_id mitgeben
+            'user_id':        user.id,
             'name':           name,
             'beschreibung':   beschreibung,
             'kategorie':      kategorie,
             'adresse':        adresse.isEmpty ? null : adresse,
             'latitude':       lat,
             'longitude':      lon,
+            'telefon':        telefon,
+            'email':          email,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          }, onConflict: 'user_id') // <-- hier nur String, nicht List<String>
-          .select(); // liefert direkt die neue/aktualisierte Zeile zurück
+          }, onConflict: 'user_id')
+          .select();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
@@ -135,6 +140,8 @@ class _ProfilDienstleisterScreenState
     _nameController.dispose();
     _beschreibungController.dispose();
     _adresseController.dispose();
+    _telefonController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -164,20 +171,16 @@ class _ProfilDienstleisterScreenState
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _beschreibungController,
-                        decoration:
-                            const InputDecoration(labelText: 'Beschreibung'),
+                        decoration: const InputDecoration(labelText: 'Beschreibung'),
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: _selectedKategorie,
-                        decoration:
-                            const InputDecoration(labelText: 'Kategorie'),
+                        decoration: const InputDecoration(labelText: 'Kategorie'),
                         items: const [
-                          DropdownMenuItem(
-                              value: 'Elektriker', child: Text('Elektriker')),
-                          DropdownMenuItem(
-                              value: 'Klempner', child: Text('Klempner')),
+                          DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
+                          DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
                           DropdownMenuItem(value: 'Maler', child: Text('Maler')),
                         ],
                         onChanged: (wert) {
@@ -200,6 +203,38 @@ class _ProfilDienstleisterScreenState
                         decoration: const InputDecoration(
                           labelText: 'Adresse (z. B. Straße, PLZ, Stadt)',
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _telefonController,
+                        decoration: const InputDecoration(
+                          labelText: 'Telefon',
+                        ),
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Bitte Telefonnummer angeben';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'E-Mail',
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Bitte E-Mail angeben';
+                          }
+                          // Optional: rudimentäre E-Mail-Formatprüfung
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Bitte gültige E-Mail-Adresse eingeben';
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 24),
                       if (_errorMessage != null) ...[

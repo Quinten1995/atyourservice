@@ -38,7 +38,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception('Nicht eingeloggt');
       }
 
-      // 1) Rolle des aktuellen Nutzers abfragen
       final roleResponse = await _supabase
           .from('users')
           .select('rolle')
@@ -48,27 +47,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception('Rolle konnte nicht ermittelt werden');
       }
       setState(() {
-        _isDienstleister = (roleResponse['rolle'] as String) == 'dienstleister';
+        _isDienstleister = roleResponse['rolle'] == 'dienstleister';
       });
 
-      // 2) Neuesten Auftrag aus der Datenbank laden
       final auftragMap = await _supabase
           .from('auftraege')
           .select()
           .eq('id', widget.initialAuftrag.id)
           .maybeSingle();
 
-      if (auftragMap == null) {
-        throw Exception('Auftrag nicht gefunden');
-      }
+      if (auftragMap == null) throw Exception('Auftrag nicht gefunden');
 
       setState(() {
         _auftragDetails = Auftrag.fromJson(auftragMap as Map<String, dynamic>);
-        _isLoading = false;
-      });
-    } on PostgrestException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
         _isLoading = false;
       });
     } catch (e) {
@@ -80,20 +71,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   }
 
   Future<void> _auftragAnnehmen() async {
-    if (_auftragDetails == null) return;
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('Nicht eingeloggt');
-      }
-
-      // Update + sofort SELECT, damit wir eine gültige Antwort erhalten
       final updated = await _supabase
           .from('auftraege')
           .update({
@@ -105,18 +88,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .select()
           .single();
 
-      // Wenn hier ein Fehler passiert, schlägt PostgrestException an
       setState(() {
-        _auftragDetails = Auftrag.fromJson(updated as Map<String, dynamic>);
-      });
-
-      // Keine extra Abfrage nötig, wir haben schon die aktualisierten Daten
-      setState(() {
-        _isLoading = false;
-      });
-    } on PostgrestException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
+        _auftragDetails = Auftrag.fromJson(updated);
         _isLoading = false;
       });
     } catch (e) {
@@ -128,15 +101,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   }
 
   Future<void> _auftragAbschliessen() async {
-    if (_auftragDetails == null) return;
-
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    setState(() => _isLoading = true);
 
     try {
-      // Update + sofort SELECT
       final updated = await _supabase
           .from('auftraege')
           .update({
@@ -148,14 +115,42 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .single();
 
       setState(() {
-        _auftragDetails = Auftrag.fromJson(updated as Map<String, dynamic>);
+        _auftragDetails = Auftrag.fromJson(updated);
         _isLoading = false;
       });
-    } on PostgrestException catch (e) {
+    } catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _errorMessage = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  // 🟢 NEU: Auftrag lokal für Kunden entfernen
+  Future<void> _kundeAuftragEntfernen() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Auftrag entfernen?'),
+        content: Text('Möchten Sie den Auftrag dauerhaft aus Ihrer Übersicht entfernen?'),
+        actions: [
+          TextButton(child: Text('Abbrechen'), onPressed: () => Navigator.of(ctx).pop(false)),
+          TextButton(child: Text('Entfernen'), onPressed: () => Navigator.of(ctx).pop(true)),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _supabase.from('auftraege').update({
+        'kunde_auftragsstatus': 'entfernt',
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', _auftragDetails!.id);
+
+      Navigator.of(context).pop(); // Zurück zur Übersicht
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -167,76 +162,57 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Auftragsdetails')),
+      appBar: AppBar(title: Text('Auftragsdetails')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16),
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-                ? const Center(child: Text('Keine Daten verfügbar'))
+                ? Center(child: Text('Keine Daten verfügbar'))
                 : SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Titel anzeigen
-                        Text(
-                          _auftragDetails!.titel,
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        // Beschreibung
+                        Text(_auftragDetails!.titel, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 12),
                         Text('Beschreibung: ${_auftragDetails!.beschreibung}'),
-                        const SizedBox(height: 8),
-                        // Kategorie
+                        SizedBox(height: 8),
                         Text('Kategorie: ${_auftragDetails!.kategorie}'),
-                        const SizedBox(height: 8),
-                        // Adresse (falls vorhanden)
+                        SizedBox(height: 8),
                         if (_auftragDetails!.adresse != null) ...[
                           Text('Adresse: ${_auftragDetails!.adresse!}'),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                         ],
-                        // Standort (falls vorhanden)
                         if (_auftragDetails!.latitude != null && _auftragDetails!.longitude != null) ...[
                           Text('Standort: ${_auftragDetails!.latitude}, ${_auftragDetails!.longitude}'),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                         ],
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
                         Row(
-                          children: [
-                            const Text('Status:'),
-                            const SizedBox(width: 12),
-                            Text(_auftragDetails!.status),
-                          ],
+                          children: [Text('Status:'), SizedBox(width: 12), Text(_auftragDetails!.status)],
                         ),
-                        const SizedBox(height: 24),
-                        if (!_isLoading && _auftragDetails != null) ...[
-                          // Button "Auftrag annehmen"
-                          if (_isDienstleister && _auftragDetails!.status == 'offen')
-                            ElevatedButton(
-                              onPressed: _auftragAnnehmen,
-                              child: const Text('Auftrag annehmen'),
-                            ),
-                          // Button "Auftrag abschliessen"
-                          if (_isDienstleister &&
-                              _auftragDetails!.status == 'in bearbeitung' &&
-                              _auftragDetails!.dienstleisterId == _supabase.auth.currentUser!.id)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: ElevatedButton(
-                                onPressed: _auftragAbschliessen,
-                                child: const Text('Auftrag abschliessen'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                ),
-                              ),
-                            ),
-                        ],
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            'Fehler: $_errorMessage',
-                            style: const TextStyle(color: Colors.red),
+                        SizedBox(height: 24),
+                        if (_isDienstleister && _auftragDetails!.status == 'offen')
+                          ElevatedButton(
+                            onPressed: _auftragAnnehmen,
+                            child: Text('Auftrag annehmen'),
                           ),
+                        if (_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
+                          ElevatedButton(
+                            onPressed: _auftragAbschliessen,
+                            child: Text('Auftrag beenden'),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          ),
+                        // 🟢 Kunden-Button (NEU)
+                        if (!_isDienstleister && _auftragDetails!.status == 'in bearbeitung')
+                          ElevatedButton(
+                            onPressed: _kundeAuftragEntfernen,
+                            child: Text('Auftrag entfernen'),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                          ),
+                        if (_errorMessage != null) ...[
+                          SizedBox(height: 16),
+                          Text('Fehler: $_errorMessage', style: TextStyle(color: Colors.red)),
                         ],
                       ],
                     ),
