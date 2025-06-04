@@ -1,0 +1,106 @@
+Projektzusammenfassung: atyourservice
+
+1. Ziel der App
+Die Flutter-App „atyourservice“ verbindet Kunden und Dienstleister (wie Elektriker, Maler, Klempner).  
+Kunden können Aufträge erstellen und verwalten, Dienstleister können passende Aufträge in ihrer Nähe annehmen und abarbeiten.
+
+2. Technologiestack
+- Frontend: Flutter (modernes, responsives UI, farblich abgestimmt, mit abgerundeten Elementen)
+- Backend: Supabase (Datenbank, Auth, Realtime, Policies)
+- Authentifizierung: E-Mail/Passwort via Supabase Auth
+
+3. Haupt-Workflows & Features
+
+Kunde
+- Registrierung & Login: Über eigene Screens, mit E-Mail/Passwort
+- Dashboard: Übersicht, neuen Auftrag erstellen, eigene Aufträge einsehen
+- Auftragserstellung: Auftrag mit Titel, Beschreibung, Kategorie, Adresse und Telefonnummer anlegen
+- Aufträge verwalten: Status sehen, Details aufrufen, „Auftrag entfernen“ (nur für sich selbst sichtbar)
+- UI: Modernes Layout, klare Navigation, alles responsiv und mobilfreundlich
+
+Dienstleister
+- Registrierung & Login: Eigener Screen, prüft Rolle
+- Profil: Name, Beschreibung, Kategorie, Adresse, Telefon und E-Mail anlegen/bearbeiten
+- Dashboard: Sieht alle offenen passenden Aufträge (nach Kategorie & Entfernung) und seine laufenden Aufträge
+- Auftrag annehmen/abschließen: Statuswechsel, alles synchron mit Supabase
+- UI: Gleicher moderner Look, mit passender Farbgebung
+
+Datenhaltung
+- Tabellen:  
+  - users (id, email, rolle, erstellt_am)  
+  - dienstleister_details (user_id, name, beschreibung, kategorie, adresse, lat/lon, telefon, email, aktualisiert_am)  
+  - auftraege (id, kunde_id, dienstleister_id, titel, beschreibung, kategorie, adresse, lat/lon, status, erstellt_am, aktualisiert_am, telefon, kunde_auftragsstatus)
+
+- Policies:  
+  - Strenge RLS für alle Mutationen  
+  - Nur autorisierte Kunden/Dienstleister dürfen ihre Daten sehen und ändern
+
+4. Flutter-Skripte und ihre Aufgaben
+
+lib/screens/start_screen.dart  
+Startscreen, moderner Willkommensbildschirm mit zwei Buttons („Ich suche Hilfe“ & „Ich biete Hilfe an“). Navigiert zu den jeweiligen Login-Screens.
+
+lib/screens/login_kunde_screen.dart  
+Kunden-Login (E-Mail & Passwort, vorausgefüllt für Testzwecke).  
+Prüft Supabase, meldet an, legt ggf. neuen User-Eintrag mit Rolle an.
+
+lib/screens/login_dienstleister_screen.dart  
+Login für Dienstleister, prüft Rolle und existierenden Eintrag in Supabase-User-Tabelle.  
+Verhindert, dass sich ein Kunde als Dienstleister anmeldet.
+
+lib/screens/registrierung_screen.dart  
+Registrierungs-Formular für Kunden und Dienstleister (Rollenwahl per Dropdown).  
+Prüft, ob E-Mail schon existiert, ansonsten wird ein neues Konto angelegt.
+
+lib/screens/kunden_dashboard_screen.dart  
+Dashboard für Kunden: Übersicht mit Buttons zum Auftrag-Erstellen und zur Anzeige aller eigenen Aufträge.
+
+lib/screens/meine_auftraege_screen.dart  
+Zeigt alle eigenen Aufträge des Kunden, die noch offen oder in Bearbeitung sind und nicht „entfernt“ wurden.  
+ListView, modernes Card-Design, Navigation zu Details.
+
+lib/screens/auftrag_erstellen_screen.dart  
+Formular für Kunden, um neue Aufträge zu erstellen.  
+Geocoding-Service wandelt Adresse in Koordinaten um.  
+Validation für Pflichtfelder.  
+Alle Felder modern und abgerundet.
+
+lib/screens/auftrag_detail_screen.dart  
+Detailansicht für einen Auftrag (Kunde & Dienstleister).  
+Dienstleister:  
+- Button „Annehmen“ (Statuswechsel zu „in bearbeitung“)
+- Button „Beenden“ (Statuswechsel zu „abgeschlossen“)
+Kunde:  
+- Button „Auftrag entfernen“ (Status in der DB wird für ihn auf „entfernt“ gesetzt, der Auftrag verschwindet für den Kunden, bleibt aber für alle anderen erhalten)
+
+lib/screens/dienstleister_dashboard_screen.dart  
+Dashboard für Dienstleister.  
+Zeigt „Meine laufenden Aufträge“ (in Bearbeitung, zugeordnet zu diesem Dienstleister) und „Offene, passende Aufträge“ (selbe Kategorie & max. 50 km entfernt).  
+Mit Refresh & Profil bearbeiten.
+
+lib/screens/profil_dienstleister_screen.dart  
+Formular für das Dienstleister-Profil.  
+Alle Felder (Name, Beschreibung, Kategorie, Adresse, Telefon, E-Mail).  
+Speichern mit Validierung, Koordinaten aus Adresse, alles im modernen Card-Layout.
+
+lib/models/auftrag.dart  
+Auftrags-Modell für die gesamte App, inkl. fromJson/toJson-Methoden.  
+Ermöglicht starke Typisierung und komfortables Mapping.
+
+lib/utils/geocoding_service.dart  
+Nutzt OpenStreetMap/Nominatim für Adressumwandlung zu Geo-Koordinaten.
+
+lib/utils/entfernung_utils.dart  
+Haversine-Formel zur Entfernungsmessung zwischen zwei Koordinaten (in km).
+
+lib/utils/supabase_client.dart  
+Initialisiert den Supabase-Client für die ganze App.
+
+5. Stand & Besonderheiten
+- Modernes, einheitliches UI-Design mit klarer Farbgebung und abgerundeten Elementen
+- Kompletter Login-/Registrier-Workflow
+- Kundenseitige und dienstleisterseitige Workflows (inkl. Statushandling)
+- Auftrag kann vom Kunden lokal entfernt werden, bleibt für Supabase/Statistik erhalten
+- RLS Policies für alle Aktionen geprüft
+- Dienstleister-Profil enthält nun auch Telefon & E-Mail
+- Getestet mit vorausgefüllten Demo-Nutzerdaten

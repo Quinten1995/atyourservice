@@ -15,6 +15,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   bool _isDienstleister = false;
+
+  // NEU: Kontaktinfos
+  String? _kundenTelefonnummer;
+  String? _dienstleisterTelefonnummer;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   static const Color primaryColor = Color(0xFF3876BF);
@@ -31,6 +36,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _kundenTelefonnummer = null;
+      _dienstleisterTelefonnummer = null;
     });
 
     try {
@@ -39,6 +46,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception('Nicht eingeloggt');
       }
 
+      // Rolle laden
       final roleResponse = await _supabase
           .from('users')
           .select('rolle')
@@ -47,10 +55,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       if (roleResponse == null || roleResponse['rolle'] == null) {
         throw Exception('Rolle konnte nicht ermittelt werden');
       }
+      final isDL = roleResponse['rolle'] == 'dienstleister';
       setState(() {
-        _isDienstleister = roleResponse['rolle'] == 'dienstleister';
+        _isDienstleister = isDL;
       });
 
+      // Auftrag laden (aktuelle Daten)
       final auftragMap = await _supabase
           .from('auftraege')
           .select()
@@ -59,8 +69,32 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
       if (auftragMap == null) throw Exception('Auftrag nicht gefunden');
 
+      final Auftrag aktuellerAuftrag = Auftrag.fromJson(auftragMap);
       setState(() {
-        _auftragDetails = Auftrag.fromJson(auftragMap as Map<String, dynamic>);
+        _auftragDetails = aktuellerAuftrag;
+      });
+
+      // Telefonnummern laden, wenn der Auftrag in Bearbeitung ist und DL zugeordnet
+      if (aktuellerAuftrag.status == 'in bearbeitung' && aktuellerAuftrag.dienstleisterId != null) {
+        if (isDL) {
+          // Dienstleister sieht Kundentelefon
+          setState(() {
+            _kundenTelefonnummer = aktuellerAuftrag.telefon;
+          });
+        } else {
+          // Kunde sieht Dienstleister-Telefon aus dienstleister_details
+          final details = await _supabase
+              .from('dienstleister_details')
+              .select('telefon')
+              .eq('user_id', aktuellerAuftrag.dienstleisterId!)
+              .maybeSingle();
+          setState(() {
+            _dienstleisterTelefonnummer = details?['telefon'];
+          });
+        }
+      }
+
+      setState(() {
         _isLoading = false;
       });
     } catch (e) {
@@ -93,6 +127,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _auftragDetails = Auftrag.fromJson(updated);
         _isLoading = false;
       });
+
+      // Nach Annahme Kontaktdaten neu laden
+      await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -237,6 +274,32 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                             ],
                           ),
                         ),
+                        // NEU: Kontaktbereich, wenn zugeordnet und in Bearbeitung
+                        if (_auftragDetails!.status == 'in bearbeitung' && _auftragDetails!.dienstleisterId != null) ...[
+                          const SizedBox(height: 18),
+                          Text(
+                            'Kontakt:',
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800], fontSize: 17),
+                          ),
+                          if (_isDienstleister && _kundenTelefonnummer != null) ...[
+                            Row(
+                              children: [
+                                const Icon(Icons.phone, size: 18),
+                                const SizedBox(width: 7),
+                                Text('Kunde: $_kundenTelefonnummer', style: const TextStyle(fontSize: 15)),
+                              ],
+                            ),
+                          ],
+                          if (!_isDienstleister && _dienstleisterTelefonnummer != null) ...[
+                            Row(
+                              children: [
+                                const Icon(Icons.phone, size: 18),
+                                const SizedBox(width: 7),
+                                Text('Dienstleister: $_dienstleisterTelefonnummer', style: const TextStyle(fontSize: 15)),
+                              ],
+                            ),
+                          ],
+                        ],
                         const SizedBox(height: 32),
                         if (_isDienstleister && _auftragDetails!.status == 'offen')
                           SizedBox(

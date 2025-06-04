@@ -14,10 +14,13 @@ class Auftrag {
   final DateTime erstelltAm;
   final DateTime aktualisiertAm;
 
+  // NEU: Telefonnummer des Kunden (wird beim Auftrag angelegt)
+  final String? telefon;
+
   Auftrag({
     required this.id,
     required this.kundeId,
-    this.dienstleisterId, // NEU
+    this.dienstleisterId,
     required this.titel,
     required this.beschreibung,
     required this.kategorie,
@@ -27,12 +30,13 @@ class Auftrag {
     required this.status,
     required this.erstelltAm,
     required this.aktualisiertAm,
+    this.telefon, // NEU
   });
 
   factory Auftrag.fromJson(Map<String, dynamic> json) => Auftrag(
         id: json['id'] as String,
         kundeId: json['kunde_id'] as String,
-        dienstleisterId: json['dienstleister_id'] as String?, // NEU
+        dienstleisterId: json['dienstleister_id'] as String?,
         titel: json['titel'] as String,
         beschreibung: json['beschreibung'] as String,
         kategorie: json['kategorie'] as String,
@@ -42,6 +46,7 @@ class Auftrag {
         status: json['status'] as String,
         erstelltAm: DateTime.parse(json['erstellt_am'] as String),
         aktualisiertAm: DateTime.parse(json['aktualisiert_am'] as String),
+        telefon: json['telefon'] as String?, // NEU
       );
 
   Map<String, dynamic> toJson() {
@@ -61,6 +66,9 @@ class Auftrag {
     if (dienstleisterId != null) {
       map['dienstleister_id'] = dienstleisterId;
     }
+    if (telefon != null) {
+      map['telefon'] = telefon;
+    }
     return map;
   }
 
@@ -72,13 +80,14 @@ class Auftrag {
     double? latitude,
     double? longitude,
     String? status,
-    String? dienstleisterId, // NEU
+    String? dienstleisterId,
     DateTime? aktualisiertAm,
+    String? telefon, // NEU
   }) {
     return Auftrag(
       id: id,
       kundeId: kundeId,
-      dienstleisterId: dienstleisterId ?? this.dienstleisterId, // NEU
+      dienstleisterId: dienstleisterId ?? this.dienstleisterId,
       titel: titel ?? this.titel,
       beschreibung: beschreibung ?? this.beschreibung,
       kategorie: kategorie ?? this.kategorie,
@@ -88,6 +97,7 @@ class Auftrag {
       status: status ?? this.status,
       erstelltAm: erstelltAm,
       aktualisiertAm: aktualisiertAm ?? this.aktualisiertAm,
+      telefon: telefon ?? this.telefon, // NEU
     );
   }
 }
