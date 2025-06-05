@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../utils/geocoding_service.dart';
+import '../data/kategorien.dart'; // <-- Zentrale Kategorienliste importieren
 
 class AuftragErstellenScreen extends StatefulWidget {
   const AuftragErstellenScreen({Key? key}) : super(key: key);
@@ -15,14 +16,37 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titelController = TextEditingController();
   final _beschreibungController = TextEditingController();
-  String _selectedKategorie = 'Elektriker';
   final _adresseController = TextEditingController();
   final _telefonController = TextEditingController();
+
+  String _selectedKategorie = kategorieListe.first; // <-- Default auf erste Kategorie setzen
   bool _isLoading = false;
   String? _errorMessage;
 
+  String? _heimatAdresse; // <-- Neu: Für Heimatadresse
+
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
+
+  @override
+  void initState() {
+    super.initState();
+    _ladeHeimatadresse();
+  }
+
+  // Heimatadresse aus Supabase laden
+  Future<void> _ladeHeimatadresse() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return;
+    final res = await _supabase
+        .from('users')
+        .select('adresse')
+        .eq('id', user.id)
+        .maybeSingle();
+    setState(() {
+      _heimatAdresse = res?['adresse'] ?? '';
+    });
+  }
 
   Future<void> _auftragAbschicken() async {
     if (!_formKey.currentState!.validate()) return;
@@ -175,11 +199,12 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               borderSide: BorderSide(color: primaryColor, width: 2),
                             ),
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
-                            DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
-                            DropdownMenuItem(value: 'Maler', child: Text('Maler')),
-                          ],
+                          items: kategorieListe.map((kategorie) {
+                            return DropdownMenuItem(
+                              value: kategorie,
+                              child: Text(kategorie),
+                            );
+                          }).toList(),
                           onChanged: (wert) {
                             if (wert != null) {
                               setState(() {
@@ -189,6 +214,31 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
+
+                        // NEU: Button zum Einfügen der Heimatadresse
+                        if (_heimatAdresse != null && _heimatAdresse!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                icon: const Icon(Icons.home, color: Color(0xFF3876BF)),
+                                label: const Text(
+                                  "Heimatadresse einfügen",
+                                  style: TextStyle(
+                                    color: Color(0xFF3876BF),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _adresseController.text = _heimatAdresse!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+
                         TextFormField(
                           controller: _adresseController,
                           decoration: InputDecoration(

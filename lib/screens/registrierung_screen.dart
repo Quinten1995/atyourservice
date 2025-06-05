@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../data/kategorien.dart'; // <-- Import für zentrale Kategorie-Liste
 
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
   final _passwordController = TextEditingController(text: 'password123');
   String _rolle = 'kunde';
+  String? _selectedKategorie; // Kategorie nur für Dienstleister
   bool _isLoading = false;
 
   final supabase = Supabase.instance.client;
@@ -63,6 +65,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
 
   Future<void> _signUpFlow(String email, String password) async {
     try {
+      // Bei Bedarf: Hier könntest du _selectedKategorie mitspeichern!
       await supabase.auth.signUp(email: email, password: password);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -154,10 +157,47 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ],
                     onChanged: (value) {
                       if (value != null) {
-                        setState(() => _rolle = value);
+                        setState(() {
+                          _rolle = value;
+                          if (_rolle != 'dienstleister') _selectedKategorie = null;
+                        });
                       }
                     },
                   ),
+
+                  // Kategorie-Auswahl nur bei Dienstleister!
+                  if (_rolle == 'dienstleister') ...[
+                    const SizedBox(height: 20),
+                    DropdownButtonFormField<String>(
+                      value: _selectedKategorie ?? kategorieListe.first,
+                      decoration: InputDecoration(
+                        labelText: 'Dienstleistungskategorie',
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(color: primaryColor, width: 2),
+                        ),
+                      ),
+                      items: kategorieListe.map((kategorie) {
+                        return DropdownMenuItem(
+                          value: kategorie,
+                          child: Text(kategorie),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() => _selectedKategorie = value);
+                      },
+                      validator: (value) => (_rolle == 'dienstleister' && (value == null || value.isEmpty))
+                          ? 'Bitte Kategorie wählen'
+                          : null,
+                    ),
+                  ],
 
                   const SizedBox(height: 20),
 

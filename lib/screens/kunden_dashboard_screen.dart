@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auftrag_erstellen_screen.dart';
 import 'meine_auftraege_screen.dart';
+import 'profil_kunde_screen.dart'; // <-- Import für den Profil-Screen
 
 class KundenDashboardScreen extends StatelessWidget {
   const KundenDashboardScreen({Key? key}) : super(key: key);
@@ -91,6 +92,35 @@ class KundenDashboardScreen extends StatelessWidget {
                     ),
                     elevation: 3,
                     shadowColor: primaryColor.withOpacity(0.10),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              // NEU: Button: Profil bearbeiten
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfilKundeScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.person_outline, size: 24),
+                  label: const Text(
+                    'Profil bearbeiten',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: primaryColor,
+                    side: BorderSide(color: primaryColor, width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 0,
                   ),
                 ),
               ),

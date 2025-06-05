@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:atyourservice/utils/geocoding_service.dart';
+import '../data/kategorien.dart'; // <--- Zentrale Kategorienliste importieren
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -17,13 +18,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _beschreibungController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController(text: 'lala@popo.com');
-  String _selectedKategorie = 'Elektriker';
+  String _selectedKategorie = kategorieListe.first; // <--- Defaultwert auf zentrale Liste setzen
   final _adresseController = TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
 
-  // NEU: Bewertungs-Daten
   double? _durchschnitt;
   int _anzahlBewertungen = 0;
 
@@ -63,7 +63,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
-        _selectedKategorie = data['kategorie'] as String? ?? 'Elektriker';
+        // --- Prüfe, ob gespeicherte Kategorie gültig ist, sonst fallback auf erste:
+        final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieListe.first;
+        _selectedKategorie = kategorieListe.contains(gespeicherteKategorie)
+            ? gespeicherteKategorie
+            : kategorieListe.first;
         _adresseController.text = data['adresse'] as String? ?? '';
         _telefonController.text = data['telefon'] as String? ?? '';
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
@@ -81,7 +85,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     }
   }
 
-  // NEU: Bewertungen laden
   Future<void> _ladeBewertungen() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return;
@@ -151,8 +154,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
       );
-
-      // Nach dem Speichern auch Bewertungen neu laden (falls z. B. der Dienstleister seinen Account weitergegeben hat)
       _ladeBewertungen();
     } catch (e) {
       setState(() {
@@ -219,7 +220,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          // ⭐️ Bewertungs-Widget im Header
                           if (_durchschnitt != null)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -270,11 +270,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                           DropdownButtonFormField<String>(
                             value: _selectedKategorie,
                             decoration: _inputDecoration('Kategorie'),
-                            items: const [
-                              DropdownMenuItem(value: 'Elektriker', child: Text('Elektriker')),
-                              DropdownMenuItem(value: 'Klempner', child: Text('Klempner')),
-                              DropdownMenuItem(value: 'Maler', child: Text('Maler')),
-                            ],
+                            items: kategorieListe.map((kategorie) {
+                              return DropdownMenuItem(
+                                value: kategorie,
+                                child: Text(kategorie),
+                              );
+                            }).toList(),
                             onChanged: (wert) {
                               if (wert != null) {
                                 setState(() {
