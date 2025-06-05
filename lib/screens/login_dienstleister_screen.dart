@@ -86,6 +86,55 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     }
   }
 
+  // Passwort-Reset-Dialog
+  void _showResetDialog(BuildContext context) {
+    final resetEmailController = TextEditingController(text: _emailController.text);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Passwort zurücksetzen'),
+        content: TextField(
+          controller: resetEmailController,
+          decoration: const InputDecoration(
+            labelText: 'E-Mail-Adresse',
+          ),
+          keyboardType: TextInputType.emailAddress,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Abbrechen'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('Senden'),
+            onPressed: () async {
+              final email = resetEmailController.text.trim();
+              if (email.isEmpty || !email.contains('@')) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Bitte eine gültige E-Mail eingeben')),
+                );
+                return;
+              }
+              Navigator.pop(context); // Dialog schließen
+              try {
+                await supabase.auth.resetPasswordForEmail(email);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Falls ein Account existiert, wurde eine E-Mail zum Zurücksetzen gesendet.')),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Fehler beim Senden: $e')),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
@@ -172,6 +221,25 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                     ),
                     obscureText: true,
                     validator: _validatePasswort,
+                  ),
+
+                  // Passwort vergessen-Button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => _showResetDialog(context),
+                      child: const Text(
+                        'Passwort vergessen?',
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: primaryColor,
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 34),

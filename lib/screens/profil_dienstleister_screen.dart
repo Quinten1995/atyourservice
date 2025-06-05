@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,8 +29,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   double? _durchschnitt;
   int _anzahlBewertungen = 0;
 
-  String? _profilbildUrl;   // URL vom Profilbild in Supabase Storage
-  File? _neuesProfilbild;   // Lokale Datei (falls neu ausgewählt)
+  String? _profilbildPfad;    // Nur relativer Pfad (ab Bucket)!
+  File? _neuesProfilbild;     // Lokale Datei (falls neu ausgewählt)
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
@@ -70,7 +69,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
             ? data['email'] as String
             : _emailController.text;
-        _profilbildUrl = data['profilbild_url'] as String?;
+        _profilbildPfad = data['profilbild_url'] as String?;
       }
     } catch (e) {
       setState(() {
@@ -133,20 +132,15 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         lon = coords['lng'];
       }
 
-      // === Profilbild-Upload (wenn neu ausgewählt) ===
-      String? profilbildUrl = _profilbildUrl;
+      // === PROFILBILD-UPLOAD (Root im Bucket, kein Unterordner mehr!) ===
+      String? profilbildPfad = _profilbildPfad;
       if (_neuesProfilbild != null) {
-        final storageResponse = await _supabase.storage
+        final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        // Upload direkt in den Bucket-Root (kein extra Ordner!)
+        await _supabase.storage
             .from('profile-pics')
-            .upload(
-              '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
-              _neuesProfilbild!,
-              fileOptions: const FileOptions(upsert: true),
-            );
-        final String publicUrl = _supabase.storage
-            .from('profile-pics')
-            .getPublicUrl(storageResponse);
-        profilbildUrl = publicUrl;
+            .upload(fileName, _neuesProfilbild!, fileOptions: const FileOptions(upsert: true));
+        profilbildPfad = 'profile-pics/$fileName'; // **Nur Pfad, keine URL!**
       }
 
       await _supabase
@@ -161,13 +155,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             'longitude':      lon,
             'telefon':        telefon,
             'email':          email,
-            'profilbild_url': profilbildUrl,
+            'profilbild_url': profilbildPfad,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
           }, onConflict: 'user_id')
           .select();
 
       setState(() {
-        _profilbildUrl = profilbildUrl;
+        _profilbildPfad = profilbildPfad;
         _neuesProfilbild = null;
       });
 
@@ -194,6 +188,33 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _neuesProfilbild = File(picked.path);
       });
     }
+  }
+
+  void _showDeleteProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Profil löschen'),
+        content: const Text(
+          'Möchtest du dein Profil wirklich löschen?\n\n'
+          'Sende uns dazu bitte eine E-Mail an:\n'
+          'quintenhessmann1995@yahoo.com\n\n'
+          'Wir löschen dein Konto und alle personenbezogenen Daten umgehend gemäß DSGVO.',
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Abbrechen'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('E-Mail senden'),
+            onPressed: () async {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -226,10 +247,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         radius: avatarSize / 2,
         backgroundImage: FileImage(_neuesProfilbild!),
       );
-    } else if (_profilbildUrl != null && _profilbildUrl!.isNotEmpty) {
+    } else if (_profilbildPfad != null && _profilbildPfad!.isNotEmpty) {
+      final publicUrl = 'https://npqanssmfxdvwauuaemd.supabase.co/storage/v1/object/public/${_profilbildPfad!}';
       avatar = CircleAvatar(
         radius: avatarSize / 2,
-        backgroundImage: NetworkImage(_profilbildUrl!),
+        backgroundImage: NetworkImage(publicUrl),
       );
     } else {
       avatar = CircleAvatar(
@@ -415,6 +437,27 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                      // PROFIL LÖSCHEN BUTTON
+                      const SizedBox(height: 32),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.delete_forever),
+                          label: const Text('Profil löschen'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 1,
+                          ),
+                          onPressed: _showDeleteProfileDialog,
                         ),
                       ),
                     ],

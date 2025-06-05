@@ -1,24 +1,72 @@
 import 'package:flutter/material.dart';
 import 'login_kunde_screen.dart';
 import 'login_dienstleister_screen.dart';
+import 'impressum_screen.dart';
+import 'datenschutz_screen.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({Key? key}) : super(key: key);
 
+  void _showInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Rechtliches'),
+        content: const Text('Hier findest du das Impressum und die Datenschutzerklärung.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Dialog schließen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ImpressumScreen()),
+              );
+            },
+            child: const Text('Impressum'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Dialog schließen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DatenschutzScreen()),
+              );
+            },
+            child: const Text('Datenschutz'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Dialog schließen
+            child: const Text('Schließen'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Die Hauptfarbe kannst du bei Bedarf global definieren
-    const primaryColor = Color(0xFF3876BF); // Modernes, ruhiges Blau
-    const accentColor = Color(0xFFE7ECEF);  // Sehr helles Grau/Blau als Hintergrund
+    const primaryColor = Color(0xFF3876BF);
+    const accentColor = Color(0xFFE7ECEF);
 
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('atyourservice', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+        title: const Text(
+          'atyourservice',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         foregroundColor: primaryColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Rechtliches',
+            onPressed: () => _showInfoDialog(context),
+            color: primaryColor,
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -26,11 +74,6 @@ class StartScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Optional: Platz für ein Logo
-              // Padding(
-              //   padding: const EdgeInsets.only(bottom: 24.0),
-              //   child: Image.asset('assets/logo.png', height: 80),
-              // ),
               Text(
                 'Willkommen!',
                 style: TextStyle(
