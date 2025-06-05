@@ -261,10 +261,77 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // --- WIDGETS ---
+  // --- NEU: Zeitplanung (auch Intervall) als Widget ---
+  Widget _zeitplanungAnzeige() {
+    final ad = _auftragDetails!;
+    if (ad.wiederkehrend == true) {
+      // Wiederkehrend
+      return Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 3),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.repeat, color: Colors.deepPurple, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                [
+                  if (ad.wochentag != null) "Jeden ${ad.wochentag!}",
+                  if (ad.intervall != null) ad.intervall!,
+                  if (ad.zeitVon != null && ad.zeitBis != null)
+                    "${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr",
+                  if (ad.wiederholenBis != null)
+                    "bis ${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}",
+                  if (ad.anzahlWiederholungen != null)
+                    "(${ad.anzahlWiederholungen} mal)"
+                ].where((s) => s.isNotEmpty).join(", "),
+                style: const TextStyle(fontSize: 15, color: Colors.deepPurple, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else if (ad.soSchnellWieMoeglich == false && ad.terminDatum != null) {
+      // Einmaliger geplanter Termin
+      return Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 3),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.schedule, color: Colors.blueGrey, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                "${ad.terminDatum!.day.toString().padLeft(2, '0')}.${ad.terminDatum!.month.toString().padLeft(2, '0')}.${ad.terminDatum!.year}"
+                "${ad.zeitVon != null && ad.zeitBis != null ? ", ${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr" : ""}",
+                style: const TextStyle(fontSize: 15, color: Colors.blueGrey, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // So schnell wie möglich
+      return Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 3),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.flash_on, color: Colors.orange, size: 20),
+            const SizedBox(width: 8),
+            const Text(
+              "So schnell wie möglich",
+              style: TextStyle(fontSize: 15, color: Colors.orange, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   Widget _auftragInfoCard() {
     final ad = _auftragDetails!;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -313,6 +380,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
+
+          // NEU: Zeitplanung/Intervall
+          _zeitplanungAnzeige(),
+          const SizedBox(height: 11),
 
           // Beschreibung
           Text(

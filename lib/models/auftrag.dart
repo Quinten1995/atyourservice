@@ -1,9 +1,9 @@
-// lib/models/auftrag.dart
+import 'package:flutter/material.dart'; // für TimeOfDay
 
 class Auftrag {
   final String id;
   final String kundeId;
-  final String? dienstleisterId; // Speichert, welcher Dienstleister den Auftrag angenommen hat
+  final String? dienstleisterId;
   final String titel;
   final String beschreibung;
   final String kategorie;
@@ -13,9 +13,20 @@ class Auftrag {
   final String status;
   final DateTime erstelltAm;
   final DateTime aktualisiertAm;
-
-  // NEU: Telefonnummer des Kunden (wird beim Auftrag angelegt)
   final String? telefon;
+
+  // Planung und Zeitfenster
+  final bool soSchnellWieMoeglich;
+  final DateTime? terminDatum;
+  final TimeOfDay? zeitVon;
+  final TimeOfDay? zeitBis;
+
+  // Intervall / Wiederkehrend (NEU)
+  final bool wiederkehrend;
+  final String? intervall;
+  final String? wochentag;
+  final int? anzahlWiederholungen;
+  final DateTime? wiederholenBis;
 
   Auftrag({
     required this.id,
@@ -30,7 +41,17 @@ class Auftrag {
     required this.status,
     required this.erstelltAm,
     required this.aktualisiertAm,
-    this.telefon, // NEU
+    this.telefon,
+    this.soSchnellWieMoeglich = true,
+    this.terminDatum,
+    this.zeitVon,
+    this.zeitBis,
+    // NEU
+    this.wiederkehrend = false,
+    this.intervall,
+    this.wochentag,
+    this.anzahlWiederholungen,
+    this.wiederholenBis,
   });
 
   factory Auftrag.fromJson(Map<String, dynamic> json) => Auftrag(
@@ -46,7 +67,25 @@ class Auftrag {
         status: json['status'] as String,
         erstelltAm: DateTime.parse(json['erstellt_am'] as String),
         aktualisiertAm: DateTime.parse(json['aktualisiert_am'] as String),
-        telefon: json['telefon'] as String?, // NEU
+        telefon: json['telefon'] as String?,
+        soSchnellWieMoeglich: json['so_schnell_wie_moeglich'] as bool? ?? true,
+        terminDatum: json['termin_datum'] != null
+            ? DateTime.tryParse(json['termin_datum'])
+            : null,
+        zeitVon: json['zeit_von'] != null
+            ? _parseTimeOfDay(json['zeit_von'])
+            : null,
+        zeitBis: json['zeit_bis'] != null
+            ? _parseTimeOfDay(json['zeit_bis'])
+            : null,
+        // NEU
+        wiederkehrend: json['wiederkehrend'] == true,
+        intervall: json['intervall'] as String?,
+        wochentag: json['wochentag'] as String?,
+        anzahlWiederholungen: json['anzahl_wiederholungen'] as int?,
+        wiederholenBis: json['wiederholen_bis'] != null
+            ? DateTime.tryParse(json['wiederholen_bis'])
+            : null,
       );
 
   Map<String, dynamic> toJson() {
@@ -62,6 +101,16 @@ class Auftrag {
       'status': status,
       'erstellt_am': erstelltAm.toIso8601String(),
       'aktualisiert_am': aktualisiertAm.toIso8601String(),
+      'so_schnell_wie_moeglich': soSchnellWieMoeglich,
+      if (terminDatum != null) 'termin_datum': terminDatum!.toIso8601String(),
+      if (zeitVon != null) 'zeit_von': _timeOfDayToString(zeitVon!),
+      if (zeitBis != null) 'zeit_bis': _timeOfDayToString(zeitBis!),
+      // NEU
+      'wiederkehrend': wiederkehrend,
+      if (intervall != null) 'intervall': intervall,
+      if (wochentag != null) 'wochentag': wochentag,
+      if (anzahlWiederholungen != null) 'anzahl_wiederholungen': anzahlWiederholungen,
+      if (wiederholenBis != null) 'wiederholen_bis': wiederholenBis!.toIso8601String().substring(0, 10),
     };
     if (dienstleisterId != null) {
       map['dienstleister_id'] = dienstleisterId;
@@ -82,7 +131,17 @@ class Auftrag {
     String? status,
     String? dienstleisterId,
     DateTime? aktualisiertAm,
-    String? telefon, // NEU
+    String? telefon,
+    bool? soSchnellWieMoeglich,
+    DateTime? terminDatum,
+    TimeOfDay? zeitVon,
+    TimeOfDay? zeitBis,
+    // NEU
+    bool? wiederkehrend,
+    String? intervall,
+    String? wochentag,
+    int? anzahlWiederholungen,
+    DateTime? wiederholenBis,
   }) {
     return Auftrag(
       id: id,
@@ -97,7 +156,30 @@ class Auftrag {
       status: status ?? this.status,
       erstelltAm: erstelltAm,
       aktualisiertAm: aktualisiertAm ?? this.aktualisiertAm,
-      telefon: telefon ?? this.telefon, // NEU
+      telefon: telefon ?? this.telefon,
+      soSchnellWieMoeglich: soSchnellWieMoeglich ?? this.soSchnellWieMoeglich,
+      terminDatum: terminDatum ?? this.terminDatum,
+      zeitVon: zeitVon ?? this.zeitVon,
+      zeitBis: zeitBis ?? this.zeitBis,
+      // NEU
+      wiederkehrend: wiederkehrend ?? this.wiederkehrend,
+      intervall: intervall ?? this.intervall,
+      wochentag: wochentag ?? this.wochentag,
+      anzahlWiederholungen: anzahlWiederholungen ?? this.anzahlWiederholungen,
+      wiederholenBis: wiederholenBis ?? this.wiederholenBis,
     );
+  }
+
+  // Hilfsfunktionen für TimeOfDay-Handling (String <-> TimeOfDay)
+  static TimeOfDay _parseTimeOfDay(String value) {
+    final parts = value.split(':');
+    return TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
+  }
+
+  static String _timeOfDayToString(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 }

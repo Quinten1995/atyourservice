@@ -25,7 +25,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   List<Map<String, dynamic>> _alleOffenenAuftraegeRaw = [];
   List<Map<String, dynamic>> _alleLaufendenAuftraegeRaw = [];
   List<Auftrag> _offenePassendeAuftraege = [];
-  List<Auftrag> _laufendeAuftraege = [];
+  List<Map<String, dynamic>> _laufendeAuftraegeMitUser = [];
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
@@ -43,7 +43,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _alleOffenenAuftraegeRaw = [];
       _alleLaufendenAuftraegeRaw = [];
       _offenePassendeAuftraege = [];
-      _laufendeAuftraege = [];
+      _laufendeAuftraegeMitUser = [];
     });
 
     try {
@@ -77,13 +77,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .eq('status', 'offen');
       _alleOffenenAuftraegeRaw = rawOffen.cast<Map<String, dynamic>>();
 
-      // 3) Laufende (in bearbeitung) Aufträge dieses Dienstleisters
+      // 3) Laufende (in bearbeitung) Aufträge dieses Dienstleisters (mit Kunden-Email per sicherem JOIN!)
       final List<dynamic> rawLaufend = await supabase
           .from('auftraege')
-          .select()
+          .select('*, kunde:users!auftraege_kunde_id_fkey(email)')
           .eq('status', 'in bearbeitung')
           .eq('dienstleister_id', user.id);
       _alleLaufendenAuftraegeRaw = rawLaufend.cast<Map<String, dynamic>>();
+      _laufendeAuftraegeMitUser = _alleLaufendenAuftraegeRaw;
 
       // 4) Offene Aufträge, nur ≤50km
       if (_meineLatitude != null && _meineLongitude != null) {
@@ -101,9 +102,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
         _offenePassendeAuftraege =
             _alleOffenenAuftraegeRaw.map((map) => Auftrag.fromJson(map)).toList();
       }
-
-      _laufendeAuftraege =
-          _alleLaufendenAuftraegeRaw.map((map) => Auftrag.fromJson(map)).toList();
 
       setState(() => _isLoading = false);
     } on PostgrestException catch (e) {
@@ -175,21 +173,25 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _dashboardHeader(),
-                      if (_laufendeAuftraege.isNotEmpty) ...[
+                      if (_laufendeAuftraegeMitUser.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
                           'Meine laufenden Aufträge',
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                         ),
                         const SizedBox(height: 7),
-                        Container(
+                        SizedBox(
                           height: 135,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _laufendeAuftraege.length,
+                            itemCount: _laufendeAuftraegeMitUser.length,
                             separatorBuilder: (context, i) => const SizedBox(width: 13),
                             itemBuilder: (context, index) {
-                              final Auftrag auftrag = _laufendeAuftraege[index];
+                              final map = _laufendeAuftraegeMitUser[index];
+                              final auftrag = Auftrag.fromJson(map);
+                              final kunde = map['kunde'];
+                              final kundenEmail = kunde?['email'] ?? 'Kunde';
+
                               return Material(
                                 elevation: 3,
                                 borderRadius: BorderRadius.circular(14),
@@ -211,11 +213,23 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          auftrag.titel,
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                auftrag.titel,
+                                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            // Uhr-Icon für geplante Aufträge
+                                            if (!auftrag.soSchnellWieMoeglich)
+                                              Tooltip(
+                                                message: 'Geplanter Auftrag',
+                                                child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
+                                              ),
+                                          ],
                                         ),
                                         const SizedBox(height: 10),
                                         Row(
@@ -230,7 +244,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                         ),
                                         const SizedBox(height: 7),
                                         Text(
-                                          'Kunde: ${auftrag.kundeId}',
+                                          'Kunde: $kundenEmail',
                                           style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                                         ),
                                       ],
@@ -283,11 +297,23 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                     child: ListTile(
                                       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                                       leading: Icon(Icons.assignment_outlined, color: primaryColor, size: 30),
-                                      title: Text(
-                                        auftrag.titel,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              auftrag.titel,
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          // Uhr-Icon für geplante Aufträge
+                                          if (!auftrag.soSchnellWieMoeglich)
+                                            Tooltip(
+                                              message: 'Geplanter Auftrag',
+                                              child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
+                                            ),
+                                        ],
                                       ),
                                       subtitle: distText.isNotEmpty
                                           ? Padding(

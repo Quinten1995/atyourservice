@@ -19,11 +19,34 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
   final _adresseController = TextEditingController();
   final _telefonController = TextEditingController();
 
-  String _selectedKategorie = kategorieListe.first; // <-- Default auf erste Kategorie setzen
+  String _selectedKategorie = kategorieListe.first;
   bool _isLoading = false;
   String? _errorMessage;
 
-  String? _heimatAdresse; // <-- Neu: Für Heimatadresse
+  String? _heimatAdresse;
+
+  // Planung / Termin
+  bool soSchnellWieMoeglich = true;
+  DateTime? terminDatum;
+  TimeOfDay? zeitVon;
+  TimeOfDay? zeitBis;
+
+  // Intervall / Wiederkehrend (NEU)
+  bool _wiederkehrend = false;
+  String? _intervall; // z.B. "wöchentlich", "alle 2 Wochen"
+  String? _wochentag;
+  int? _anzahlWiederholungen;
+  DateTime? _wiederholenBis;
+
+  static const intervallOptionen = [
+    "wöchentlich",
+    "alle 2 Wochen",
+    "monatlich",
+  ];
+
+  static const wochentage = [
+    "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
+  ];
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
@@ -34,7 +57,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
     _ladeHeimatadresse();
   }
 
-  // Heimatadresse aus Supabase laden
   Future<void> _ladeHeimatadresse() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return;
@@ -47,6 +69,9 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       _heimatAdresse = res?['adresse'] ?? '';
     });
   }
+
+  String _timeOfDayToString(TimeOfDay tod) =>
+      '${tod.hour.toString().padLeft(2, '0')}:${tod.minute.toString().padLeft(2, '0')}';
 
   Future<void> _auftragAbschicken() async {
     if (!_formKey.currentState!.validate()) return;
@@ -69,7 +94,9 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       }
       final String id = const Uuid().v4();
       final timestamp = DateTime.now().toUtc().toIso8601String();
-      await _supabase.from('auftraege').insert({
+
+      // Map für Auftrag
+      final auftragMap = {
         'id': id,
         'kunde_id': user.id,
         'titel': _titelController.text.trim(),
@@ -82,7 +109,27 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
         'erstellt_am': timestamp,
         'aktualisiert_am': timestamp,
         'telefon': telefon,
-      });
+        'so_schnell_wie_moeglich': soSchnellWieMoeglich,
+        'termin_datum': (!soSchnellWieMoeglich && terminDatum != null)
+            ? terminDatum!.toIso8601String().substring(0, 10)
+            : null,
+        'zeit_von': (!soSchnellWieMoeglich && zeitVon != null)
+            ? _timeOfDayToString(zeitVon!)
+            : null,
+        'zeit_bis': (!soSchnellWieMoeglich && zeitBis != null)
+            ? _timeOfDayToString(zeitBis!)
+            : null,
+        // NEU: Intervall/Wiederkehrend
+        'wiederkehrend': _wiederkehrend,
+        'intervall': _wiederkehrend ? _intervall : null,
+        'wochentag': _wiederkehrend ? _wochentag : null,
+        'anzahl_wiederholungen': _wiederkehrend ? _anzahlWiederholungen : null,
+        'wiederholen_bis': _wiederkehrend && _wiederholenBis != null
+            ? _wiederholenBis!.toIso8601String().substring(0, 10)
+            : null,
+      };
+
+      await _supabase.from('auftraege').insert(auftragMap);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Auftrag wurde gespeichert!')),
       );
@@ -215,7 +262,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // NEU: Button zum Einfügen der Heimatadresse
+                        // Heimatadresse einfügen
                         if (_heimatAdresse != null && _heimatAdresse!.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10.0),
@@ -281,6 +328,168 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                             return null;
                           },
                         ),
+                        const SizedBox(height: 20),
+
+                        // Termin/Planungsauswahl
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Ausführungszeitpunkt', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Row(
+                              children: [
+                                Radio<bool>(
+                                  value: true,
+                                  groupValue: soSchnellWieMoeglich,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      soSchnellWieMoeglich = true;
+                                      terminDatum = null;
+                                      zeitVon = null;
+                                      zeitBis = null;
+                                    });
+                                  },
+                                ),
+                                const Text('So schnell wie möglich'),
+                                Radio<bool>(
+                                  value: false,
+                                  groupValue: soSchnellWieMoeglich,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      soSchnellWieMoeglich = false;
+                                    });
+                                  },
+                                ),
+                                const Text('Geplant'),
+                              ],
+                            ),
+                            if (!soSchnellWieMoeglich) ...[
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.calendar_today, size: 18),
+                                      label: Text(terminDatum == null
+                                          ? 'Datum wählen'
+                                          : '${terminDatum!.day.toString().padLeft(2, '0')}.${terminDatum!.month.toString().padLeft(2, '0')}.${terminDatum!.year}'),
+                                      onPressed: () async {
+                                        final picked = await showDatePicker(
+                                          context: context,
+                                          initialDate: terminDatum ?? DateTime.now().add(const Duration(days: 1)),
+                                          firstDate: DateTime.now(),
+                                          lastDate: DateTime.now().add(const Duration(days: 365)),
+                                        );
+                                        if (picked != null) setState(() => terminDatum = picked);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 7),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.access_time, size: 18),
+                                      label: Text(zeitVon == null
+                                          ? 'Zeit von'
+                                          : '${zeitVon!.hour.toString().padLeft(2, '0')}:${zeitVon!.minute.toString().padLeft(2, '0')}'),
+                                      onPressed: () async {
+                                        final picked = await showTimePicker(
+                                          context: context,
+                                          initialTime: const TimeOfDay(hour: 10, minute: 0),
+                                        );
+                                        if (picked != null) setState(() => zeitVon = picked);
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.access_time, size: 18),
+                                      label: Text(zeitBis == null
+                                          ? 'Zeit bis'
+                                          : '${zeitBis!.hour.toString().padLeft(2, '0')}:${zeitBis!.minute.toString().padLeft(2, '0')}'),
+                                      onPressed: () async {
+                                        final picked = await showTimePicker(
+                                          context: context,
+                                          initialTime: const TimeOfDay(hour: 12, minute: 0),
+                                        );
+                                        if (picked != null) setState(() => zeitBis = picked);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // NEU: Wiederkehrend/Intervall
+                        CheckboxListTile(
+                          value: _wiederkehrend,
+                          onChanged: (val) {
+                            setState(() {
+                              _wiederkehrend = val ?? false;
+                            });
+                          },
+                          title: const Text("Wiederkehrender Auftrag?"),
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        if (_wiederkehrend) ...[
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<String>(
+                            value: _intervall,
+                            decoration: const InputDecoration(labelText: "Intervall"),
+                            items: intervallOptionen
+                                .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+                                .toList(),
+                            onChanged: (val) => setState(() => _intervall = val),
+                            validator: (val) => val == null ? 'Bitte Intervall wählen' : null,
+                          ),
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<String>(
+                            value: _wochentag,
+                            decoration: const InputDecoration(labelText: "Wochentag"),
+                            items: wochentage
+                                .map((tag) => DropdownMenuItem(value: tag, child: Text(tag)))
+                                .toList(),
+                            onChanged: (val) => setState(() => _wochentag = val),
+                            validator: (val) => val == null ? 'Bitte Wochentag wählen' : null,
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            decoration: const InputDecoration(labelText: "Anzahl Wiederholungen (optional)"),
+                            keyboardType: TextInputType.number,
+                            onChanged: (val) {
+                              _anzahlWiederholungen = int.tryParse(val);
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(_wiederholenBis == null
+                                    ? "Wiederholen bis: nicht gesetzt"
+                                    : "Wiederholen bis: ${_wiederholenBis!.toLocal().toString().split(' ')[0]}"),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.calendar_today),
+                                onPressed: () async {
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: _wiederholenBis ?? DateTime.now().add(const Duration(days: 30)),
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                                  );
+                                  if (picked != null) setState(() => _wiederholenBis = picked);
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+
                         const SizedBox(height: 28),
                         if (_errorMessage != null) ...[
                           Text(

@@ -157,7 +157,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                             elevation: 2,
                             borderRadius: BorderRadius.circular(15),
                             child: ListTile(
-                              isThreeLine: true, // WICHTIG für mehr Platz bei Wrap
+                              isThreeLine: true, // Mehr Platz für mehrzeilige Badges
                               contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
@@ -167,9 +167,22 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                                 color: primaryColor,
                                 size: 30,
                               ),
-                              title: Text(
-                                auftrag.titel,
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      auftrag.titel,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  // NEU: Icon für geplanten Auftrag
+                                  if (!auftrag.soSchnellWieMoeglich)
+                                    Tooltip(
+                                      message: 'Geplanter Auftrag',
+                                      child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 21),
+                                    ),
+                                ],
                               ),
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
