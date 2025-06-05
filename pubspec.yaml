@@ -25,6 +25,13 @@ dependencies:
   # Sterne-Bewertungs-Widget
   flutter_rating_bar: ^4.0.1
 
+  # === Firebase & Push Notifications ===
+  firebase_core: ^2.27.0
+  firebase_messaging: ^14.8.0
+
+  # === Profilbild-Upload ===
+  image_picker: ^1.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

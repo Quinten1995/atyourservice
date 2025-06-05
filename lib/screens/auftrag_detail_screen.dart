@@ -24,6 +24,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   double? _dlDurchschnitt;
   int? _dlAnzahlBewertungen;
 
+  // NEU: Profilbild-URL des Dienstleisters
+  String? _dienstleisterProfilbildUrl;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   static const Color primaryColor = Color(0xFF3876BF);
@@ -46,6 +49,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       _dienstleisterTelefonnummer = null;
       _dlDurchschnitt = null;
       _dlAnzahlBewertungen = null;
+      _dienstleisterProfilbildUrl = null;
     });
 
     try {
@@ -103,6 +107,16 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       // Bewertung laden, wenn Dienstleister zugeordnet ist
       if (aktuellerAuftrag.dienstleisterId != null) {
         await _ladeDienstleisterBewertung(aktuellerAuftrag.dienstleisterId!);
+
+        // PROFILBILD-URL laden
+        final details = await _supabase
+            .from('dienstleister_details')
+            .select('profilbild_url')
+            .eq('user_id', aktuellerAuftrag.dienstleisterId!)
+            .maybeSingle();
+        setState(() {
+          _dienstleisterProfilbildUrl = details?['profilbild_url'];
+        });
       }
 
       setState(() {
@@ -329,6 +343,66 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  Widget _kopfbereichMitProfilbild() {
+    final ad = _auftragDetails!;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Avatar nur, wenn ein Dienstleister zugeordnet ist (und Kunde draufschaut)
+        if (!_isDienstleister &&
+            ad.dienstleisterId != null &&
+            (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen'))
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: CircleAvatar(
+              radius: 24,
+              backgroundImage: (_dienstleisterProfilbildUrl != null && _dienstleisterProfilbildUrl!.isNotEmpty)
+                  ? NetworkImage(_dienstleisterProfilbildUrl!)
+                  : null,
+              child: (_dienstleisterProfilbildUrl == null || _dienstleisterProfilbildUrl!.isEmpty)
+                  ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                  : null,
+            ),
+          ),
+        // Titel, Bewertung, Anzahl Bewertungen ...
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ad.titel,
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
+                children: [
+                  if (!_isDienstleister &&
+                      ad.dienstleisterId != null &&
+                      (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen')) ...[
+                    Icon(Icons.star, color: Colors.amber, size: 22),
+                    const SizedBox(width: 3),
+                    Text(
+                      _dlDurchschnitt != null
+                          ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
+                          : '—',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
+                      Text(
+                        ' (${_dlAnzahlBewertungen!} Bewertung${_dlAnzahlBewertungen == 1 ? '' : 'en'})',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _auftragInfoCard() {
     final ad = _auftragDetails!;
 
@@ -348,40 +422,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Titel & Bewertung
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  ad.titel,
-                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (!_isDienstleister &&
-                  ad.dienstleisterId != null &&
-                  (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen')) ...[
-                Icon(Icons.star, color: Colors.amber, size: 22),
-                const SizedBox(width: 3),
-                Text(
-                  _dlDurchschnitt != null
-                      ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
-                      : '—',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
-                  Text(
-                    ' (${_dlAnzahlBewertungen!} Bewertung${_dlAnzahlBewertungen == 1 ? '' : 'en'})',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                  ),
-              ],
-            ],
-          ),
+          // Kopfbereich mit Avatar + Bewertung + Titel
+          _kopfbereichMitProfilbild(),
           const SizedBox(height: 16),
-
-          // NEU: Zeitplanung/Intervall
+          // Zeitplanung/Intervall
           _zeitplanungAnzeige(),
           const SizedBox(height: 11),
 

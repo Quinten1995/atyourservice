@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:atyourservice/utils/geocoding_service.dart';
-import '../data/kategorien.dart'; // <--- Zentrale Kategorienliste importieren
+import '../data/kategorien.dart';
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -18,7 +21,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _beschreibungController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController(text: 'lala@popo.com');
-  String _selectedKategorie = kategorieListe.first; // <--- Defaultwert auf zentrale Liste setzen
+  String _selectedKategorie = kategorieListe.first;
   final _adresseController = TextEditingController();
 
   bool _isLoading = false;
@@ -27,20 +30,15 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   double? _durchschnitt;
   int _anzahlBewertungen = 0;
 
+  String? _profilbildUrl;   // URL vom Profilbild in Supabase Storage
+  File? _neuesProfilbild;   // Lokale Datei (falls neu ausgewählt)
+
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
   @override
   void initState() {
     super.initState();
-
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session != null) {
-      print('––– MEIN JWT-TOKEN: ${session.accessToken}');
-    } else {
-      print('––– KEINE SESSION GEFUNDEN');
-    }
-
     _ladeProfil();
     _ladeBewertungen();
   }
@@ -63,7 +61,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
-        // --- Prüfe, ob gespeicherte Kategorie gültig ist, sonst fallback auf erste:
         final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieListe.first;
         _selectedKategorie = kategorieListe.contains(gespeicherteKategorie)
             ? gespeicherteKategorie
@@ -73,6 +70,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
             ? data['email'] as String
             : _emailController.text;
+        _profilbildUrl = data['profilbild_url'] as String?;
       }
     } catch (e) {
       setState(() {
@@ -135,6 +133,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         lon = coords['lng'];
       }
 
+      // === Profilbild-Upload (wenn neu ausgewählt) ===
+      String? profilbildUrl = _profilbildUrl;
+      if (_neuesProfilbild != null) {
+        final storageResponse = await _supabase.storage
+            .from('profile-pics')
+            .upload(
+              '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+              _neuesProfilbild!,
+              fileOptions: const FileOptions(upsert: true),
+            );
+        final String publicUrl = _supabase.storage
+            .from('profile-pics')
+            .getPublicUrl(storageResponse);
+        profilbildUrl = publicUrl;
+      }
+
       await _supabase
           .from('dienstleister_details')
           .upsert({
@@ -147,9 +161,15 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             'longitude':      lon,
             'telefon':        telefon,
             'email':          email,
+            'profilbild_url': profilbildUrl,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
           }, onConflict: 'user_id')
           .select();
+
+      setState(() {
+        _profilbildUrl = profilbildUrl;
+        _neuesProfilbild = null;
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
@@ -162,6 +182,16 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _bildWaehlen() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked != null) {
+      setState(() {
+        _neuesProfilbild = File(picked.path);
       });
     }
   }
@@ -187,6 +217,44 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         ),
       );
 
+  Widget _profilbildWidget() {
+    final double avatarSize = 96;
+    Widget avatar;
+
+    if (_neuesProfilbild != null) {
+      avatar = CircleAvatar(
+        radius: avatarSize / 2,
+        backgroundImage: FileImage(_neuesProfilbild!),
+      );
+    } else if (_profilbildUrl != null && _profilbildUrl!.isNotEmpty) {
+      avatar = CircleAvatar(
+        radius: avatarSize / 2,
+        backgroundImage: NetworkImage(_profilbildUrl!),
+      );
+    } else {
+      avatar = CircleAvatar(
+        radius: avatarSize / 2,
+        backgroundColor: Colors.grey[300],
+        child: Icon(Icons.person, size: 48, color: Colors.grey[700]),
+      );
+    }
+
+    return Column(
+      children: [
+        avatar,
+        const SizedBox(height: 7),
+        TextButton.icon(
+          onPressed: _bildWaehlen,
+          icon: const Icon(Icons.edit, size: 20),
+          label: const Text('Profilbild ändern'),
+          style: TextButton.styleFrom(
+            foregroundColor: primaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -203,146 +271,153 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             ? const Center(child: CircularProgressIndicator())
             : Center(
                 child: SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          if (_durchschnitt != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.star, color: Colors.amber, size: 28),
-                                const SizedBox(width: 6),
-                                Text(
-                                  '${_durchschnitt!.toStringAsFixed(2)} / 5',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 9),
-                                Text(
-                                  '($_anzahlBewertungen Bewertungen)',
-                                  style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ],
-                            )
-                          else
-                            const Text(
-                              'Noch keine Bewertungen',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                              ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      _profilbildWidget(),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
                             ),
-                          const SizedBox(height: 26),
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: _inputDecoration('Name'),
-                            validator: (value) =>
-                                (value == null || value.isEmpty) ? 'Bitte Name eingeben' : null,
-                          ),
-                          const SizedBox(height: 18),
-                          TextFormField(
-                            controller: _beschreibungController,
-                            decoration: _inputDecoration('Beschreibung'),
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: 18),
-                          DropdownButtonFormField<String>(
-                            value: _selectedKategorie,
-                            decoration: _inputDecoration('Kategorie'),
-                            items: kategorieListe.map((kategorie) {
-                              return DropdownMenuItem(
-                                value: kategorie,
-                                child: Text(kategorie),
-                              );
-                            }).toList(),
-                            onChanged: (wert) {
-                              if (wert != null) {
-                                setState(() {
-                                  _selectedKategorie = wert;
-                                });
-                              }
-                            },
-                            validator: (value) => (value == null || value.isEmpty)
-                                ? 'Bitte Kategorie auswählen'
-                                : null,
-                          ),
-                          const SizedBox(height: 18),
-                          TextFormField(
-                            controller: _adresseController,
-                            decoration: _inputDecoration('Adresse (z. B. Straße, PLZ, Stadt)'),
-                          ),
-                          const SizedBox(height: 18),
-                          TextFormField(
-                            controller: _telefonController,
-                            decoration: _inputDecoration('Telefon'),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) =>
-                                (value == null || value.isEmpty) ? 'Bitte Telefonnummer angeben' : null,
-                          ),
-                          const SizedBox(height: 18),
-                          TextFormField(
-                            controller: _emailController,
-                            decoration: _inputDecoration('E-Mail'),
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) return 'Bitte E-Mail angeben';
-                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                return 'Bitte gültige E-Mail-Adresse eingeben';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 28),
-                          if (_errorMessage != null) ...[
-                            Text(
-                              'Fehler: $_errorMessage',
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                            const SizedBox(height: 12),
                           ],
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              if (_durchschnitt != null)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.star, color: Colors.amber, size: 28),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${_durchschnitt!.toStringAsFixed(2)} / 5',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 9),
+                                    Text(
+                                      '($_anzahlBewertungen Bewertungen)',
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                const Text(
+                                  'Noch keine Bewertungen',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                                backgroundColor: primaryColor,
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                elevation: 2,
+                              const SizedBox(height: 26),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: _inputDecoration('Name'),
+                                validator: (value) =>
+                                    (value == null || value.isEmpty) ? 'Bitte Name eingeben' : null,
                               ),
-                              onPressed: _profilSpeichern,
-                              child: const Text('Profil speichern'),
-                            ),
+                              const SizedBox(height: 18),
+                              TextFormField(
+                                controller: _beschreibungController,
+                                decoration: _inputDecoration('Beschreibung'),
+                                maxLines: 3,
+                              ),
+                              const SizedBox(height: 18),
+                              DropdownButtonFormField<String>(
+                                value: _selectedKategorie,
+                                decoration: _inputDecoration('Kategorie'),
+                                items: kategorieListe.map((kategorie) {
+                                  return DropdownMenuItem(
+                                    value: kategorie,
+                                    child: Text(kategorie),
+                                  );
+                                }).toList(),
+                                onChanged: (wert) {
+                                  if (wert != null) {
+                                    setState(() {
+                                      _selectedKategorie = wert;
+                                    });
+                                  }
+                                },
+                                validator: (value) => (value == null || value.isEmpty)
+                                    ? 'Bitte Kategorie auswählen'
+                                    : null,
+                              ),
+                              const SizedBox(height: 18),
+                              TextFormField(
+                                controller: _adresseController,
+                                decoration: _inputDecoration('Adresse (z. B. Straße, PLZ, Stadt)'),
+                              ),
+                              const SizedBox(height: 18),
+                              TextFormField(
+                                controller: _telefonController,
+                                decoration: _inputDecoration('Telefon'),
+                                keyboardType: TextInputType.phone,
+                                validator: (value) =>
+                                    (value == null || value.isEmpty) ? 'Bitte Telefonnummer angeben' : null,
+                              ),
+                              const SizedBox(height: 18),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: _inputDecoration('E-Mail'),
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) return 'Bitte E-Mail angeben';
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                    return 'Bitte gültige E-Mail-Adresse eingeben';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 28),
+                              if (_errorMessage != null) ...[
+                                Text(
+                                  'Fehler: $_errorMessage',
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    backgroundColor: primaryColor,
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                  onPressed: _profilSpeichern,
+                                  child: const Text('Profil speichern'),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

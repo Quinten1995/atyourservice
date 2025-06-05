@@ -2,9 +2,21 @@ import 'package:flutter/material.dart';
 import 'utils/supabase_client.dart'; // Supabase Client Manager
 import 'screens/start_screen.dart';  // StartScreen importieren
 
+// NEU: Firebase-Imports
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SupabaseClientManager.init(); // Supabase initialisieren
+  // Zuerst Firebase initialisieren
+  await Firebase.initializeApp();
+  // Dann Supabase initialisieren
+  await SupabaseClientManager.init();
+
+  // NEU: FCM-Token ausgeben (zu Testzwecken)
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print('FCM Token: $fcmToken');
+
   runApp(const MyApp());
 }
 
@@ -57,70 +69,10 @@ class MyApp extends StatelessWidget {
           labelStyle: const TextStyle(color: Colors.deepPurple),
         ),
       ),
-      home: const StartScreen(), // Hier StartScreen als Startseite nutzen
-      // Zum Testen kannst du vorübergehend wechseln auf:
-      // home: const SupabaseTestScreen(),
+      home: const StartScreen(),
+      // home: const SupabaseTestScreen(), // Zum Testen
     );
   }
 }
 
-class SupabaseTestScreen extends StatelessWidget {
-  const SupabaseTestScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Supabase Test')),
-      body: Center(
-        child: ElevatedButton(
-          child: const Text('Teste Supabase Verbindung'),
-          onPressed: () async {
-            try {
-              final data = await SupabaseClientManager.client
-                  .from('users')
-                  .select()
-                  .maybeSingle();
-
-              if (data == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Keine Nutzer gefunden')),
-                );
-              } else if (data is List) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Erfolg! Anzahl Nutzer: ${data.length}')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Erfolg! Nutzer gefunden')),
-                );
-              }
-            } catch (error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Fehler: $error')),
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// (SupabaseTestScreen bleibt unverändert)

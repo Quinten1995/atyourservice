@@ -42,3 +42,6 @@ android {
 flutter {
     source = "../.."
 }
+
+// === WICHTIG für Firebase Messaging ===
+apply(plugin = "com.google.gms.google-services")
