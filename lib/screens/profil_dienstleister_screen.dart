@@ -31,8 +31,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   double? _durchschnitt;
   int _anzahlBewertungen = 0;
 
-  String? _profilbildUrl;   // URL vom Profilbild in Supabase Storage
-  File? _neuesProfilbild;   // Lokale Datei (falls neu ausgewählt)
+  String? _profilbildUrl;
+  File? _neuesProfilbild;
+
+  DateTime? _lastProfileChange; // Für Limitierung
+  String? _aboTyp; // Abo-Typ ('free', 'silver', 'gold')
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
@@ -72,7 +75,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             ? data['email'] as String
             : _emailController.text;
         _profilbildUrl = data['profilbild_url'] as String?;
+        _lastProfileChange = data['last_profile_change'] != null
+            ? DateTime.parse(data['last_profile_change'])
+            : null;
       }
+
+      // Abo-Typ aus users-Tabelle holen
+      final userData = await _supabase
+          .from('users')
+          .select('abo_typ')
+          .eq('id', user.id)
+          .maybeSingle();
+      _aboTyp = userData?['abo_typ'] as String? ?? 'free'; // Fallback: 'free'
     } catch (e) {
       setState(() {
         _errorMessage = 'Fehler beim Laden des Profils: $e';
@@ -117,6 +131,34 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) throw Exception('Bitte zuerst einloggen');
+
+      // === Nur Free-User haben Änderungssperre ===
+      final isFree = (_aboTyp ?? 'free') == 'free';
+
+      if (isFree && _lastProfileChange != null) {
+        final now = DateTime.now();
+        final diff = now.difference(_lastProfileChange!).inDays;
+        if (diff < 20) {
+          final naechstesDatum = _lastProfileChange!.add(const Duration(days: 20));
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Änderung nicht möglich'),
+              content: Text(
+                'Als Free-Nutzer kannst du deine Kategorie oder Adresse nur alle 20 Tage ändern.\n'
+                'Nächste Änderung ab: ${naechstesDatum.toLocal().toString().substring(0, 10)}'
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+              ],
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
+      }
 
       final name         = _nameController.text.trim();
       final beschreibung = _beschreibungController.text.trim();
@@ -164,12 +206,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             'email':          email,
             'profilbild_url': profilbildUrl,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+            // Sperr-Feld nur bei Free-User setzen/aktualisieren!
+            if (isFree)
+              'last_profile_change': DateTime.now().toUtc().toIso8601String(),
           }, onConflict: 'user_id')
           .select();
 
       setState(() {
         _profilbildUrl = profilbildUrl;
         _neuesProfilbild = null;
+        if (isFree) {
+          _lastProfileChange = DateTime.now();
+        }
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -214,7 +262,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: primaryColor, width: 2),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
       );
 
@@ -285,6 +333,24 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Hinweis-Widget
+    Widget? limitHinweis;
+    final isFree = (_aboTyp ?? 'free') == 'free';
+    if (isFree && _lastProfileChange != null) {
+      final naechstesDatum = _lastProfileChange!.add(const Duration(days: 20));
+      final nochGesperrt = DateTime.now().isBefore(naechstesDatum);
+      if (nochGesperrt) {
+        limitHinweis = Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: Text(
+            'Kategorie/Adresse kann erst wieder ab '
+            '${naechstesDatum.toLocal().toString().substring(0, 10)} geändert werden.',
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+        );
+      }
+    }
+
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
@@ -301,11 +367,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Premium-Button ganz oben!
                       _premiumButtonOben(context),
                       const SizedBox(height: 10),
                       _profilbildWidget(),
                       const SizedBox(height: 14),
+                      if (limitHinweis != null) limitHinweis,
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
@@ -443,7 +509,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   child: const Text('Profil speichern'),
                                 ),
                               ),
-                              // Hinweis: Der Premium-Button ist jetzt oben, also unten rausnehmen!
                             ],
                           ),
                         ),

@@ -21,6 +21,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   String? _meineKategorie;
   double? _meineLatitude;
   double? _meineLongitude;
+  String? _aboTyp; // <--- NEU
 
   List<Map<String, dynamic>> _alleOffenenAuftraegeRaw = [];
   List<Map<String, dynamic>> _alleLaufendenAuftraegeRaw = [];
@@ -69,6 +70,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _meineLatitude = latitude;
       _meineLongitude = longitude;
 
+      // 1b) Abo-Typ aus users-Tabelle holen
+      final userData = await supabase
+          .from('users')
+          .select('abo_typ')
+          .eq('id', user.id)
+          .maybeSingle();
+      _aboTyp = userData?['abo_typ'] as String? ?? 'free';
+
       // 2) Alle offenen Aufträge derselben Kategorie laden
       final List<dynamic> rawOffen = await supabase
           .from('auftraege')
@@ -86,7 +95,16 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _alleLaufendenAuftraegeRaw = rawLaufend.cast<Map<String, dynamic>>();
       _laufendeAuftraegeMitUser = _alleLaufendenAuftraegeRaw;
 
-      // 4) Offene Aufträge, nur ≤50km
+      // --- NEU: Radius nach Abo-Typ bestimmen ---
+      double radiusKm = 10.0;
+      if (_aboTyp == 'silver') {
+        radiusKm = 30.0;
+      } else if (_aboTyp == 'gold') {
+        radiusKm = 70.0;
+      }
+      // ------------------------------------------------
+
+      // 4) Offene Aufträge, nur im passenden Radius!
       if (_meineLatitude != null && _meineLongitude != null) {
         _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
             .map((map) => Auftrag.fromJson(map))
@@ -96,7 +114,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
             _meineLatitude!, _meineLongitude!,
             auftrag.latitude!, auftrag.longitude!,
           );
-          return dist <= 50.0;
+          return dist <= radiusKm;
         }).toList();
       } else {
         _offenePassendeAuftraege =

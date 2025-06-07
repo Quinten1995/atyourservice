@@ -29,6 +29,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   // NEU: Profilbild-URL des Dienstleisters
   String? _dienstleisterProfilbildUrl;
 
+  // NEU: Abo-Typ
+  String? _aboTyp;
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   static const Color primaryColor = Color(0xFF3876BF);
@@ -60,18 +63,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception('Nicht eingeloggt');
       }
 
-      // Rolle laden
-      final roleResponse = await _supabase
+      // Rolle und Abo-Typ laden
+      final userResponse = await _supabase
           .from('users')
-          .select('rolle')
+          .select('rolle, abo_typ')
           .eq('id', user.id)
           .maybeSingle();
-      if (roleResponse == null || roleResponse['rolle'] == null) {
+      if (userResponse == null || userResponse['rolle'] == null) {
         throw Exception('Rolle konnte nicht ermittelt werden');
       }
-      final isDL = roleResponse['rolle'] == 'dienstleister';
+      final isDL = userResponse['rolle'] == 'dienstleister';
       setState(() {
         _isDienstleister = isDL;
+        _aboTyp = userResponse['abo_typ'] as String? ?? 'free';
       });
 
       // Auftrag laden (aktuelle Daten)
@@ -185,6 +189,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // AUFTRAGSANNAHME MIT ABO-LIMITS
   Future<void> _auftragAnnehmen() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return;
@@ -192,11 +197,55 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // --- LIMIT-LOGIK NACH ABO-TYP ---
+      int wochenLimit = 2; // Default: free
+      if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 5;
+      if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999; // "unbegrenzt"
+
+      // Gold-User werden nicht geprüft, weil das Limit absurd hoch ist.
+      if ((_aboTyp ?? 'free') != 'gold') {
+        // Wochenbeginn (Montag)
+        final now = DateTime.now();
+        final weekStart = now.subtract(Duration(days: now.weekday - 1));
+        final weekStartUtc = DateTime.utc(weekStart.year, weekStart.month, weekStart.day);
+
+        final auftraegeDieseWoche = await _supabase
+            .from('auftraege')
+            .select()
+            .eq('dienstleister_id', user.id)
+            .gte('angenommen_am', weekStartUtc.toIso8601String())
+            .inFilter('status', ['in bearbeitung', 'abgeschlossen']);
+
+        if (auftraegeDieseWoche is List && auftraegeDieseWoche.length >= wochenLimit) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Limit erreicht'),
+              content: Text(
+                (_aboTyp == 'free')
+                    ? 'Als Freemium-Dienstleister kannst du pro Woche maximal 2 Aufträge annehmen.\nUpgrade auf Silver oder Gold für mehr Möglichkeiten!'
+                    : 'Als Silver-Dienstleister kannst du pro Woche maximal 5 Aufträge annehmen.\nUpgrade auf Gold für unbegrenzte Aufträge!',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          setState(() => _isLoading = false);
+          return;
+        }
+      }
+
+      // Auftrag wirklich annehmen (mit Timestamp!)
       final updated = await _supabase
           .from('auftraege')
           .update({
             'status': 'in bearbeitung',
             'dienstleister_id': user.id,
+            'angenommen_am': DateTime.now().toUtc().toIso8601String(),
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
           })
           .eq('id', _auftragDetails!.id)
@@ -564,13 +613,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                     icon: const Icon(Icons.copy, color: Colors.black54),
                     tooltip: 'Nummer kopieren',
                     onPressed: () {
-                    Clipboard.setData(ClipboardData(text: nummer!));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Nummer kopiert!')),
-    );
-  },
-),
-
+                      Clipboard.setData(ClipboardData(text: nummer!));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Nummer kopiert!')),
+                      );
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.call, color: Colors.green),
                     tooltip: 'Anrufen',
