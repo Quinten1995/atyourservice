@@ -6,7 +6,7 @@ List<Dienstleister> findePassendeDienstleister({
   required String kategorie,
   required double auftragLat,
   required double auftragLon,
-  double maxEntfernungKm = 20.0, // Standard-Radius z. B. 20 km
+  double maxEntfernungKm = 10.0, // Standard-Radius z. B. 20 km
 }) {
   return alleDienstleister.where((dienstleister) {
     bool gleicheKategorie = dienstleister.kategorie == kategorie;

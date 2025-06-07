@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:atyourservice/utils/geocoding_service.dart';
 import '../data/kategorien.dart';
+import 'premium_screen.dart'; // <--- Pfad ggf. anpassen!
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -255,6 +256,33 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     );
   }
 
+  Widget _premiumButtonOben(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          icon: Icon(Icons.star, color: Colors.yellow[700]),
+          label: const Text('Upgrade to Premium'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.amber[600],
+            foregroundColor: Colors.black87,
+            textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 2,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PremiumScreen()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,6 +301,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      // Premium-Button ganz oben!
+                      _premiumButtonOben(context),
                       const SizedBox(height: 10),
                       _profilbildWidget(),
                       const SizedBox(height: 14),
@@ -413,6 +443,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   child: const Text('Profil speichern'),
                                 ),
                               ),
+                              // Hinweis: Der Premium-Button ist jetzt oben, also unten rausnehmen!
                             ],
                           ),
                         ),

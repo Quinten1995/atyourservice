@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Für Clipboard
+import 'package:url_launcher/url_launcher.dart'; // Für Anrufen
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'bewertung_dialog.dart'; // Passe ggf. den Pfad an!
@@ -505,37 +507,84 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     );
   }
 
+  // --- DEUTLICH HERVORGEHOBENER KONTAKTBEREICH ---
   Widget _kontaktBereich() {
     final ad = _auftragDetails!;
     if (ad.status == 'in bearbeitung' && ad.dienstleisterId != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 18),
-          Text(
-            'Kontakt:',
-            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800], fontSize: 17),
+      String? label;
+      String? nummer;
+      if (_isDienstleister && _kundenTelefonnummer != null) {
+        label = "Kunde";
+        nummer = _kundenTelefonnummer;
+      } else if (!_isDienstleister && _dienstleisterTelefonnummer != null) {
+        label = "Dienstleister";
+        nummer = _dienstleisterTelefonnummer;
+      }
+      if (label != null && nummer != null) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 18.0),
+          child: Card(
+            elevation: 4,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.phone, color: Colors.green, size: 30),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Kontakt zu $label:',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          nummer,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.copy, color: Colors.black54),
+                    tooltip: 'Nummer kopieren',
+                    onPressed: () {
+                    Clipboard.setData(ClipboardData(text: nummer!));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Nummer kopiert!')),
+    );
+  },
+),
+
+                  IconButton(
+                    icon: const Icon(Icons.call, color: Colors.green),
+                    tooltip: 'Anrufen',
+                    onPressed: () {
+                      final uri = Uri(scheme: 'tel', path: nummer);
+                      launchUrl(uri);
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
-          if (_isDienstleister && _kundenTelefonnummer != null) ...[
-            Row(
-              children: [
-                const Icon(Icons.phone, size: 18),
-                const SizedBox(width: 7),
-                Text('Kunde: $_kundenTelefonnummer', style: const TextStyle(fontSize: 15)),
-              ],
-            ),
-          ],
-          if (!_isDienstleister && _dienstleisterTelefonnummer != null) ...[
-            Row(
-              children: [
-                const Icon(Icons.phone, size: 18),
-                const SizedBox(width: 7),
-                Text('Dienstleister: $_dienstleisterTelefonnummer', style: const TextStyle(fontSize: 15)),
-              ],
-            ),
-          ],
-        ],
-      );
+        );
+      }
     }
     return const SizedBox.shrink();
   }
