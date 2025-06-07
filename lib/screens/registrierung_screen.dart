@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../data/kategorien.dart'; // <-- Import für zentrale Kategorie-Liste
+import '../data/kategorien.dart';
 
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
   final _passwordController = TextEditingController(text: 'password123');
   String _rolle = 'kunde';
-  String? _selectedKategorie; // Kategorie nur für Dienstleister
+  String? _selectedKategorie;
   bool _isLoading = false;
 
   final supabase = Supabase.instance.client;
@@ -32,54 +32,32 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     final password = _passwordController.text;
 
     try {
-      await supabase.auth.signInWithPassword(
-        email: email,
-        password: '••••••••',
-      );
-      await supabase.auth.signOut();
+      final response = await supabase.auth.signUp(email: email, password: password);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Diese E-Mail ist bereits registriert. Bitte einloggen.')),
-      );
-    } on AuthException catch (authError) {
-      final err = authError.message.toLowerCase();
-      if (err.contains('invalid login credentials')) {
+      // identities: [] => Account existiert bereits (unconfirmed oder confirmed)
+      final identities = response.user?.identities;
+      if (identities != null && identities.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Diese E-Mail ist bereits registriert. Passwort vergessen?')),
+          const SnackBar(
+            content: Text('Registrierung erfolgreich! Bitte E-Mail bestätigen.'),
+          ),
         );
-      } else if (err.contains('user not found')) {
-        await _signUpFlow(email, password);
+        Navigator.of(context).pop();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Überprüfen: ${authError.message}')),
+          const SnackBar(
+            content: Text('Diese E-Mail ist bereits registriert. Bitte einloggen oder Passwort zurücksetzen.'),
+          ),
         );
+        // KEIN pop im Fehlerfall!
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unbekannter Fehler: $e')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _signUpFlow(String email, String password) async {
-    try {
-      // Bei Bedarf: Hier könntest du _selectedKategorie mitspeichern!
-      await supabase.auth.signUp(email: email, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registrierung erfolgreich! Bitte überprüfe deine E-Mail und bestätige sie.'),
-        ),
-      );
-      Navigator.of(context).pop();
     } on AuthException catch (authError) {
       final err = authError.message.toLowerCase();
       String userMessage;
       if (err.contains('already registered') ||
           err.contains('duplicate') ||
           err.contains('user exists')) {
-        userMessage = 'Diese E-Mail ist bereits registriert.';
+        userMessage = 'Diese E-Mail ist bereits registriert. Bitte einloggen oder Passwort zurücksetzen.';
       } else if (err.contains('invalid email')) {
         userMessage = 'Bitte gib eine gültige E-Mail-Adresse ein.';
       } else if (err.contains('password')) {
@@ -90,10 +68,14 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(userMessage)),
       );
+      // KEIN pop im Fehlerfall!
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Unbekannter Fehler: $e')),
       );
+      // KEIN pop im Fehlerfall!
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 

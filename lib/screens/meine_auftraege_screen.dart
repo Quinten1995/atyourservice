@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'auftrag_detail_screen.dart';
-import '../data/kategorie_icons.dart'; // <-- Import für die Icon-Map
+import '../data/kategorie_icons.dart';
 
-// Hilfsfunktion für Status-Badge-Farbe
 Color statusColor(String status) {
   switch (status.toLowerCase()) {
     case 'offen':
@@ -60,8 +59,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
           .from('auftraege')
           .select()
           .eq('kunde_id', user.id)
-          .or('status.eq.offen,status.eq.in bearbeitung,status.eq.abgeschlossen')
-          .eq('kunde_auftragsstatus', 'sichtbar')
+          .or('kunde_auftragsstatus.is.null,kunde_auftragsstatus.neq.entfernt')
           .order('erstellt_am', ascending: false);
 
       setState(() {
@@ -91,7 +89,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
     _ladeAuftraege();
   }
 
-  // NEU: Auftrag ausblenden (Soft-Delete für abgeschlossene Aufträge)
+  // Soft-Delete für abgeschlossene Aufträge
   Future<void> _auftragEntfernen(Auftrag auftrag) async {
     try {
       await supabase
@@ -157,7 +155,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                             elevation: 2,
                             borderRadius: BorderRadius.circular(15),
                             child: ListTile(
-                              isThreeLine: true, // Mehr Platz für mehrzeilige Badges
+                              isThreeLine: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
@@ -176,7 +174,6 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  // NEU: Icon für geplanten Auftrag
                                   if (!auftrag.soSchnellWieMoeglich)
                                     Tooltip(
                                       message: 'Geplanter Auftrag',
@@ -200,7 +197,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                                       child: Text(
                                         auftrag.kategorie,
                                         style: const TextStyle(
-                                          color: Color(0xFF3876BF), // primaryColor
+                                          color: Color(0xFF3876BF),
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),

@@ -243,12 +243,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // *** WICHTIG: Entfernen für Kunden bei abgeschlossenem Auftrag ***
   Future<void> _kundeAuftragEntfernen() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Auftrag entfernen?'),
-        content: const Text('Möchten Sie den Auftrag dauerhaft aus Ihrer Übersicht entfernen?'),
+        content: const Text('Möchtest du diesen Auftrag aus deiner Übersicht entfernen?'),
         actions: [
           TextButton(child: const Text('Abbrechen'), onPressed: () => Navigator.of(ctx).pop(false)),
           TextButton(child: const Text('Entfernen'), onPressed: () => Navigator.of(ctx).pop(true)),
@@ -575,6 +576,24 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 elevation: 3,
+              ),
+            ),
+          ),
+        // *** NEU: Auftrag entfernen für Kunden nach Abschluss ***
+        if (!_isDienstleister && ad.status == 'abgeschlossen')
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _kundeAuftragEntfernen,
+              icon: const Icon(Icons.delete_forever_rounded),
+              label: const Text('Auftrag aus Übersicht entfernen'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[600],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 2,
               ),
             ),
           ),
