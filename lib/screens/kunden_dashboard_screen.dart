@@ -5,6 +5,23 @@ import 'auftrag_detail_screen.dart';
 import 'auftrag_erstellen_screen.dart';
 import 'profil_kunde_screen.dart';
 
+// Hilfsfunktion: Wähle das passende Icon je Kategorie
+IconData getKategorieIcon(String kategorie) {
+  switch (kategorie.toLowerCase()) {
+    case 'elektriker':
+      return Icons.electrical_services;
+    case 'maler':
+      return Icons.format_paint;
+    case 'babysitter / kinderbetreuung':
+      return Icons.child_care;
+    case 'klempner':
+      return Icons.plumbing;
+    // ... weitere Kategorien nach Bedarf
+    default:
+      return Icons.assignment_ind;
+  }
+}
+
 class KundenDashboardScreen extends StatefulWidget {
   const KundenDashboardScreen({Key? key}) : super(key: key);
 
@@ -127,6 +144,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                     children: [
                       _dashboardHeader(),
 
+                      // ----------- Laufende Aufträge (horizontal) -----------
                       if (_laufendeAuftraege.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
@@ -135,7 +153,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                         ),
                         const SizedBox(height: 7),
                         SizedBox(
-                          height: 135,
+                          height: 160, // Erhöht für mehr Platz!
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: _laufendeAuftraege.length,
@@ -158,13 +176,26 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                   },
                                   child: Container(
                                     width: 240,
-                                    padding: const EdgeInsets.all(16),
+                                    padding: const EdgeInsets.all(14),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
+                                            // Kategorie-Icon
+                                            CircleAvatar(
+                                              radius: 22,
+                                              backgroundColor: KundenDashboardScreen.accentColor,
+                                              child: Icon(
+                                                getKategorieIcon(auftrag.kategorie),
+                                                color: KundenDashboardScreen.primaryColor,
+                                                size: 28,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            // Titel, max. 2 Zeilen
                                             Expanded(
                                               child: Text(
                                                 auftrag.titel,
@@ -173,14 +204,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            if (!auftrag.soSchnellWieMoeglich)
-                                              Tooltip(
-                                                message: 'Geplanter Auftrag',
-                                                child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
-                                              ),
                                           ],
                                         ),
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 12),
                                         Row(
                                           children: [
                                             Icon(Icons.assignment, size: 17, color: KundenDashboardScreen.primaryColor),
@@ -188,6 +214,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                             Text(
                                               'Status: ${auftrag.status}',
                                               style: const TextStyle(fontSize: 13),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),
@@ -196,6 +223,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                           Text(
                                             'Dienstleister: ${auftrag.dienstleisterId}',
                                             style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                       ],
                                     ),
@@ -208,6 +236,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                         const Divider(height: 32, thickness: 1.2),
                       ],
 
+                      // ----------- Offene Aufträge (vertikal) -----------
                       Text(
                         'Offene Aufträge',
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
@@ -232,23 +261,20 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                     elevation: 2,
                                     child: ListTile(
                                       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                                      leading: Icon(Icons.assignment_outlined, color: KundenDashboardScreen.primaryColor, size: 30),
-                                      title: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              auftrag.titel,
-                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          if (!auftrag.soSchnellWieMoeglich)
-                                            Tooltip(
-                                              message: 'Geplanter Auftrag',
-                                              child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
-                                            ),
-                                        ],
+                                      leading: CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor: KundenDashboardScreen.accentColor,
+                                        child: Icon(
+                                          getKategorieIcon(auftrag.kategorie),
+                                          color: KundenDashboardScreen.primaryColor,
+                                          size: 28,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        auftrag.titel,
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       subtitle: auftrag.status != null
                                           ? Padding(
@@ -274,7 +300,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                               ),
                       ),
 
-                      // Optional: Abgeschlossene Aufträge separat
+                      // ----------- Abgeschlossene Aufträge (optional horizontal) -----------
                       if (_abgeschlosseneAuftraege.isNotEmpty) ...[
                         const Divider(height: 30, thickness: 1.2),
                         Text(
@@ -311,11 +337,27 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          auftrag.titel,
-                                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 17,
+                                              backgroundColor: KundenDashboardScreen.accentColor,
+                                              child: Icon(
+                                                getKategorieIcon(auftrag.kategorie),
+                                                color: KundenDashboardScreen.primaryColor,
+                                                size: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                auftrag.titel,
+                                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
