@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../utils/geocoding_service.dart';
-import '../data/kategorien.dart'; // <-- Zentrale Kategorienliste importieren
+import '../data/kategorien.dart';
 
 class AuftragErstellenScreen extends StatefulWidget {
   const AuftragErstellenScreen({Key? key}) : super(key: key);
@@ -25,25 +25,20 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
 
   String? _heimatAdresse;
 
-  // Planung / Termin
   bool soSchnellWieMoeglich = true;
   DateTime? terminDatum;
   TimeOfDay? zeitVon;
   TimeOfDay? zeitBis;
 
-  // Intervall / Wiederkehrend (NEU)
   bool _wiederkehrend = false;
-  String? _intervall; // z.B. "wöchentlich", "alle 2 Wochen"
+  String? _intervall;
   String? _wochentag;
   int? _anzahlWiederholungen;
   DateTime? _wiederholenBis;
 
   static const intervallOptionen = [
-    "wöchentlich",
-    "alle 2 Wochen",
-    "monatlich",
+    "wöchentlich", "alle 2 Wochen", "monatlich",
   ];
-
   static const wochentage = [
     "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
   ];
@@ -95,7 +90,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       final String id = const Uuid().v4();
       final timestamp = DateTime.now().toUtc().toIso8601String();
 
-      // Map für Auftrag
       final auftragMap = {
         'id': id,
         'kunde_id': user.id,
@@ -119,7 +113,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
         'zeit_bis': (!soSchnellWieMoeglich && zeitBis != null)
             ? _timeOfDayToString(zeitBis!)
             : null,
-        // NEU: Intervall/Wiederkehrend
         'wiederkehrend': _wiederkehrend,
         'intervall': _wiederkehrend ? _intervall : null,
         'wochentag': _wiederkehrend ? _wochentag : null,
@@ -261,8 +254,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-                        // Heimatadresse einfügen
                         if (_heimatAdresse != null && _heimatAdresse!.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10.0),
@@ -285,7 +276,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               ),
                             ),
                           ),
-
                         TextFormField(
                           controller: _adresseController,
                           decoration: InputDecoration(
@@ -329,12 +319,10 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           },
                         ),
                         const SizedBox(height: 20),
-
-                        // Termin/Planungsauswahl
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ausführungszeitpunkt', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const Text('Ausführungszeitpunkt', style: TextStyle(fontWeight: FontWeight.bold)),
                             Row(
                               children: [
                                 Radio<bool>(
@@ -425,8 +413,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           ],
                         ),
                         const SizedBox(height: 24),
-
-                        // NEU: Wiederkehrend/Intervall
                         CheckboxListTile(
                           value: _wiederkehrend,
                           onChanged: (val) {
