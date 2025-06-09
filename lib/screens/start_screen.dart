@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart'; // Pfad anpassen, falls nötig!
 import 'login_kunde_screen.dart';
 import 'login_dienstleister_screen.dart';
 
@@ -14,7 +15,10 @@ class StartScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('atyourservice', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+        title: Text(
+          AppLocalizations.of(context)!.appTitle, // <-- Lokalisierung!
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -32,8 +36,8 @@ class StartScreen extends StatelessWidget {
               //   child: Image.asset('assets/logo.png', height: 80),
               // ),
               Text(
-                'Willkommen!',
-                style: TextStyle(
+                AppLocalizations.of(context)!.hello, // <-- Lokalisierung!
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: primaryColor,
@@ -61,9 +65,9 @@ class StartScreen extends StatelessWidget {
                     elevation: 4,
                     shadowColor: primaryColor.withOpacity(0.25),
                   ),
-                  child: const Text(
-                    'Ich suche Hilfe (Kunde)',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
+                  child: Text(
+                    AppLocalizations.of(context)!.kundeButton, // <-- Lokalisierung!
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
                   ),
                 ),
               ),
@@ -91,9 +95,9 @@ class StartScreen extends StatelessWidget {
                     elevation: 3,
                     shadowColor: primaryColor.withOpacity(0.13),
                   ),
-                  child: const Text(
-                    'Ich biete Hilfe an (Dienstleister)',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
+                  child: Text(
+                    AppLocalizations.of(context)!.dienstleisterButton, // <-- Lokalisierung!
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
                   ),
                 ),
               ),

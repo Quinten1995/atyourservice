@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../l10n/app_localizations.dart'; // <--- Import l10n
 
 class ProfilKundeScreen extends StatefulWidget {
   const ProfilKundeScreen({Key? key}) : super(key: key);
@@ -28,7 +29,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     setState(() => _isLoading = true);
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       final res = await supabase
           .from('users')
           .select('adresse')
@@ -36,7 +37,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
           .maybeSingle();
       _adresseController.text = res?['adresse'] ?? '';
     } catch (e) {
-      setState(() => _errorMessage = 'Fehler beim Laden: $e');
+      setState(() => _errorMessage = AppLocalizations.of(context)!.profileLoadError(e.toString()));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -47,16 +48,16 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     setState(() => _isLoading = true);
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       await supabase
           .from('users')
           .update({'adresse': _adresseController.text.trim()})
           .eq('id', user.id);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Adresse gespeichert!')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.profileAddressSaved)),
       );
     } catch (e) {
-      setState(() => _errorMessage = 'Fehler beim Speichern: $e');
+      setState(() => _errorMessage = AppLocalizations.of(context)!.profileSaveError(e.toString()));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -73,7 +74,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Profil – Heimatadresse'),
+        title: Text(AppLocalizations.of(context)!.profileAppBar),
         backgroundColor: Colors.white,
         foregroundColor: primaryColor,
         elevation: 0,
@@ -90,7 +91,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
                       TextFormField(
                         controller: _adresseController,
                         decoration: InputDecoration(
-                          labelText: 'Heimatadresse (z. B. Musterstraße 12, 12345 Musterstadt)',
+                          labelText: AppLocalizations.of(context)!.profileAddressLabel,
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -98,7 +99,9 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
                           ),
                         ),
                         validator: (value) =>
-                            (value == null || value.isEmpty) ? 'Adresse angeben' : null,
+                            (value == null || value.isEmpty)
+                                ? AppLocalizations.of(context)!.profileAddressEmpty
+                                : null,
                       ),
                       const SizedBox(height: 24),
                       if (_errorMessage != null)
@@ -118,9 +121,9 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text(
-                            'Speichern',
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                          child: Text(
+                            AppLocalizations.of(context)!.profileSaveButton,
+                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'auftrag_detail_screen.dart';
 import '../data/kategorie_icons.dart';
+import '../l10n/app_localizations.dart';
 
 Color statusColor(String status) {
   switch (status.toLowerCase()) {
@@ -40,11 +41,12 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
   }
 
   Future<void> _ladeAuftraege() async {
+    final l10n = AppLocalizations.of(context)!;
     final user = supabase.auth.currentUser;
     if (user == null) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'Nicht eingeloggt';
+        _errorMessage = l10n.notLoggedIn;
       });
       return;
     }
@@ -91,6 +93,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
 
   // Soft-Delete für abgeschlossene Aufträge
   Future<void> _auftragEntfernen(Auftrag auftrag) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       await supabase
           .from('auftraege')
@@ -102,21 +105,25 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Auftrag ausgeblendet.')),
+        SnackBar(content: Text(l10n.auftragHidden)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Ausblenden: $e')),
+        SnackBar(content: Text(l10n.auftragHideError(e.toString()))),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Meine Aufträge', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.meineAuftraegeAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -126,7 +133,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _ladeAuftraege,
             color: primaryColor,
-            tooltip: 'Aktualisieren',
+            tooltip: l10n.refreshTooltip,
           ),
         ],
       ),
@@ -135,12 +142,12 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Text('Fehler: $_errorMessage'))
+                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
                 : _auftraege.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'Keine Aufträge gefunden.',
-                          style: TextStyle(fontSize: 17, color: Colors.black54),
+                          l10n.noAuftraegeFound,
+                          style: const TextStyle(fontSize: 17, color: Colors.black54),
                         ),
                       )
                     : ListView.separated(
@@ -176,7 +183,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                                   ),
                                   if (!auftrag.soSchnellWieMoeglich)
                                     Tooltip(
-                                      message: 'Geplanter Auftrag',
+                                      message: l10n.geplanterAuftrag,
                                       child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 21),
                                     ),
                                 ],
@@ -226,7 +233,7 @@ class _MeineAuftraegeScreenState extends State<MeineAuftraegeScreen> {
                                   if (auftrag.status.toLowerCase() == 'abgeschlossen')
                                     IconButton(
                                       icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                      tooltip: 'Auftrag ausblenden',
+                                      tooltip: l10n.auftragAusblenden,
                                       onPressed: () => _auftragEntfernen(auftrag),
                                     ),
                                   const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),

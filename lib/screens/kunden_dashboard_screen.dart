@@ -4,6 +4,7 @@ import '../models/auftrag.dart';
 import 'auftrag_detail_screen.dart';
 import 'auftrag_erstellen_screen.dart';
 import 'profil_kunde_screen.dart';
+import '../l10n/app_localizations.dart';
 
 // Hilfsfunktion: Wähle das passende Icon je Kategorie
 IconData getKategorieIcon(String kategorie) {
@@ -16,7 +17,6 @@ IconData getKategorieIcon(String kategorie) {
       return Icons.child_care;
     case 'klempner':
       return Icons.plumbing;
-    // ... weitere Kategorien nach Bedarf
     default:
       return Icons.assignment_ind;
   }
@@ -45,19 +45,22 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _ladeAuftraege();
+    // Sicherstellen, dass context/L10n da ist:
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ladeAuftraege();
+    });
   }
 
   Future<void> _ladeAuftraege() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception(l10n.notLoggedIn);
 
-      // Filtere Aufträge, die NICHT entfernt wurden!
       final auftraegeRaw = await supabase
           .from('auftraege')
           .select()
@@ -85,6 +88,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   }
 
   Widget _dashboardHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0, left: 2),
       child: Row(
@@ -92,7 +96,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           Icon(Icons.person, color: KundenDashboardScreen.primaryColor, size: 28),
           const SizedBox(width: 10),
           Text(
-            'Dein Dashboard',
+            l10n.kundenDashboardHeader,
             style: TextStyle(
                 fontSize: 23,
                 fontWeight: FontWeight.bold,
@@ -105,23 +109,27 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: KundenDashboardScreen.accentColor,
       appBar: AppBar(
-        title: const Text('Kunden-Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.kundenDashboardAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: KundenDashboardScreen.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Neu laden',
+            tooltip: l10n.refreshTooltip,
             onPressed: _ladeAuftraege,
             color: KundenDashboardScreen.primaryColor,
           ),
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Profil bearbeiten',
+            tooltip: l10n.editProfileTooltip,
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -138,7 +146,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Text('Fehler: $_errorMessage'))
+                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -148,12 +156,12 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                       if (_laufendeAuftraege.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'Laufende Aufträge',
+                          l10n.laufendeAuftraege,
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                         ),
                         const SizedBox(height: 7),
                         SizedBox(
-                          height: 160, // Erhöht für mehr Platz!
+                          height: 160,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: _laufendeAuftraege.length,
@@ -212,7 +220,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                             Icon(Icons.assignment, size: 17, color: KundenDashboardScreen.primaryColor),
                                             const SizedBox(width: 5),
                                             Text(
-                                              'Status: ${auftrag.status}',
+                                              l10n.statusPrefix(auftrag.status),
                                               style: const TextStyle(fontSize: 13),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -221,7 +229,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                         // Dienstleister anzeigen, falls gewünscht
                                         if (auftrag.dienstleisterId != null)
                                           Text(
-                                            'Dienstleister: ${auftrag.dienstleisterId}',
+                                            l10n.dienstleisterPrefix(auftrag.dienstleisterId!),
                                             style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -238,7 +246,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
 
                       // ----------- Offene Aufträge (vertikal) -----------
                       Text(
-                        'Offene Aufträge',
+                        l10n.offeneAuftraege,
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                       ),
                       const SizedBox(height: 7),
@@ -246,7 +254,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                         child: _offeneAuftraege.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Keine offenen Aufträge gefunden.',
+                                  l10n.noOffeneAuftraege,
                                   style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                                 ),
                               )
@@ -280,7 +288,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                           ? Padding(
                                               padding: const EdgeInsets.only(top: 3.0),
                                               child: Text(
-                                                'Status: ${auftrag.status}',
+                                                l10n.statusPrefix(auftrag.status),
                                                 style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                                               ),
                                             )
@@ -300,11 +308,11 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                               ),
                       ),
 
-                      // ----------- Abgeschlossene Aufträge (optional horizontal) -----------
+                      // ----------- Abgeschlossene Aufträge -----------
                       if (_abgeschlosseneAuftraege.isNotEmpty) ...[
                         const Divider(height: 30, thickness: 1.2),
                         Text(
-                          'Abgeschlossene Aufträge',
+                          l10n.abgeschlosseneAuftraege,
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
                         ),
                         const SizedBox(height: 7),
@@ -361,7 +369,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          'Abgeschlossen',
+                                          l10n.abgeschlossenStatus,
                                           style: TextStyle(fontSize: 13, color: Colors.teal[700]),
                                         ),
                                       ],
@@ -378,7 +386,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
-        label: const Text('Neuer Auftrag'),
+        label: Text(l10n.neuerAuftrag),
         backgroundColor: KundenDashboardScreen.primaryColor,
         onPressed: () {
           Navigator.push(

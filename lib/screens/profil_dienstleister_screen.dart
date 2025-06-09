@@ -5,7 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:atyourservice/utils/geocoding_service.dart';
 import '../data/kategorien.dart';
-import 'premium_screen.dart'; // <--- Pfad ggf. anpassen!
+import '../l10n/app_localizations.dart';
+import 'premium_screen.dart';
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _nameController = TextEditingController();
   final _beschreibungController = TextEditingController();
   final _telefonController = TextEditingController();
-  final _emailController = TextEditingController(text: 'lala@popo.com');
+  final _emailController = TextEditingController();
   String _selectedKategorie = kategorieListe.first;
   final _adresseController = TextEditingController();
 
@@ -34,8 +35,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   String? _profilbildUrl;
   File? _neuesProfilbild;
 
-  DateTime? _lastProfileChange; // Für Limitierung
-  String? _aboTyp; // Abo-Typ ('free', 'silver', 'gold')
+  DateTime? _lastProfileChange;
+  String? _aboTyp;
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
@@ -55,7 +56,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('Bitte zuerst einloggen');
+      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
       final data = await _supabase
           .from('dienstleister_details')
           .select()
@@ -80,16 +81,15 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             : null;
       }
 
-      // Abo-Typ aus users-Tabelle holen
       final userData = await _supabase
           .from('users')
           .select('abo_typ')
           .eq('id', user.id)
           .maybeSingle();
-      _aboTyp = userData?['abo_typ'] as String? ?? 'free'; // Fallback: 'free'
+      _aboTyp = userData?['abo_typ'] as String? ?? 'free';
     } catch (e) {
       setState(() {
-        _errorMessage = 'Fehler beim Laden des Profils: $e';
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
       });
     } finally {
       setState(() {
@@ -130,9 +130,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('Bitte zuerst einloggen');
+      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
 
-      // === Nur Free-User haben Änderungssperre ===
       final isFree = (_aboTyp ?? 'free') == 'free';
 
       if (isFree && _lastProfileChange != null) {
@@ -143,13 +142,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
-              title: const Text('Änderung nicht möglich'),
-              content: Text(
-                'Als Free-Nutzer kannst du deine Kategorie oder Adresse nur alle 20 Tage ändern.\n'
-                'Nächste Änderung ab: ${naechstesDatum.toLocal().toString().substring(0, 10)}'
-              ),
+              title: Text(AppLocalizations.of(context)!.changeNotAllowedTitle),
+              content: Text(AppLocalizations.of(context)!.changeNotAllowedContent(
+                  naechstesDatum.toLocal().toString().substring(0, 10))),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(AppLocalizations.of(context)!.ok)),
               ],
             ),
           );
@@ -160,23 +159,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         }
       }
 
-      final name         = _nameController.text.trim();
+      final name = _nameController.text.trim();
       final beschreibung = _beschreibungController.text.trim();
-      final telefon      = _telefonController.text.trim();
-      final email        = _emailController.text.trim();
-      final kategorie    = _selectedKategorie;
-      final adresse      = _adresseController.text.trim();
+      final telefon = _telefonController.text.trim();
+      final email = _emailController.text.trim();
+      final kategorie = _selectedKategorie;
+      final adresse = _adresseController.text.trim();
 
       double? lat;
       double? lon;
       if (adresse.isNotEmpty) {
         final coords = await GeocodingService().getCoordinates(adresse);
-        if (coords == null) throw Exception('Adresse nicht gefunden. Bitte prüfen.');
+        if (coords == null) throw Exception(AppLocalizations.of(context)!.addressNotFound);
         lat = coords['lat'];
         lon = coords['lng'];
       }
 
-      // === Profilbild-Upload (wenn neu ausgewählt) ===
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
         final storageResponse = await _supabase.storage
@@ -195,20 +193,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       await _supabase
           .from('dienstleister_details')
           .upsert({
-            'user_id':        user.id,
-            'name':           name,
-            'beschreibung':   beschreibung,
-            'kategorie':      kategorie,
-            'adresse':        adresse.isEmpty ? null : adresse,
-            'latitude':       lat,
-            'longitude':      lon,
-            'telefon':        telefon,
-            'email':          email,
+            'user_id': user.id,
+            'name': name,
+            'beschreibung': beschreibung,
+            'kategorie': kategorie,
+            'adresse': adresse.isEmpty ? null : adresse,
+            'latitude': lat,
+            'longitude': lon,
+            'telefon': telefon,
+            'email': email,
             'profilbild_url': profilbildUrl,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-            // Sperr-Feld nur bei Free-User setzen/aktualisieren!
-            if (isFree)
-              'last_profile_change': DateTime.now().toUtc().toIso8601String(),
+            if (isFree) 'last_profile_change': DateTime.now().toUtc().toIso8601String(),
           }, onConflict: 'user_id')
           .select();
 
@@ -221,7 +217,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil wurde erfolgreich gespeichert!')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.profileSaved)),
       );
       _ladeBewertungen();
     } catch (e) {
@@ -295,7 +291,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         TextButton.icon(
           onPressed: _bildWaehlen,
           icon: const Icon(Icons.edit, size: 20),
-          label: const Text('Profilbild ändern'),
+          label: Text(AppLocalizations.of(context)!.changeProfileImage),
           style: TextButton.styleFrom(
             foregroundColor: primaryColor,
           ),
@@ -311,7 +307,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         width: double.infinity,
         child: ElevatedButton.icon(
           icon: Icon(Icons.star, color: Colors.yellow[700]),
-          label: const Text('Upgrade to Premium'),
+          label: Text(AppLocalizations.of(context)!.upgradeToPremium),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.amber[600],
             foregroundColor: Colors.black87,
@@ -333,7 +329,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Hinweis-Widget
     Widget? limitHinweis;
     final isFree = (_aboTyp ?? 'free') == 'free';
     if (isFree && _lastProfileChange != null) {
@@ -343,8 +338,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         limitHinweis = Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: Text(
-            'Kategorie/Adresse kann erst wieder ab '
-            '${naechstesDatum.toLocal().toString().substring(0, 10)} geändert werden.',
+            AppLocalizations.of(context)!.changeLimitHint(
+              naechstesDatum.toLocal().toString().substring(0, 10),
+            ),
             style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
           ),
         );
@@ -354,7 +350,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Dienstleister-Profil', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppLocalizations.of(context)!.profileAppBar),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: primaryColor,
@@ -405,7 +401,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     ),
                                     const SizedBox(width: 9),
                                     Text(
-                                      '($_anzahlBewertungen Bewertungen)',
+                                      AppLocalizations.of(context)!.ratingsCount(
+                                        _anzahlBewertungen.toString(),
+                                      ),
                                       style: TextStyle(
                                         color: Colors.grey[700],
                                         fontSize: 15,
@@ -414,8 +412,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   ],
                                 )
                               else
-                                const Text(
-                                  'Noch keine Bewertungen',
+                                Text(
+                                  AppLocalizations.of(context)!.noRatingsYet,
                                   style: TextStyle(
                                     color: Colors.black54,
                                     fontSize: 15,
@@ -425,20 +423,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                               const SizedBox(height: 26),
                               TextFormField(
                                 controller: _nameController,
-                                decoration: _inputDecoration('Name'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.nameLabel),
                                 validator: (value) =>
-                                    (value == null || value.isEmpty) ? 'Bitte Name eingeben' : null,
+                                    (value == null || value.isEmpty)
+                                        ? AppLocalizations.of(context)!.nameValidator
+                                        : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _beschreibungController,
-                                decoration: _inputDecoration('Beschreibung'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.descriptionLabel),
                                 maxLines: 3,
                               ),
                               const SizedBox(height: 18),
                               DropdownButtonFormField<String>(
                                 value: _selectedKategorie,
-                                decoration: _inputDecoration('Kategorie'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.categoryLabel),
                                 items: kategorieListe.map((kategorie) {
                                   return DropdownMenuItem(
                                     value: kategorie,
@@ -453,60 +453,64 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   }
                                 },
                                 validator: (value) => (value == null || value.isEmpty)
-                                    ? 'Bitte Kategorie auswählen'
+                                    ? AppLocalizations.of(context)!.categoryValidator
                                     : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _adresseController,
-                                decoration: _inputDecoration('Adresse (z. B. Straße, PLZ, Stadt)'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.addressLabel),
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _telefonController,
-                                decoration: _inputDecoration('Telefon'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.phoneLabel),
                                 keyboardType: TextInputType.phone,
                                 validator: (value) =>
-                                    (value == null || value.isEmpty) ? 'Bitte Telefonnummer angeben' : null,
+                                    (value == null || value.isEmpty)
+                                        ? AppLocalizations.of(context)!.phoneValidator
+                                        : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _emailController,
-                                decoration: _inputDecoration('E-Mail'),
+                                decoration: _inputDecoration(AppLocalizations.of(context)!.emailLabel),
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) return 'Bitte E-Mail angeben';
-                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                    return 'Bitte gültige E-Mail-Adresse eingeben';
+                                  if (value == null || value.isEmpty) {
+                                    return AppLocalizations.of(context)!.emailEmptyValidator;
+                                  }
+                                  final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                                  if (!emailRegExp.hasMatch(value)) {
+                                    return AppLocalizations.of(context)!.emailInvalidValidator;
                                   }
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 28),
-                              if (_errorMessage != null) ...[
-                                Text(
-                                  'Fehler: $_errorMessage',
-                                  style: const TextStyle(color: Colors.red),
+                              const SizedBox(height: 24),
+                              if (_errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Text(
+                                    "${AppLocalizations.of(context)!.errorPrefix(_errorMessage!)}",
+                                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                                const SizedBox(height: 12),
-                              ],
                               SizedBox(
                                 width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
+                                child: ElevatedButton.icon(
+                                  icon: const Icon(Icons.save),
+                                  label: Text(AppLocalizations.of(context)!.profileSaveButton),
                                   style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
                                     backgroundColor: primaryColor,
-                                    textStyle: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                    foregroundColor: Colors.white,
+                                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
                                     ),
-                                    elevation: 2,
                                   ),
-                                  onPressed: _profilSpeichern,
-                                  child: const Text('Profil speichern'),
+                                  onPressed: _isLoading ? null : _profilSpeichern,
                                 ),
                               ),
                             ],

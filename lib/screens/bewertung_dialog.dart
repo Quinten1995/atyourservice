@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import '../l10n/app_localizations.dart';
 
 class BewertungDialog extends StatefulWidget {
   final String auftragId;
@@ -25,6 +26,7 @@ class _BewertungDialogState extends State<BewertungDialog> {
   final supabase = Supabase.instance.client;
 
   Future<void> _absenden() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -32,7 +34,7 @@ class _BewertungDialogState extends State<BewertungDialog> {
 
     try {
       final userId = supabase.auth.currentUser?.id;
-      if (userId == null) throw Exception('Nicht eingeloggt.');
+      if (userId == null) throw Exception(l10n.notLoggedIn);
 
       // Prüfen, ob schon eine Bewertung existiert
       final exist = await supabase
@@ -44,7 +46,7 @@ class _BewertungDialogState extends State<BewertungDialog> {
 
       if (exist != null) {
         setState(() {
-          _error = "Du hast diesen Auftrag bereits bewertet.";
+          _error = l10n.auftragBereitsBewertet;
           _isLoading = false;
         });
         return;
@@ -69,8 +71,9 @@ class _BewertungDialogState extends State<BewertungDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: const Text('Dienstleister bewerten'),
+      title: Text(l10n.bewertungDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -85,8 +88,8 @@ class _BewertungDialogState extends State<BewertungDialog> {
           ),
           const SizedBox(height: 16),
           TextField(
-            decoration: const InputDecoration(
-              labelText: 'Kommentar (optional)',
+            decoration: InputDecoration(
+              labelText: l10n.bewertungKommentarLabel,
             ),
             minLines: 2,
             maxLines: 4,
@@ -101,11 +104,11 @@ class _BewertungDialogState extends State<BewertungDialog> {
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Abbrechen'),
+          child: Text(l10n.abbrechen),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _absenden,
-          child: _isLoading ? const CircularProgressIndicator() : const Text('Abschicken'),
+          child: _isLoading ? const CircularProgressIndicator() : Text(l10n.abschicken),
         ),
       ],
     );

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../utils/geocoding_service.dart';
 import '../data/kategorien.dart';
+import '../l10n/app_localizations.dart';
 
 class AuftragErstellenScreen extends StatefulWidget {
   const AuftragErstellenScreen({Key? key}) : super(key: key);
@@ -69,6 +70,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       '${tod.hour.toString().padLeft(2, '0')}:${tod.minute.toString().padLeft(2, '0')}';
 
   Future<void> _auftragAbschicken() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     setState(() {
       _isLoading = true;
@@ -76,14 +78,14 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
     });
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception('Bitte zuerst einloggen');
+      if (user == null) throw Exception(l10n.bitteEinloggen);
 
       final adresse = _adresseController.text.trim();
       final telefon = _telefonController.text.trim();
       double? lat, lon;
       if (adresse.isNotEmpty) {
         final coords = await GeocodingService().getCoordinates(adresse);
-        if (coords == null) throw Exception('Adresse nicht gefunden.');
+        if (coords == null) throw Exception(l10n.adresseNichtGefunden);
         lat = coords['lat'];
         lon = coords['lng'];
       }
@@ -124,7 +126,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
 
       await _supabase.from('auftraege').insert(auftragMap);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Auftrag wurde gespeichert!')),
+        SnackBar(content: Text(l10n.auftragGespeichert)),
       );
       Navigator.pop(context);
     } on Exception catch (e) {
@@ -134,7 +136,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Unbekannter Fehler: $e';
+        _errorMessage = AppLocalizations.of(context)!.unbekannterFehler(e.toString());
         _isLoading = false;
       });
     }
@@ -151,10 +153,11 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Neuen Auftrag erstellen', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.auftragErstellenTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -171,7 +174,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                     child: Column(
                       children: [
                         Text(
-                          'Jetzt Auftrag einstellen',
+                          l10n.auftragEinstellenUeberschrift,
                           style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.bold,
@@ -183,7 +186,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         TextFormField(
                           controller: _titelController,
                           decoration: InputDecoration(
-                            labelText: 'Titel',
+                            labelText: l10n.titelLabel,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -198,7 +201,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Bitte Titel eingeben';
+                              return l10n.titelValidator;
                             }
                             return null;
                           },
@@ -207,7 +210,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         TextFormField(
                           controller: _beschreibungController,
                           decoration: InputDecoration(
-                            labelText: 'Beschreibung',
+                            labelText: l10n.beschreibungLabel,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -226,7 +229,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         DropdownButtonFormField<String>(
                           value: _selectedKategorie,
                           decoration: InputDecoration(
-                            labelText: 'Kategorie',
+                            labelText: l10n.kategorieLabel,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 14),
@@ -261,9 +264,9 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               alignment: Alignment.centerRight,
                               child: TextButton.icon(
                                 icon: const Icon(Icons.home, color: Color(0xFF3876BF)),
-                                label: const Text(
-                                  "Heimatadresse einfügen",
-                                  style: TextStyle(
+                                label: Text(
+                                  l10n.heimatadresseEinfuegen,
+                                  style: const TextStyle(
                                     color: Color(0xFF3876BF),
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -279,7 +282,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         TextFormField(
                           controller: _adresseController,
                           decoration: InputDecoration(
-                            labelText: 'Adresse (z. B. Alter Markt 76, 50667 Köln)',
+                            labelText: l10n.adresseLabel,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -297,7 +300,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         TextFormField(
                           controller: _telefonController,
                           decoration: InputDecoration(
-                            labelText: 'Telefonnummer',
+                            labelText: l10n.telefonnummerLabel,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -313,7 +316,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           keyboardType: TextInputType.phone,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Bitte Telefonnummer eingeben';
+                              return l10n.telefonnummerValidator;
                             }
                             return null;
                           },
@@ -322,7 +325,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Ausführungszeitpunkt', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text(l10n.ausfuehrungszeitpunkt, style: const TextStyle(fontWeight: FontWeight.bold)),
                             Row(
                               children: [
                                 Radio<bool>(
@@ -337,7 +340,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                                     });
                                   },
                                 ),
-                                const Text('So schnell wie möglich'),
+                                Text(l10n.soSchnellWieMoeglich),
                                 Radio<bool>(
                                   value: false,
                                   groupValue: soSchnellWieMoeglich,
@@ -347,7 +350,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                                     });
                                   },
                                 ),
-                                const Text('Geplant'),
+                                Text(l10n.geplant),
                               ],
                             ),
                             if (!soSchnellWieMoeglich) ...[
@@ -358,7 +361,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                                     child: ElevatedButton.icon(
                                       icon: const Icon(Icons.calendar_today, size: 18),
                                       label: Text(terminDatum == null
-                                          ? 'Datum wählen'
+                                          ? l10n.datumWaehlen
                                           : '${terminDatum!.day.toString().padLeft(2, '0')}.${terminDatum!.month.toString().padLeft(2, '0')}.${terminDatum!.year}'),
                                       onPressed: () async {
                                         final picked = await showDatePicker(
@@ -380,7 +383,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                                     child: ElevatedButton.icon(
                                       icon: const Icon(Icons.access_time, size: 18),
                                       label: Text(zeitVon == null
-                                          ? 'Zeit von'
+                                          ? l10n.zeitVon
                                           : '${zeitVon!.hour.toString().padLeft(2, '0')}:${zeitVon!.minute.toString().padLeft(2, '0')}'),
                                       onPressed: () async {
                                         final picked = await showTimePicker(
@@ -396,7 +399,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                                     child: ElevatedButton.icon(
                                       icon: const Icon(Icons.access_time, size: 18),
                                       label: Text(zeitBis == null
-                                          ? 'Zeit bis'
+                                          ? l10n.zeitBis
                                           : '${zeitBis!.hour.toString().padLeft(2, '0')}:${zeitBis!.minute.toString().padLeft(2, '0')}'),
                                       onPressed: () async {
                                         final picked = await showTimePicker(
@@ -420,33 +423,33 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               _wiederkehrend = val ?? false;
                             });
                           },
-                          title: const Text("Wiederkehrender Auftrag?"),
+                          title: Text(l10n.wiederkehrendCheckbox),
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
                         if (_wiederkehrend) ...[
                           const SizedBox(height: 10),
                           DropdownButtonFormField<String>(
                             value: _intervall,
-                            decoration: const InputDecoration(labelText: "Intervall"),
+                            decoration: InputDecoration(labelText: l10n.intervallLabel),
                             items: intervallOptionen
                                 .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
                                 .toList(),
                             onChanged: (val) => setState(() => _intervall = val),
-                            validator: (val) => val == null ? 'Bitte Intervall wählen' : null,
+                            validator: (val) => val == null ? l10n.intervallValidator : null,
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<String>(
                             value: _wochentag,
-                            decoration: const InputDecoration(labelText: "Wochentag"),
+                            decoration: InputDecoration(labelText: l10n.wochentagLabel),
                             items: wochentage
                                 .map((tag) => DropdownMenuItem(value: tag, child: Text(tag)))
                                 .toList(),
                             onChanged: (val) => setState(() => _wochentag = val),
-                            validator: (val) => val == null ? 'Bitte Wochentag wählen' : null,
+                            validator: (val) => val == null ? l10n.wochentagValidator : null,
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
-                            decoration: const InputDecoration(labelText: "Anzahl Wiederholungen (optional)"),
+                            decoration: InputDecoration(labelText: l10n.anzahlWiederholungenLabel),
                             keyboardType: TextInputType.number,
                             onChanged: (val) {
                               _anzahlWiederholungen = int.tryParse(val);
@@ -457,8 +460,8 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                             children: [
                               Expanded(
                                 child: Text(_wiederholenBis == null
-                                    ? "Wiederholen bis: nicht gesetzt"
-                                    : "Wiederholen bis: ${_wiederholenBis!.toLocal().toString().split(' ')[0]}"),
+                                    ? l10n.wiederholenBisNichtGesetzt
+                                    : l10n.wiederholenBisLabel(_wiederholenBis!.toLocal().toString().split(' ')[0])),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.calendar_today),
@@ -479,7 +482,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                         const SizedBox(height: 28),
                         if (_errorMessage != null) ...[
                           Text(
-                            'Fehler: $_errorMessage',
+                            l10n.errorPrefix(_errorMessage!),
                             style: const TextStyle(color: Colors.red),
                           ),
                           const SizedBox(height: 12),
@@ -489,9 +492,9 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           child: ElevatedButton.icon(
                             onPressed: _auftragAbschicken,
                             icon: const Icon(Icons.send_rounded),
-                            label: const Text(
-                              'Auftrag abschicken',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                            label: Text(
+                              l10n.auftragAbschicken,
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,

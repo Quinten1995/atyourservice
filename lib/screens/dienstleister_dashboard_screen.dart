@@ -4,6 +4,7 @@ import '../models/auftrag.dart';
 import '../utils/entfernung_utils.dart';
 import 'auftrag_detail_screen.dart';
 import 'profil_dienstleister_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class DienstleisterDashboardScreen extends StatefulWidget {
   const DienstleisterDashboardScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   String? _meineKategorie;
   double? _meineLatitude;
   double? _meineLongitude;
-  String? _aboTyp; // <--- NEU
+  String? _aboTyp;
 
   List<Map<String, dynamic>> _alleOffenenAuftraegeRaw = [];
   List<Map<String, dynamic>> _alleLaufendenAuftraegeRaw = [];
@@ -34,10 +35,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   @override
   void initState() {
     super.initState();
-    _ladeProfilUndAuftraege();
+    // Korrektes Pattern: Laden erst nach erstem Frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ladeProfilUndAuftraege();
+    });
   }
 
   Future<void> _ladeProfilUndAuftraege() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -49,7 +54,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
 
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('Nicht eingeloggt');
+      if (user == null) throw Exception(l10n.notLoggedIn);
 
       // 1) Profil abrufen (kategorie, latitude, longitude)
       final List<dynamic> profilList = await supabase
@@ -57,14 +62,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .select('kategorie, latitude, longitude')
           .eq('user_id', user.id);
 
-      if (profilList.isEmpty) throw Exception('Bitte zunächst dein Profil anlegen.');
+      if (profilList.isEmpty) throw Exception(l10n.pleaseCreateProfile);
 
       final profilData = profilList.first as Map<String, dynamic>;
       final String? kategorie = profilData['kategorie'] as String?;
       final double? latitude = (profilData['latitude'] as num?)?.toDouble();
       final double? longitude = (profilData['longitude'] as num?)?.toDouble();
 
-      if (kategorie == null) throw Exception('Kategorie im Profil fehlt.');
+      if (kategorie == null) throw Exception(l10n.profilMissingCategory);
 
       _meineKategorie = kategorie;
       _meineLatitude = latitude;
@@ -86,7 +91,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .eq('status', 'offen');
       _alleOffenenAuftraegeRaw = rawOffen.cast<Map<String, dynamic>>();
 
-      // 3) Laufende (in bearbeitung) Aufträge dieses Dienstleisters (mit Kunden-Email per sicherem JOIN!)
+      // 3) Laufende (in bearbeitung) Aufträge dieses Dienstleisters (mit Kunden-Email)
       final List<dynamic> rawLaufend = await supabase
           .from('auftraege')
           .select('*, kunde:users!auftraege_kunde_id_fkey(email)')
@@ -95,16 +100,15 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _alleLaufendenAuftraegeRaw = rawLaufend.cast<Map<String, dynamic>>();
       _laufendeAuftraegeMitUser = _alleLaufendenAuftraegeRaw;
 
-      // --- NEU: Radius nach Abo-Typ bestimmen ---
+      // Radius nach Abo-Typ bestimmen
       double radiusKm = 10.0;
       if (_aboTyp == 'silver') {
         radiusKm = 30.0;
       } else if (_aboTyp == 'gold') {
         radiusKm = 70.0;
       }
-      // ------------------------------------------------
 
-      // 4) Offene Aufträge, nur im passenden Radius!
+      // Offene Aufträge, nur im passenden Radius!
       if (_meineLatitude != null && _meineLongitude != null) {
         _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
             .map((map) => Auftrag.fromJson(map))
@@ -136,6 +140,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   }
 
   Widget _dashboardHeader() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0, left: 2),
       child: Row(
@@ -143,7 +148,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           Icon(Icons.handyman, color: primaryColor, size: 28),
           const SizedBox(width: 10),
           Text(
-            'Dein Dashboard',
+            l10n.dienstleisterDashboardHeader,
             style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: primaryColor),
           ),
         ],
@@ -153,23 +158,27 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Dashboard Dienstleister', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.dienstleisterDashboardAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Neu laden',
+            tooltip: l10n.refreshTooltip,
             onPressed: _ladeProfilUndAuftraege,
             color: primaryColor,
           ),
           IconButton(
             icon: const Icon(Icons.person),
-            tooltip: 'Profil bearbeiten',
+            tooltip: l10n.editProfileTooltip,
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -186,7 +195,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Text('Fehler: $_errorMessage'))
+                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -194,7 +203,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                       if (_laufendeAuftraegeMitUser.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
-                          'Meine laufenden Aufträge',
+                          l10n.meineLaufendenAuftraege,
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                         ),
                         const SizedBox(height: 7),
@@ -241,10 +250,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            // Uhr-Icon für geplante Aufträge
                                             if (!auftrag.soSchnellWieMoeglich)
                                               Tooltip(
-                                                message: 'Geplanter Auftrag',
+                                                message: l10n.geplanterAuftrag,
                                                 child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
                                               ),
                                           ],
@@ -255,14 +263,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                             Icon(Icons.assignment, size: 17, color: primaryColor),
                                             const SizedBox(width: 5),
                                             Text(
-                                              'Status: ${auftrag.status}',
+                                              l10n.statusPrefix(auftrag.status),
                                               style: const TextStyle(fontSize: 13),
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 7),
                                         Text(
-                                          'Kunde: $kundenEmail',
+                                          l10n.kundePrefix(kundenEmail),
                                           style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                                         ),
                                       ],
@@ -276,7 +284,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                         const Divider(height: 32, thickness: 1.2),
                       ],
                       Text(
-                        'Offene, passende Aufträge',
+                        l10n.offenePassendeAuftraege,
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
                       ),
                       const SizedBox(height: 7),
@@ -284,7 +292,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                         child: _offenePassendeAuftraege.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Keine passenden Aufträge gefunden.',
+                                  l10n.noPassendeAuftraege,
                                   style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                                 ),
                               )
@@ -305,7 +313,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                       auftrag.latitude!,
                                       auftrag.longitude!,
                                     );
-                                    distText = '${dist.toStringAsFixed(1)} km entfernt';
+                                    distText = l10n.entfernungSuffix(dist.toStringAsFixed(1));
                                   }
 
                                   return Material(
@@ -325,10 +333,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                          // Uhr-Icon für geplante Aufträge
                                           if (!auftrag.soSchnellWieMoeglich)
                                             Tooltip(
-                                              message: 'Geplanter Auftrag',
+                                              message: l10n.geplanterAuftrag,
                                               child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
                                             ),
                                         ],

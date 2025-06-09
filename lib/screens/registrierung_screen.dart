@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/kategorien.dart';
+import '../l10n/app_localizations.dart'; // NEU: Lokalisation importieren
 
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
@@ -34,19 +35,18 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     try {
       final response = await supabase.auth.signUp(email: email, password: password);
 
-      // identities: [] => Account existiert bereits (unconfirmed oder confirmed)
       final identities = response.user?.identities;
       if (identities != null && identities.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registrierung erfolgreich! Bitte E-Mail bestätigen.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.registerSuccess),
           ),
         );
         Navigator.of(context).pop();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Diese E-Mail ist bereits registriert. Bitte einloggen oder Passwort zurücksetzen.'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.registerExists),
           ),
         );
         // KEIN pop im Fehlerfall!
@@ -57,13 +57,13 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       if (err.contains('already registered') ||
           err.contains('duplicate') ||
           err.contains('user exists')) {
-        userMessage = 'Diese E-Mail ist bereits registriert. Bitte einloggen oder Passwort zurücksetzen.';
+        userMessage = AppLocalizations.of(context)!.registerExists;
       } else if (err.contains('invalid email')) {
-        userMessage = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+        userMessage = AppLocalizations.of(context)!.registerInvalidEmail;
       } else if (err.contains('password')) {
-        userMessage = 'Passwort muss mindestens 6 Zeichen haben.';
+        userMessage = AppLocalizations.of(context)!.registerPasswordShort;
       } else {
-        userMessage = 'Registrierung fehlgeschlagen: ${authError.message}';
+        userMessage = AppLocalizations.of(context)!.registerFailed(authError.message);
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(userMessage)),
@@ -71,7 +71,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       // KEIN pop im Fehlerfall!
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unbekannter Fehler: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.registerUnknownError(e.toString()))),
       );
       // KEIN pop im Fehlerfall!
     } finally {
@@ -91,7 +91,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Registrierung', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          AppLocalizations.of(context)!.registerAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -106,7 +109,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
               child: Column(
                 children: [
                   Text(
-                    'Registrieren',
+                    AppLocalizations.of(context)!.registerTitle,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -120,7 +123,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   DropdownButtonFormField<String>(
                     value: _rolle,
                     decoration: InputDecoration(
-                      labelText: 'Rolle auswählen',
+                      labelText: AppLocalizations.of(context)!.roleLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -133,9 +136,15 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         borderSide: BorderSide(color: primaryColor, width: 2),
                       ),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'kunde', child: Text('Kunde')),
-                      DropdownMenuItem(value: 'dienstleister', child: Text('Dienstleister')),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'kunde',
+                        child: Text(AppLocalizations.of(context)!.roleKunde),
+                      ),
+                      DropdownMenuItem(
+                        value: 'dienstleister',
+                        child: Text(AppLocalizations.of(context)!.roleDienstleister),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value != null) {
@@ -153,7 +162,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     DropdownButtonFormField<String>(
                       value: _selectedKategorie ?? kategorieListe.first,
                       decoration: InputDecoration(
-                        labelText: 'Dienstleistungskategorie',
+                        labelText: AppLocalizations.of(context)!.categoryLabel,
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -176,7 +185,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         setState(() => _selectedKategorie = value);
                       },
                       validator: (value) => (_rolle == 'dienstleister' && (value == null || value.isEmpty))
-                          ? 'Bitte Kategorie wählen'
+                          ? AppLocalizations.of(context)!.categoryValidator
                           : null,
                     ),
                   ],
@@ -187,7 +196,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'E-Mail',
+                      labelText: AppLocalizations.of(context)!.emailLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -202,9 +211,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
+                      if (value == null || value.isEmpty) return AppLocalizations.of(context)!.emailEmpty;
                       if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                        return 'Bitte gültige E-Mail eingeben';
+                        return AppLocalizations.of(context)!.emailInvalid;
                       }
                       return null;
                     },
@@ -216,7 +225,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      labelText: 'Passwort',
+                      labelText: AppLocalizations.of(context)!.passwordLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -231,8 +240,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Bitte Passwort eingeben';
-                      if (value.length < 6) return 'Passwort muss mindestens 6 Zeichen haben';
+                      if (value == null || value.isEmpty) return AppLocalizations.of(context)!.passwordEmpty;
+                      if (value.length < 6) return AppLocalizations.of(context)!.passwordTooShort;
                       return null;
                     },
                   ),
@@ -254,9 +263,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                               elevation: 4,
                               shadowColor: primaryColor.withOpacity(0.20),
                             ),
-                            child: const Text(
-                              'Registrieren',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                            child: Text(
+                              AppLocalizations.of(context)!.registerButton,
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),

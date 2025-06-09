@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
 import 'registrierung_screen.dart';
+import '../l10n/app_localizations.dart';
 
 class LoginDienstleisterScreen extends StatefulWidget {
   const LoginDienstleisterScreen({Key? key}) : super(key: key);
@@ -17,11 +18,11 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
   bool _isLoading = false;
   final supabase = Supabase.instance.client;
 
-  // Farben wie im Kunden-Login
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
   Future<void> _login() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -33,7 +34,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       );
       final user = authRes.user;
       if (user == null) {
-        throw AuthException('Login fehlgeschlagen. Bitte überprüfe deine Daten oder bestätige deine E-Mail.');
+        throw AuthException(l10n.loginFailedDetailsDL);
       }
 
       // 1. Prüfen, ob es bereits einen Eintrag in 'users' gibt
@@ -58,8 +59,8 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       } else if (fetched['rolle'] != 'dienstleister') {
         await supabase.auth.signOut();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Dieser Account ist kein Dienstleister. Bitte nutze den Kunden-Login.'),
+          SnackBar(
+            content: Text(l10n.wrongRoleDL),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -67,19 +68,19 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login erfolgreich!')),
+        SnackBar(content: Text(l10n.loginSuccess)),
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DienstleisterDashboardScreen()),
+        MaterialPageRoute(builder: (context) => const DienstleisterDashboardScreen()),
       );
     } on AuthException catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login fehlgeschlagen: ${error.message}')),
+        SnackBar(content: Text(l10n.loginFailedPrefix(error.message))),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unbekannter Fehler: $e')),
+        SnackBar(content: Text(l10n.loginUnknownError(e.toString()))),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -87,24 +88,30 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Bitte E-Mail eingeben';
+    final l10n = AppLocalizations.of(context)!;
+    if (value == null || value.isEmpty) return l10n.emailValidatorEmpty;
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) return 'Bitte eine gültige E-Mail eingeben';
+    if (!emailRegex.hasMatch(value)) return l10n.emailValidatorInvalid;
     return null;
   }
 
   String? _validatePasswort(String? value) {
-    if (value == null || value.isEmpty) return 'Bitte Passwort eingeben';
-    if (value.length < 6) return 'Passwort muss mindestens 6 Zeichen lang sein';
+    final l10n = AppLocalizations.of(context)!;
+    if (value == null || value.isEmpty) return l10n.passwordValidatorEmpty;
+    if (value.length < 6) return l10n.passwordValidatorShort;
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Login für Dienstleister', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.loginDLAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -120,7 +127,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Anmelden',
+                    l10n.loginDLHeadline,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -134,7 +141,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'E-Mail',
+                      labelText: l10n.emailLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -157,7 +164,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                   TextFormField(
                     controller: _passwortController,
                     decoration: InputDecoration(
-                      labelText: 'Passwort',
+                      labelText: l10n.passwordLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -191,9 +198,9 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                               elevation: 4,
                               shadowColor: primaryColor.withOpacity(0.20),
                             ),
-                            child: const Text(
-                              'Login',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                            child: Text(
+                              l10n.loginButton,
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
@@ -212,7 +219,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                       foregroundColor: primaryColor,
                       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
-                    child: const Text('Noch kein Konto? Jetzt registrieren'),
+                    child: Text(l10n.noAccountYet),
                   ),
                 ],
               ),

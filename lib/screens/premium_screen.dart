@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../l10n/app_localizations.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -41,9 +42,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upgrade to Premium'),
+        title: Text(l10n.premiumAppBar),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.blueAccent,
@@ -56,9 +59,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Choose your Premium Plan',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.premiumChoosePlan,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   if (_aboTyp != null)
@@ -69,7 +72,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           Icon(Icons.verified_user, color: Colors.blueAccent, size: 23),
                           const SizedBox(width: 8),
                           Text(
-                            'Aktuelles Abo: ',
+                            l10n.premiumCurrentPlan,
                             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -93,14 +96,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'FREE',
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
-                    priceText: 'kostenlos',
-                    features: const [
-                      'Auftragsradius: 10 km',
-                      'Max. 2 Aufträge/Woche',
-                      'Kategorie/Adresse selten änderbar',
+                    priceText: l10n.premiumFreePrice,
+                    features: [
+                      l10n.premiumFreeFeature1,
+                      l10n.premiumFreeFeature2,
+                      l10n.premiumFreeFeature3,
                     ],
                     highlighted: _aboTyp == 'free',
-                    showButton: false, // <--- Kein Button!
+                    showButton: false, // Kein Button!
                     onTap: () {},
                   ),
                   const SizedBox(height: 14),
@@ -109,19 +112,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'SILVER',
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
-                    priceText: '€ 4.99 / Monat',
-                    features: const [
-                      'Auftragsradius: 30 km',
-                      'Max. 5 Aufträge/Woche',
-                      'Jederzeit Kategorie/Adresse ändern',
-                      'Normale Sichtbarkeit',
+                    priceText: l10n.premiumSilverPrice,
+                    features: [
+                      l10n.premiumSilverFeature1,
+                      l10n.premiumSilverFeature2,
+                      l10n.premiumSilverFeature3,
+                      l10n.premiumSilverFeature4,
                     ],
                     highlighted: _aboTyp == 'silver',
                     showButton: true,
                     onTap: () {
-                      // Hier später echte IAP-Logik für Silver einbauen
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Silver purchase coming soon!')),
+                        SnackBar(content: Text(l10n.premiumSilverComingSoon)),
                       );
                     },
                   ),
@@ -131,27 +133,26 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'GOLD',
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
-                    priceText: '€ 9.99 / Monat',
-                    features: const [
-                      'Auftragsradius: 70 km',
-                      'Unbegrenzte Aufträge',
-                      'Hervorgehobenes Profil',
-                      'Premium Support',
-                      'Jederzeit Kategorie/Adresse ändern',
+                    priceText: l10n.premiumGoldPrice,
+                    features: [
+                      l10n.premiumGoldFeature1,
+                      l10n.premiumGoldFeature2,
+                      l10n.premiumGoldFeature3,
+                      l10n.premiumGoldFeature4,
+                      l10n.premiumGoldFeature5,
                     ],
                     highlighted: _aboTyp == 'gold',
                     showButton: true,
                     onTap: () {
-                      // Hier später echte IAP-Logik für Gold einbauen
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Gold purchase coming soon!')),
+                        SnackBar(content: Text(l10n.premiumGoldComingSoon)),
                       );
                     },
                   ),
                   const SizedBox(height: 34),
-                  const Text(
-                    'Hinweis: Alle Zahlungen werden sicher über Apple oder Google abgewickelt. Du kannst dein Abo jederzeit im Store kündigen oder verwalten.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  Text(
+                    l10n.premiumPaymentNote,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),
@@ -168,8 +169,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
     required List<String> features,
     required VoidCallback onTap,
     bool highlighted = false,
-    bool showButton = true, // <--- NEU
+    bool showButton = true,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeInOut,
@@ -235,7 +238,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onTap,
-                  child: Text('Wähle $title'),
+                  child: Text(l10n.premiumChooseButton(title)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

@@ -6,6 +6,11 @@ import 'screens/start_screen.dart';  // StartScreen importieren
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+// NEU: Lokalisierungs-Imports
+import 'package:flutter_localizations/flutter_localizations.dart';
+import '../l10n/app_localizations.dart';
+ // Automatisch generiert!
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Zuerst Firebase initialisieren
@@ -69,10 +74,21 @@ class MyApp extends StatelessWidget {
           labelStyle: const TextStyle(color: Colors.deepPurple),
         ),
       ),
+
+      // HIER: Lokalisierung einbinden!
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de'), // Deutsch
+        Locale('en'), // Englisch (du kannst beliebig erweitern)
+      ],
+
       home: const StartScreen(),
       // home: const SupabaseTestScreen(), // Zum Testen
     );
   }
 }
-
-// (SupabaseTestScreen bleibt unverändert)

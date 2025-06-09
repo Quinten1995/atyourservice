@@ -32,6 +32,11 @@ dependencies:
   # === Profilbild-Upload ===
   image_picker: ^1.0.7
 
+  # === Lokalisierung (Mehrsprachigkeit) ===
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -40,3 +45,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Für automatische Generierung der Lokalisationen (optional, aber empfohlen)
+  generate: true
+
+  # Optional, falls du was anpassen willst:
+  # l10n:
+  #   arb-dir: lib/l10n
+  #   template-arb-file: app_de.arb
+  #   output-localization-file: app_localizations.dart

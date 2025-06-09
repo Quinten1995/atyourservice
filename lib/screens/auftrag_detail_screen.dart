@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart'; // Für Anrufen
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'bewertung_dialog.dart'; // Passe ggf. den Pfad an!
+import '../l10n/app_localizations.dart';
 
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
@@ -26,11 +27,15 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   double? _dlDurchschnitt;
   int? _dlAnzahlBewertungen;
 
-  // NEU: Profilbild-URL des Dienstleisters
+  // Profilbild-URL des Dienstleisters
   String? _dienstleisterProfilbildUrl;
 
-  // NEU: Abo-Typ
+  // Abo-Typ
   String? _aboTyp;
+
+  // NEU: E-Mail als Name
+  String? _kundenName;
+  String? _dienstleisterName;
 
   final SupabaseClient _supabase = Supabase.instance.client;
 
@@ -55,12 +60,14 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       _dlDurchschnitt = null;
       _dlAnzahlBewertungen = null;
       _dienstleisterProfilbildUrl = null;
+      _kundenName = null;
+      _dienstleisterName = null;
     });
 
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) {
-        throw Exception('Nicht eingeloggt');
+        throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       }
 
       // Rolle und Abo-Typ laden
@@ -70,7 +77,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .eq('id', user.id)
           .maybeSingle();
       if (userResponse == null || userResponse['rolle'] == null) {
-        throw Exception('Rolle konnte nicht ermittelt werden');
+        throw Exception(AppLocalizations.of(context)!.rolleNichtErmittelt);
       }
       final isDL = userResponse['rolle'] == 'dienstleister';
       setState(() {
@@ -85,11 +92,21 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .eq('id', widget.initialAuftrag.id)
           .maybeSingle();
 
-      if (auftragMap == null) throw Exception('Auftrag nicht gefunden');
+      if (auftragMap == null) throw Exception(AppLocalizations.of(context)!.auftragNichtGefunden);
 
       final Auftrag aktuellerAuftrag = Auftrag.fromJson(auftragMap);
       setState(() {
         _auftragDetails = aktuellerAuftrag;
+      });
+
+      // Kunden-E-Mail laden
+      final kunde = await _supabase
+          .from('users')
+          .select('email')
+          .eq('id', aktuellerAuftrag.kundeId)
+          .maybeSingle();
+      setState(() {
+        _kundenName = kunde?['email'];
       });
 
       // Telefonnummern laden, wenn der Auftrag in Bearbeitung ist und DL zugeordnet
@@ -110,7 +127,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         }
       }
 
-      // Bewertung laden, wenn Dienstleister zugeordnet ist
+      // Bewertung & Dienstleisterinfos laden, wenn Dienstleister zugeordnet ist
       if (aktuellerAuftrag.dienstleisterId != null) {
         await _ladeDienstleisterBewertung(aktuellerAuftrag.dienstleisterId!);
 
@@ -122,6 +139,16 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             .maybeSingle();
         setState(() {
           _dienstleisterProfilbildUrl = details?['profilbild_url'];
+        });
+
+        // Dienstleister-E-Mail laden
+        final dl = await _supabase
+            .from('users')
+            .select('email')
+            .eq('id', aktuellerAuftrag.dienstleisterId!)
+            .maybeSingle();
+        setState(() {
+          _dienstleisterName = dl?['email'];
         });
       }
 
@@ -136,7 +163,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // Bewertungs-Infos laden (Durchschnitt, Anzahl)
   Future<void> _ladeDienstleisterBewertung(String dienstleisterId) async {
     final res = await _supabase
         .from('bewertungen')
@@ -157,7 +183,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // Bewertungsdialog nur für Kunde nach Abschluss
   Future<void> _zeigeBewertungsDialogWennNoetig() async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null || _auftragDetails == null || _isDienstleister || _auftragDetails!.status != 'abgeschlossen') {
@@ -182,14 +207,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       );
       if (result == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Danke für deine Bewertung!')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.bewertungDanke)),
         );
         setState(() {});
       }
     }
   }
 
-  // AUFTRAGSANNAHME MIT ABO-LIMITS
   Future<void> _auftragAnnehmen() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return;
@@ -197,14 +221,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // --- LIMIT-LOGIK NACH ABO-TYP ---
       int wochenLimit = 2; // Default: free
       if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 5;
       if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999; // "unbegrenzt"
 
-      // Gold-User werden nicht geprüft, weil das Limit absurd hoch ist.
       if ((_aboTyp ?? 'free') != 'gold') {
-        // Wochenbeginn (Montag)
         final now = DateTime.now();
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
         final weekStartUtc = DateTime.utc(weekStart.year, weekStart.month, weekStart.day);
@@ -220,16 +241,16 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
-              title: const Text('Limit erreicht'),
+              title: Text(AppLocalizations.of(context)!.limitErreicht),
               content: Text(
                 (_aboTyp == 'free')
-                    ? 'Als Freemium-Dienstleister kannst du pro Woche maximal 2 Aufträge annehmen.\nUpgrade auf Silver oder Gold für mehr Möglichkeiten!'
-                    : 'Als Silver-Dienstleister kannst du pro Woche maximal 5 Aufträge annehmen.\nUpgrade auf Gold für unbegrenzte Aufträge!',
+                    ? AppLocalizations.of(context)!.limitFree
+                    : AppLocalizations.of(context)!.limitSilver,
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
+                  child: Text(AppLocalizations.of(context)!.ok),
                 ),
               ],
             ),
@@ -239,7 +260,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         }
       }
 
-      // Auftrag wirklich annehmen (mit Timestamp!)
       final updated = await _supabase
           .from('auftraege')
           .update({
@@ -294,16 +314,20 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // *** WICHTIG: Entfernen für Kunden bei abgeschlossenem Auftrag ***
   Future<void> _kundeAuftragEntfernen() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Auftrag entfernen?'),
-        content: const Text('Möchtest du diesen Auftrag aus deiner Übersicht entfernen?'),
+        title: Text(l10n.auftragEntfernenTitel),
+        content: Text(l10n.auftragEntfernenText),
         actions: [
-          TextButton(child: const Text('Abbrechen'), onPressed: () => Navigator.of(ctx).pop(false)),
-          TextButton(child: const Text('Entfernen'), onPressed: () => Navigator.of(ctx).pop(true)),
+          TextButton(
+              child: Text(l10n.abbrechen),
+              onPressed: () => Navigator.of(ctx).pop(false)),
+          TextButton(
+              child: Text(l10n.entfernen),
+              onPressed: () => Navigator.of(ctx).pop(true)),
         ],
       ),
     );
@@ -327,11 +351,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // --- NEU: Zeitplanung (auch Intervall) als Widget ---
+  // ---- Übersetzungsfunktionen überall korrekt! ----
   Widget _zeitplanungAnzeige() {
+    final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
     if (ad.wiederkehrend == true) {
-      // Wiederkehrend
       return Padding(
         padding: const EdgeInsets.only(top: 6, bottom: 3),
         child: Row(
@@ -342,14 +366,15 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             Expanded(
               child: Text(
                 [
-                  if (ad.wochentag != null) "Jeden ${ad.wochentag!}",
+                  if (ad.wochentag != null) l10n.jedenWochentag(ad.wochentag!),
                   if (ad.intervall != null) ad.intervall!,
                   if (ad.zeitVon != null && ad.zeitBis != null)
                     "${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr",
                   if (ad.wiederholenBis != null)
-                    "bis ${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}",
+                    l10n.bisDatum(
+                        "${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}"),
                   if (ad.anzahlWiederholungen != null)
-                    "(${ad.anzahlWiederholungen} mal)"
+                    "${ad.anzahlWiederholungen} ${l10n.malSuffix}"
                 ].where((s) => s.isNotEmpty).join(", "),
                 style: const TextStyle(fontSize: 15, color: Colors.deepPurple, fontWeight: FontWeight.w600),
               ),
@@ -358,7 +383,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         ),
       );
     } else if (ad.soSchnellWieMoeglich == false && ad.terminDatum != null) {
-      // Einmaliger geplanter Termin
       return Padding(
         padding: const EdgeInsets.only(top: 6, bottom: 3),
         child: Row(
@@ -377,7 +401,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         ),
       );
     } else {
-      // So schnell wie möglich
       return Padding(
         padding: const EdgeInsets.only(top: 6, bottom: 3),
         child: Row(
@@ -385,9 +408,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           children: [
             const Icon(Icons.flash_on, color: Colors.orange, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              "So schnell wie möglich",
-              style: TextStyle(fontSize: 15, color: Colors.orange, fontWeight: FontWeight.w600),
+            Text(
+              l10n.soSchnellWieMoeglich,
+              style: const TextStyle(fontSize: 15, color: Colors.orange, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -396,11 +419,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   }
 
   Widget _kopfbereichMitProfilbild() {
+    final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Avatar nur, wenn ein Dienstleister zugeordnet ist (und Kunde draufschaut)
         if (!_isDienstleister &&
             ad.dienstleisterId != null &&
             (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen'))
@@ -416,7 +439,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                   : null,
             ),
           ),
-        // Titel, Bewertung, Anzahl Bewertungen ...
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,7 +464,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                     ),
                     if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
                       Text(
-                        ' (${_dlAnzahlBewertungen!} Bewertung${_dlAnzahlBewertungen == 1 ? '' : 'en'})',
+                        l10n.ratingsCount(_dlAnzahlBewertungen!),
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                   ],
@@ -456,6 +478,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   }
 
   Widget _auftragInfoCard() {
+    final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
 
     return Container(
@@ -474,16 +497,14 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Kopfbereich mit Avatar + Bewertung + Titel
           _kopfbereichMitProfilbild(),
           const SizedBox(height: 16),
-          // Zeitplanung/Intervall
           _zeitplanungAnzeige(),
           const SizedBox(height: 11),
 
           // Beschreibung
           Text(
-            'Beschreibung:',
+            l10n.beschreibung,
             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800]),
           ),
           Padding(
@@ -497,7 +518,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             children: [
               Icon(Icons.category, color: primaryColor, size: 19),
               SizedBox(width: 7),
-              Text('Kategorie:', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(l10n.kategorie, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(width: 7),
               Text(ad.kategorie),
             ],
@@ -511,7 +532,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               children: [
                 Icon(Icons.location_on, color: Colors.redAccent, size: 19),
                 SizedBox(width: 7),
-                Text('Adresse:', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n.adresse, style: TextStyle(fontWeight: FontWeight.w600)),
                 SizedBox(width: 7),
                 Expanded(child: Text(ad.adresse!, overflow: TextOverflow.ellipsis)),
               ],
@@ -531,7 +552,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           // Status
           Row(
             children: [
-              Text('Status:', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(l10n.status, style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(width: 10),
               Chip(
                 label: Text(
@@ -556,17 +577,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     );
   }
 
-  // --- DEUTLICH HERVORGEHOBENER KONTAKTBEREICH ---
   Widget _kontaktBereich() {
+    final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
     if (ad.status == 'in bearbeitung' && ad.dienstleisterId != null) {
       String? label;
       String? nummer;
       if (_isDienstleister && _kundenTelefonnummer != null) {
-        label = "Kunde";
+        label = l10n.kundePrefix(_kundenName ?? l10n.roleKunde);
         nummer = _kundenTelefonnummer;
       } else if (!_isDienstleister && _dienstleisterTelefonnummer != null) {
-        label = "Dienstleister";
+        label = l10n.dienstleisterPrefix(_dienstleisterName ?? l10n.roleDienstleister);
         nummer = _dienstleisterTelefonnummer;
       }
       if (label != null && nummer != null) {
@@ -589,7 +610,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kontakt zu $label:',
+                          l10n.kontaktZuLabel(label),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -611,17 +632,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.copy, color: Colors.black54),
-                    tooltip: 'Nummer kopieren',
+                    tooltip: l10n.nummerKopieren,
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: nummer!));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Nummer kopiert!')),
+                        SnackBar(content: Text(l10n.nummerKopiert)),
                       );
                     },
                   ),
                   IconButton(
                     icon: const Icon(Icons.call, color: Colors.green),
-                    tooltip: 'Anrufen',
+                    tooltip: l10n.anrufen,
                     onPressed: () {
                       final uri = Uri(scheme: 'tel', path: nummer);
                       launchUrl(uri);
@@ -638,6 +659,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   }
 
   Widget _actionButtons() {
+    final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
     return Column(
       children: [
@@ -648,7 +670,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             child: ElevatedButton.icon(
               onPressed: _auftragAnnehmen,
               icon: const Icon(Icons.play_arrow),
-              label: const Text('Auftrag annehmen'),
+              label: Text(l10n.auftragAnnehmen),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -665,7 +687,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             child: ElevatedButton.icon(
               onPressed: _auftragAbschliessen,
               icon: const Icon(Icons.check),
-              label: const Text('Auftrag beenden'),
+              label: Text(l10n.auftragBeenden),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -676,14 +698,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
-        // *** NEU: Auftrag entfernen für Kunden nach Abschluss ***
         if (!_isDienstleister && ad.status == 'abgeschlossen')
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _kundeAuftragEntfernen,
               icon: const Icon(Icons.delete_forever_rounded),
-              label: const Text('Auftrag aus Übersicht entfernen'),
+              label: Text(l10n.auftragEntfernenUebersicht),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[600],
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -700,7 +721,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             child: ElevatedButton.icon(
               onPressed: _kundeAuftragEntfernen,
               icon: const Icon(Icons.delete),
-              label: const Text('Auftrag entfernen'),
+              label: Text(l10n.auftragEntfernen),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[600],
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -713,7 +734,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           ),
         if (_errorMessage != null) ...[
           const SizedBox(height: 20),
-          Text('Fehler: $_errorMessage', style: const TextStyle(color: Colors.red)),
+          Text(
+            l10n.errorPrefix(_errorMessage ?? ""),
+            style: const TextStyle(color: Colors.red),
+          ),
         ],
       ],
     );
@@ -721,10 +745,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: const Text('Auftragsdetails', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.auftragDetailTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -735,7 +760,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-                ? const Center(child: Text('Keine Daten verfügbar'))
+                ? Center(child: Text(l10n.keineDatenVerfuegbar))
                 : SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
