@@ -588,4 +588,157 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dienstleisterButton => 'Soy un proveedor de servicios';
+
+  @override
+  String get category_babysitter => 'Niñera / Cuidado de niños';
+
+  @override
+  String get category_catering => 'Catering';
+
+  @override
+  String get category_dachdecker => 'Techador';
+
+  @override
+  String get category_elektriker => 'Electricista';
+
+  @override
+  String get category_ernaehrungsberatung => 'Asesoría nutricional';
+
+  @override
+  String get category_eventplanung => 'Planificación de eventos';
+
+  @override
+  String get category_fahrdienste => 'Servicios de transporte';
+
+  @override
+  String get category_fahrlehrer => 'Instructor de conducción';
+
+  @override
+  String get category_fensterputzer => 'Limpiador de ventanas';
+
+  @override
+  String get category_fliesenleger => 'Colocador de azulejos';
+
+  @override
+  String get category_fotografie => 'Fotografía / Videografía';
+
+  @override
+  String get category_friseur => 'Peluquero/a';
+
+  @override
+  String get category_gartenpflege => 'Cuidado del jardín / Corte de césped';
+
+  @override
+  String get category_grafikdesign => 'Diseño gráfico';
+
+  @override
+  String get category_handy_reparatur => 'Reparación de móviles/tablets';
+
+  @override
+  String get category_haushaltsreinigung => 'Limpieza del hogar';
+
+  @override
+  String get category_hausmeisterservice => 'Servicio de portería';
+
+  @override
+  String get category_heizungsbauer => 'Instalador de calefacción';
+
+  @override
+  String get category_hundesitter => 'Paseador de perros / Cuidado de perros';
+
+  @override
+  String get category_it_support => 'Soporte informático';
+
+  @override
+  String get category_klempner => 'Fontanero';
+
+  @override
+  String get category_kosmetik => 'Esteticista';
+
+  @override
+  String get category_kuenstler => 'Artista (p.ej. músico para eventos)';
+
+  @override
+  String get category_kurierdienst => 'Servicio de mensajería';
+
+  @override
+  String get category_maler => 'Pintor';
+
+  @override
+  String get category_massagen => 'Masajes';
+
+  @override
+  String get category_maurer => 'Albañil';
+
+  @override
+  String get category_moebelaufbau => 'Montaje de muebles';
+
+  @override
+  String get category_musikunterricht => 'Clases de música';
+
+  @override
+  String get category_nachhilfe => 'Clases particulares';
+
+  @override
+  String get category_nagelstudio => 'Salón de uñas';
+
+  @override
+  String get category_pc_reparatur => 'Reparación de PC/portátiles';
+
+  @override
+  String get category_partyservice => 'Servicio para fiestas';
+
+  @override
+  String get category_personal_trainer => 'Entrenador personal';
+
+  @override
+  String get category_rasenmaeher_service => 'Servicio de cortacésped';
+
+  @override
+  String get category_rechtsberatung => 'Asesoría jurídica';
+
+  @override
+  String get category_reparaturdienste => 'Servicios de reparación';
+
+  @override
+  String get category_seniorenbetreuung => 'Cuidado de mayores';
+
+  @override
+  String get category_social_media => 'Gestión de redes sociales';
+
+  @override
+  String get category_sonstige => 'Otros servicios';
+
+  @override
+  String get category_sprachunterricht => 'Clases de idiomas';
+
+  @override
+  String get category_steuerberatung => 'Asesoría fiscal';
+
+  @override
+  String get category_tischler => 'Carpintero';
+
+  @override
+  String get category_transport => 'Transporte y movilidad';
+
+  @override
+  String get category_umzugstransporte => 'Transporte de mudanzas';
+
+  @override
+  String get category_umzugshelfer => 'Ayudante de mudanza';
+
+  @override
+  String get category_uebersetzungen => 'Traducciones';
+
+  @override
+  String get category_waescheservice => 'Servicio de lavandería';
+
+  @override
+  String get category_webdesign => 'Diseño web';
+
+  @override
+  String get category_einkaufsservice => 'Servicio de compras';
+
+  @override
+  String get category_haustierbetreuung => 'Cuidado de mascotas';
 }

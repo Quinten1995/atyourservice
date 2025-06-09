@@ -86,13 +86,124 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     super.dispose();
   }
 
+  /// Helper zum Anzeigen der übersetzten Kategorie
+  String getKategorieLabel(String kategorieKey, AppLocalizations l10n) {
+    switch (kategorieKey) {
+      case 'category_babysitter':
+        return l10n.category_babysitter;
+      case 'category_catering':
+        return l10n.category_catering;
+      case 'category_dachdecker':
+        return l10n.category_dachdecker;
+      case 'category_elektriker':
+        return l10n.category_elektriker;
+      case 'category_ernaehrungsberatung':
+        return l10n.category_ernaehrungsberatung;
+      case 'category_eventplanung':
+        return l10n.category_eventplanung;
+      case 'category_fahrdienste':
+        return l10n.category_fahrdienste;
+      case 'category_fahrlehrer':
+        return l10n.category_fahrlehrer;
+      case 'category_fensterputzer':
+        return l10n.category_fensterputzer;
+      case 'category_fliesenleger':
+        return l10n.category_fliesenleger;
+      case 'category_fotografie':
+        return l10n.category_fotografie;
+      case 'category_friseur':
+        return l10n.category_friseur;
+      case 'category_gartenpflege':
+        return l10n.category_gartenpflege;
+      case 'category_grafikdesign':
+        return l10n.category_grafikdesign;
+      case 'category_handy_reparatur':
+        return l10n.category_handy_reparatur;
+      case 'category_haushaltsreinigung':
+        return l10n.category_haushaltsreinigung;
+      case 'category_hausmeisterservice':
+        return l10n.category_hausmeisterservice;
+      case 'category_heizungsbauer':
+        return l10n.category_heizungsbauer;
+      case 'category_hundesitter':
+        return l10n.category_hundesitter;
+      case 'category_it_support':
+        return l10n.category_it_support;
+      case 'category_klempner':
+        return l10n.category_klempner;
+      case 'category_kosmetik':
+        return l10n.category_kosmetik;
+      case 'category_kuenstler':
+        return l10n.category_kuenstler;
+      case 'category_kurierdienst':
+        return l10n.category_kurierdienst;
+      case 'category_maler':
+        return l10n.category_maler;
+      case 'category_massagen':
+        return l10n.category_massagen;
+      case 'category_maurer':
+        return l10n.category_maurer;
+      case 'category_moebelaufbau':
+        return l10n.category_moebelaufbau;
+      case 'category_musikunterricht':
+        return l10n.category_musikunterricht;
+      case 'category_nachhilfe':
+        return l10n.category_nachhilfe;
+      case 'category_nagelstudio':
+        return l10n.category_nagelstudio;
+      case 'category_pc_reparatur':
+        return l10n.category_pc_reparatur;
+      case 'category_partyservice':
+        return l10n.category_partyservice;
+      case 'category_personal_trainer':
+        return l10n.category_personal_trainer;
+      case 'category_rasenmaeher_service':
+        return l10n.category_rasenmaeher_service;
+      case 'category_rechtsberatung':
+        return l10n.category_rechtsberatung;
+      case 'category_reparaturdienste':
+        return l10n.category_reparaturdienste;
+      case 'category_seniorenbetreuung':
+        return l10n.category_seniorenbetreuung;
+      case 'category_social_media':
+        return l10n.category_social_media;
+      case 'category_sonstige':
+        return l10n.category_sonstige;
+      case 'category_sprachunterricht':
+        return l10n.category_sprachunterricht;
+      case 'category_steuerberatung':
+        return l10n.category_steuerberatung;
+      case 'category_tischler':
+        return l10n.category_tischler;
+      case 'category_transport':
+        return l10n.category_transport;
+      case 'category_umzugstransporte':
+        return l10n.category_umzugstransporte;
+      case 'category_umzugshelfer':
+        return l10n.category_umzugshelfer;
+      case 'category_uebersetzungen':
+        return l10n.category_uebersetzungen;
+      case 'category_waescheservice':
+        return l10n.category_waescheservice;
+      case 'category_webdesign':
+        return l10n.category_webdesign;
+      case 'category_einkaufsservice':
+        return l10n.category_einkaufsservice;
+      case 'category_haustierbetreuung':
+        return l10n.category_haustierbetreuung;
+      default:
+        return kategorieKey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)!.registerAppBar,
+          l10n.registerAppBar,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
@@ -109,7 +220,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
               child: Column(
                 children: [
                   Text(
-                    AppLocalizations.of(context)!.registerTitle,
+                    l10n.registerTitle,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
@@ -123,7 +234,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   DropdownButtonFormField<String>(
                     value: _rolle,
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.roleLabel,
+                      labelText: l10n.roleLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -139,11 +250,11 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     items: [
                       DropdownMenuItem(
                         value: 'kunde',
-                        child: Text(AppLocalizations.of(context)!.roleKunde),
+                        child: Text(l10n.roleKunde),
                       ),
                       DropdownMenuItem(
                         value: 'dienstleister',
-                        child: Text(AppLocalizations.of(context)!.roleDienstleister),
+                        child: Text(l10n.roleDienstleister),
                       ),
                     ],
                     onChanged: (value) {
@@ -160,9 +271,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   if (_rolle == 'dienstleister') ...[
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
-                      value: _selectedKategorie ?? kategorieListe.first,
+                      value: _selectedKategorie ?? kategorieKeys.first,
                       decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.categoryLabel,
+                        labelText: l10n.categoryLabel,
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -175,17 +286,17 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
                       ),
-                      items: kategorieListe.map((kategorie) {
+                      items: kategorieKeys.map((kategorie) {
                         return DropdownMenuItem(
                           value: kategorie,
-                          child: Text(kategorie),
+                          child: Text(getKategorieLabel(kategorie, l10n)),
                         );
                       }).toList(),
                       onChanged: (value) {
                         setState(() => _selectedKategorie = value);
                       },
                       validator: (value) => (_rolle == 'dienstleister' && (value == null || value.isEmpty))
-                          ? AppLocalizations.of(context)!.categoryValidator
+                          ? l10n.categoryValidator
                           : null,
                     ),
                   ],
@@ -196,7 +307,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.emailLabel,
+                      labelText: l10n.emailLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -211,9 +322,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return AppLocalizations.of(context)!.emailEmpty;
+                      if (value == null || value.isEmpty) return l10n.emailEmpty;
                       if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                        return AppLocalizations.of(context)!.emailInvalid;
+                        return l10n.emailInvalid;
                       }
                       return null;
                     },
@@ -225,7 +336,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.passwordLabel,
+                      labelText: l10n.passwordLabel,
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
@@ -240,8 +351,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return AppLocalizations.of(context)!.passwordEmpty;
-                      if (value.length < 6) return AppLocalizations.of(context)!.passwordTooShort;
+                      if (value == null || value.isEmpty) return l10n.passwordEmpty;
+                      if (value.length < 6) return l10n.passwordTooShort;
                       return null;
                     },
                   ),
@@ -264,7 +375,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                               shadowColor: primaryColor.withOpacity(0.20),
                             ),
                             child: Text(
-                              AppLocalizations.of(context)!.registerButton,
+                              l10n.registerButton,
                               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                             ),
                           ),

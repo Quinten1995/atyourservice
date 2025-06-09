@@ -588,4 +588,157 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get dienstleisterButton => 'Ben bir hizmet sağlayıcıyım';
+
+  @override
+  String get category_babysitter => 'Bebek bakıcısı / Çocuk bakımı';
+
+  @override
+  String get category_catering => 'Catering';
+
+  @override
+  String get category_dachdecker => 'Çatı ustası';
+
+  @override
+  String get category_elektriker => 'Elektrikçi';
+
+  @override
+  String get category_ernaehrungsberatung => 'Beslenme danışmanlığı';
+
+  @override
+  String get category_eventplanung => 'Etkinlik planlama';
+
+  @override
+  String get category_fahrdienste => 'Servis taşımacılığı';
+
+  @override
+  String get category_fahrlehrer => 'Sürücü eğitmeni';
+
+  @override
+  String get category_fensterputzer => 'Pencere temizleyici';
+
+  @override
+  String get category_fliesenleger => 'Fayans ustası';
+
+  @override
+  String get category_fotografie => 'Fotoğrafçılık / Videografi';
+
+  @override
+  String get category_friseur => 'Kuaför';
+
+  @override
+  String get category_gartenpflege => 'Bahçe bakımı / Çim biçme';
+
+  @override
+  String get category_grafikdesign => 'Grafik tasarım';
+
+  @override
+  String get category_handy_reparatur => 'Cep telefonu / Tablet tamiri';
+
+  @override
+  String get category_haushaltsreinigung => 'Ev temizliği';
+
+  @override
+  String get category_hausmeisterservice => 'Apartman görevlisi hizmeti';
+
+  @override
+  String get category_heizungsbauer => 'Isıtma sistemleri ustası';
+
+  @override
+  String get category_hundesitter => 'Köpek gezdirme / Bakım';
+
+  @override
+  String get category_it_support => 'IT desteği';
+
+  @override
+  String get category_klempner => 'Tesisatçı';
+
+  @override
+  String get category_kosmetik => 'Güzellik uzmanı';
+
+  @override
+  String get category_kuenstler => 'Sanatçı (örn. etkinlik müzisyeni)';
+
+  @override
+  String get category_kurierdienst => 'Kurye servisi';
+
+  @override
+  String get category_maler => 'Boya ustası';
+
+  @override
+  String get category_massagen => 'Masaj';
+
+  @override
+  String get category_maurer => 'Duvar ustası';
+
+  @override
+  String get category_moebelaufbau => 'Mobilya montajı';
+
+  @override
+  String get category_musikunterricht => 'Müzik dersi';
+
+  @override
+  String get category_nachhilfe => 'Özel ders';
+
+  @override
+  String get category_nagelstudio => 'Tırnak stüdyosu';
+
+  @override
+  String get category_pc_reparatur => 'PC / Laptop tamiri';
+
+  @override
+  String get category_partyservice => 'Parti servisi';
+
+  @override
+  String get category_personal_trainer => 'Kişisel antrenör';
+
+  @override
+  String get category_rasenmaeher_service => 'Çim biçme servisi';
+
+  @override
+  String get category_rechtsberatung => 'Hukuk danışmanlığı';
+
+  @override
+  String get category_reparaturdienste => 'Tamir hizmetleri';
+
+  @override
+  String get category_seniorenbetreuung => 'Yaşlı bakımı';
+
+  @override
+  String get category_social_media => 'Sosyal medya yönetimi';
+
+  @override
+  String get category_sonstige => 'Diğer hizmetler';
+
+  @override
+  String get category_sprachunterricht => 'Dil dersi';
+
+  @override
+  String get category_steuerberatung => 'Vergi danışmanlığı';
+
+  @override
+  String get category_tischler => 'Marangoz';
+
+  @override
+  String get category_transport => 'Taşıma & Mobilite';
+
+  @override
+  String get category_umzugstransporte => 'Taşınma taşımacılığı';
+
+  @override
+  String get category_umzugshelfer => 'Taşınma yardımcısı';
+
+  @override
+  String get category_uebersetzungen => 'Çeviri hizmetleri';
+
+  @override
+  String get category_waescheservice => 'Çamaşır servisi';
+
+  @override
+  String get category_webdesign => 'Web tasarım';
+
+  @override
+  String get category_einkaufsservice => 'Alışveriş servisi';
+
+  @override
+  String get category_haustierbetreuung => 'Evcil hayvan bakımı';
 }

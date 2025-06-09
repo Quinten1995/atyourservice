@@ -588,4 +588,157 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dienstleisterButton => 'Ich bin Dienstleister';
+
+  @override
+  String get category_babysitter => 'Babysitter / Kinderbetreuung';
+
+  @override
+  String get category_catering => 'Catering';
+
+  @override
+  String get category_dachdecker => 'Dachdecker';
+
+  @override
+  String get category_elektriker => 'Elektriker';
+
+  @override
+  String get category_ernaehrungsberatung => 'Ernährungsberatung';
+
+  @override
+  String get category_eventplanung => 'Eventplanung';
+
+  @override
+  String get category_fahrdienste => 'Fahrdienste';
+
+  @override
+  String get category_fahrlehrer => 'Fahrlehrer/in';
+
+  @override
+  String get category_fensterputzer => 'Fensterputzer';
+
+  @override
+  String get category_fliesenleger => 'Fliesenleger';
+
+  @override
+  String get category_fotografie => 'Fotografie / Videografie';
+
+  @override
+  String get category_friseur => 'Friseur/in';
+
+  @override
+  String get category_gartenpflege => 'Gartenpflege / Rasenmähen';
+
+  @override
+  String get category_grafikdesign => 'Grafikdesign';
+
+  @override
+  String get category_handy_reparatur => 'Handy/Tablet-Reparatur';
+
+  @override
+  String get category_haushaltsreinigung => 'Haushaltsreinigung';
+
+  @override
+  String get category_hausmeisterservice => 'Hausmeisterservice';
+
+  @override
+  String get category_heizungsbauer => 'Heizungsbauer';
+
+  @override
+  String get category_hundesitter => 'Hundesitter / Gassi-Service';
+
+  @override
+  String get category_it_support => 'IT-Support';
+
+  @override
+  String get category_klempner => 'Klempner';
+
+  @override
+  String get category_kosmetik => 'Kosmetiker/in';
+
+  @override
+  String get category_kuenstler => 'Künstler (z.B. Musiker für Events)';
+
+  @override
+  String get category_kurierdienst => 'Kurierdienst';
+
+  @override
+  String get category_maler => 'Maler';
+
+  @override
+  String get category_massagen => 'Massagen';
+
+  @override
+  String get category_maurer => 'Maurer';
+
+  @override
+  String get category_moebelaufbau => 'Möbelaufbau / -montage';
+
+  @override
+  String get category_musikunterricht => 'Musikunterricht';
+
+  @override
+  String get category_nachhilfe => 'Nachhilfe';
+
+  @override
+  String get category_nagelstudio => 'Nagelstudio';
+
+  @override
+  String get category_pc_reparatur => 'PC-/Laptop-Reparatur';
+
+  @override
+  String get category_partyservice => 'Partyservice';
+
+  @override
+  String get category_personal_trainer => 'Personal Trainer';
+
+  @override
+  String get category_rasenmaeher_service => 'Rasenmäher-Service';
+
+  @override
+  String get category_rechtsberatung => 'Rechtsberatung';
+
+  @override
+  String get category_reparaturdienste => 'Reparaturdienste';
+
+  @override
+  String get category_seniorenbetreuung => 'Seniorenbetreuung';
+
+  @override
+  String get category_social_media => 'Social Media Betreuung';
+
+  @override
+  String get category_sonstige => 'Sonstige Dienstleistungen';
+
+  @override
+  String get category_sprachunterricht => 'Sprachunterricht';
+
+  @override
+  String get category_steuerberatung => 'Steuerberatung';
+
+  @override
+  String get category_tischler => 'Tischler/Schreiner';
+
+  @override
+  String get category_transport => 'Transport & Mobilität';
+
+  @override
+  String get category_umzugstransporte => 'Umzugstransporte';
+
+  @override
+  String get category_umzugshelfer => 'Umzugshelfer';
+
+  @override
+  String get category_uebersetzungen => 'Übersetzungen';
+
+  @override
+  String get category_waescheservice => 'Wäscheservice';
+
+  @override
+  String get category_webdesign => 'Webdesign';
+
+  @override
+  String get category_einkaufsservice => 'Einkaufsservice';
+
+  @override
+  String get category_haustierbetreuung => 'Haustierbetreuung';
 }

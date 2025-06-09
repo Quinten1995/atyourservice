@@ -588,4 +588,157 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dienstleisterButton => 'Je suis un prestataire';
+
+  @override
+  String get category_babysitter => 'Baby-sitter / Garde d\'enfants';
+
+  @override
+  String get category_catering => 'Traiteur';
+
+  @override
+  String get category_dachdecker => 'Couvreur';
+
+  @override
+  String get category_elektriker => 'Électricien';
+
+  @override
+  String get category_ernaehrungsberatung => 'Conseil en nutrition';
+
+  @override
+  String get category_eventplanung => 'Organisation d\'événements';
+
+  @override
+  String get category_fahrdienste => 'Services de transport';
+
+  @override
+  String get category_fahrlehrer => 'Moniteur d\'auto-école';
+
+  @override
+  String get category_fensterputzer => 'Laveur de vitres';
+
+  @override
+  String get category_fliesenleger => 'Carreleur';
+
+  @override
+  String get category_fotografie => 'Photographie / Vidéographie';
+
+  @override
+  String get category_friseur => 'Coiffeur/euse';
+
+  @override
+  String get category_gartenpflege => 'Entretien de jardin / Tonte de pelouse';
+
+  @override
+  String get category_grafikdesign => 'Graphisme';
+
+  @override
+  String get category_handy_reparatur => 'Réparation smartphone/tablette';
+
+  @override
+  String get category_haushaltsreinigung => 'Ménage à domicile';
+
+  @override
+  String get category_hausmeisterservice => 'Service de conciergerie';
+
+  @override
+  String get category_heizungsbauer => 'Installateur de chauffage';
+
+  @override
+  String get category_hundesitter => 'Promenade de chiens / Garde de chiens';
+
+  @override
+  String get category_it_support => 'Support informatique';
+
+  @override
+  String get category_klempner => 'Plombier';
+
+  @override
+  String get category_kosmetik => 'Esthéticien/ne';
+
+  @override
+  String get category_kuenstler => 'Artiste (ex : musicien pour événements)';
+
+  @override
+  String get category_kurierdienst => 'Service de messagerie';
+
+  @override
+  String get category_maler => 'Peintre';
+
+  @override
+  String get category_massagen => 'Massages';
+
+  @override
+  String get category_maurer => 'Maçon';
+
+  @override
+  String get category_moebelaufbau => 'Montage de meubles';
+
+  @override
+  String get category_musikunterricht => 'Cours de musique';
+
+  @override
+  String get category_nachhilfe => 'Cours particuliers';
+
+  @override
+  String get category_nagelstudio => 'Institut de manucure';
+
+  @override
+  String get category_pc_reparatur => 'Réparation PC / ordinateur portable';
+
+  @override
+  String get category_partyservice => 'Service pour fêtes';
+
+  @override
+  String get category_personal_trainer => 'Coach personnel';
+
+  @override
+  String get category_rasenmaeher_service => 'Service de tondeuse à gazon';
+
+  @override
+  String get category_rechtsberatung => 'Conseil juridique';
+
+  @override
+  String get category_reparaturdienste => 'Services de réparation';
+
+  @override
+  String get category_seniorenbetreuung => 'Aide aux personnes âgées';
+
+  @override
+  String get category_social_media => 'Gestion des réseaux sociaux';
+
+  @override
+  String get category_sonstige => 'Autres services';
+
+  @override
+  String get category_sprachunterricht => 'Cours de langues';
+
+  @override
+  String get category_steuerberatung => 'Conseil fiscal';
+
+  @override
+  String get category_tischler => 'Menuisier';
+
+  @override
+  String get category_transport => 'Transport & Mobilité';
+
+  @override
+  String get category_umzugstransporte => 'Transport de déménagement';
+
+  @override
+  String get category_umzugshelfer => 'Aide au déménagement';
+
+  @override
+  String get category_uebersetzungen => 'Traductions';
+
+  @override
+  String get category_waescheservice => 'Service de blanchisserie';
+
+  @override
+  String get category_webdesign => 'Webdesign';
+
+  @override
+  String get category_einkaufsservice => 'Service de courses';
+
+  @override
+  String get category_haustierbetreuung => 'Garde d\'animaux';
 }

@@ -1174,6 +1174,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I am a service provider'**
   String get dienstleisterButton;
+
+  /// No description provided for @category_babysitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Babysitter / Child care'**
+  String get category_babysitter;
+
+  /// No description provided for @category_catering.
+  ///
+  /// In en, this message translates to:
+  /// **'Catering'**
+  String get category_catering;
+
+  /// No description provided for @category_dachdecker.
+  ///
+  /// In en, this message translates to:
+  /// **'Roofer'**
+  String get category_dachdecker;
+
+  /// No description provided for @category_elektriker.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrician'**
+  String get category_elektriker;
+
+  /// No description provided for @category_ernaehrungsberatung.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition consulting'**
+  String get category_ernaehrungsberatung;
+
+  /// No description provided for @category_eventplanung.
+  ///
+  /// In en, this message translates to:
+  /// **'Event planning'**
+  String get category_eventplanung;
+
+  /// No description provided for @category_fahrdienste.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport services'**
+  String get category_fahrdienste;
+
+  /// No description provided for @category_fahrlehrer.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving instructor'**
+  String get category_fahrlehrer;
+
+  /// No description provided for @category_fensterputzer.
+  ///
+  /// In en, this message translates to:
+  /// **'Window cleaner'**
+  String get category_fensterputzer;
+
+  /// No description provided for @category_fliesenleger.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiler'**
+  String get category_fliesenleger;
+
+  /// No description provided for @category_fotografie.
+  ///
+  /// In en, this message translates to:
+  /// **'Photography / Videography'**
+  String get category_fotografie;
+
+  /// No description provided for @category_friseur.
+  ///
+  /// In en, this message translates to:
+  /// **'Hairdresser'**
+  String get category_friseur;
+
+  /// No description provided for @category_gartenpflege.
+  ///
+  /// In en, this message translates to:
+  /// **'Garden care / Lawn mowing'**
+  String get category_gartenpflege;
+
+  /// No description provided for @category_grafikdesign.
+  ///
+  /// In en, this message translates to:
+  /// **'Graphic design'**
+  String get category_grafikdesign;
+
+  /// No description provided for @category_handy_reparatur.
+  ///
+  /// In en, this message translates to:
+  /// **'Smartphone / Tablet repair'**
+  String get category_handy_reparatur;
+
+  /// No description provided for @category_haushaltsreinigung.
+  ///
+  /// In en, this message translates to:
+  /// **'House cleaning'**
+  String get category_haushaltsreinigung;
+
+  /// No description provided for @category_hausmeisterservice.
+  ///
+  /// In en, this message translates to:
+  /// **'Janitorial service'**
+  String get category_hausmeisterservice;
+
+  /// No description provided for @category_heizungsbauer.
+  ///
+  /// In en, this message translates to:
+  /// **'Heating installer'**
+  String get category_heizungsbauer;
+
+  /// No description provided for @category_hundesitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Dog sitting / Walking'**
+  String get category_hundesitter;
+
+  /// No description provided for @category_it_support.
+  ///
+  /// In en, this message translates to:
+  /// **'IT support'**
+  String get category_it_support;
+
+  /// No description provided for @category_klempner.
+  ///
+  /// In en, this message translates to:
+  /// **'Plumber'**
+  String get category_klempner;
+
+  /// No description provided for @category_kosmetik.
+  ///
+  /// In en, this message translates to:
+  /// **'Beautician'**
+  String get category_kosmetik;
+
+  /// No description provided for @category_kuenstler.
+  ///
+  /// In en, this message translates to:
+  /// **'Artist (e.g. musician for events)'**
+  String get category_kuenstler;
+
+  /// No description provided for @category_kurierdienst.
+  ///
+  /// In en, this message translates to:
+  /// **'Courier service'**
+  String get category_kurierdienst;
+
+  /// No description provided for @category_maler.
+  ///
+  /// In en, this message translates to:
+  /// **'Painter'**
+  String get category_maler;
+
+  /// No description provided for @category_massagen.
+  ///
+  /// In en, this message translates to:
+  /// **'Massage'**
+  String get category_massagen;
+
+  /// No description provided for @category_maurer.
+  ///
+  /// In en, this message translates to:
+  /// **'Bricklayer'**
+  String get category_maurer;
+
+  /// No description provided for @category_moebelaufbau.
+  ///
+  /// In en, this message translates to:
+  /// **'Furniture assembly'**
+  String get category_moebelaufbau;
+
+  /// No description provided for @category_musikunterricht.
+  ///
+  /// In en, this message translates to:
+  /// **'Music lessons'**
+  String get category_musikunterricht;
+
+  /// No description provided for @category_nachhilfe.
+  ///
+  /// In en, this message translates to:
+  /// **'Tutoring'**
+  String get category_nachhilfe;
+
+  /// No description provided for @category_nagelstudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Nail studio'**
+  String get category_nagelstudio;
+
+  /// No description provided for @category_pc_reparatur.
+  ///
+  /// In en, this message translates to:
+  /// **'PC / Laptop repair'**
+  String get category_pc_reparatur;
+
+  /// No description provided for @category_partyservice.
+  ///
+  /// In en, this message translates to:
+  /// **'Party service'**
+  String get category_partyservice;
+
+  /// No description provided for @category_personal_trainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal trainer'**
+  String get category_personal_trainer;
+
+  /// No description provided for @category_rasenmaeher_service.
+  ///
+  /// In en, this message translates to:
+  /// **'Lawnmower service'**
+  String get category_rasenmaeher_service;
+
+  /// No description provided for @category_rechtsberatung.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal consulting'**
+  String get category_rechtsberatung;
+
+  /// No description provided for @category_reparaturdienste.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair services'**
+  String get category_reparaturdienste;
+
+  /// No description provided for @category_seniorenbetreuung.
+  ///
+  /// In en, this message translates to:
+  /// **'Senior care'**
+  String get category_seniorenbetreuung;
+
+  /// No description provided for @category_social_media.
+  ///
+  /// In en, this message translates to:
+  /// **'Social media management'**
+  String get category_social_media;
+
+  /// No description provided for @category_sonstige.
+  ///
+  /// In en, this message translates to:
+  /// **'Other services'**
+  String get category_sonstige;
+
+  /// No description provided for @category_sprachunterricht.
+  ///
+  /// In en, this message translates to:
+  /// **'Language lessons'**
+  String get category_sprachunterricht;
+
+  /// No description provided for @category_steuerberatung.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax consulting'**
+  String get category_steuerberatung;
+
+  /// No description provided for @category_tischler.
+  ///
+  /// In en, this message translates to:
+  /// **'Carpenter'**
+  String get category_tischler;
+
+  /// No description provided for @category_transport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport & Mobility'**
+  String get category_transport;
+
+  /// No description provided for @category_umzugstransporte.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving transport'**
+  String get category_umzugstransporte;
+
+  /// No description provided for @category_umzugshelfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving helper'**
+  String get category_umzugshelfer;
+
+  /// No description provided for @category_uebersetzungen.
+  ///
+  /// In en, this message translates to:
+  /// **'Translations'**
+  String get category_uebersetzungen;
+
+  /// No description provided for @category_waescheservice.
+  ///
+  /// In en, this message translates to:
+  /// **'Laundry service'**
+  String get category_waescheservice;
+
+  /// No description provided for @category_webdesign.
+  ///
+  /// In en, this message translates to:
+  /// **'Web design'**
+  String get category_webdesign;
+
+  /// No description provided for @category_einkaufsservice.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping service'**
+  String get category_einkaufsservice;
+
+  /// No description provided for @category_haustierbetreuung.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet care'**
+  String get category_haustierbetreuung;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

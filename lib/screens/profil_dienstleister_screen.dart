@@ -8,6 +8,117 @@ import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
 import 'premium_screen.dart';
 
+// ---- Helper für Kategorien (mit Unterstrich) ----
+String getKategorieLabel(String key, AppLocalizations l10n) {
+  switch (key) {
+    case 'category_babysitter':
+      return l10n.category_babysitter;
+    case 'category_catering':
+      return l10n.category_catering;
+    case 'category_dachdecker':
+      return l10n.category_dachdecker;
+    case 'category_elektriker':
+      return l10n.category_elektriker;
+    case 'category_ernaehrungsberatung':
+      return l10n.category_ernaehrungsberatung;
+    case 'category_eventplanung':
+      return l10n.category_eventplanung;
+    case 'category_fahrdienste':
+      return l10n.category_fahrdienste;
+    case 'category_fahrlehrer':
+      return l10n.category_fahrlehrer;
+    case 'category_fensterputzer':
+      return l10n.category_fensterputzer;
+    case 'category_fliesenleger':
+      return l10n.category_fliesenleger;
+    case 'category_fotografie':
+      return l10n.category_fotografie;
+    case 'category_friseur':
+      return l10n.category_friseur;
+    case 'category_gartenpflege':
+      return l10n.category_gartenpflege;
+    case 'category_grafikdesign':
+      return l10n.category_grafikdesign;
+    case 'category_handy_reparatur':
+      return l10n.category_handy_reparatur;
+    case 'category_haushaltsreinigung':
+      return l10n.category_haushaltsreinigung;
+    case 'category_hausmeisterservice':
+      return l10n.category_hausmeisterservice;
+    case 'category_heizungsbauer':
+      return l10n.category_heizungsbauer;
+    case 'category_hundesitter':
+      return l10n.category_hundesitter;
+    case 'category_it_support':
+      return l10n.category_it_support;
+    case 'category_klempner':
+      return l10n.category_klempner;
+    case 'category_kosmetik':
+      return l10n.category_kosmetik;
+    case 'category_kuenstler':
+      return l10n.category_kuenstler;
+    case 'category_kurierdienst':
+      return l10n.category_kurierdienst;
+    case 'category_maler':
+      return l10n.category_maler;
+    case 'category_massagen':
+      return l10n.category_massagen;
+    case 'category_maurer':
+      return l10n.category_maurer;
+    case 'category_moebelaufbau':
+      return l10n.category_moebelaufbau;
+    case 'category_musikunterricht':
+      return l10n.category_musikunterricht;
+    case 'category_nachhilfe':
+      return l10n.category_nachhilfe;
+    case 'category_nagelstudio':
+      return l10n.category_nagelstudio;
+    case 'category_pc_reparatur':
+      return l10n.category_pc_reparatur;
+    case 'category_partyservice':
+      return l10n.category_partyservice;
+    case 'category_personal_trainer':
+      return l10n.category_personal_trainer;
+    case 'category_rasenmaeher_service':
+      return l10n.category_rasenmaeher_service;
+    case 'category_rechtsberatung':
+      return l10n.category_rechtsberatung;
+    case 'category_reparaturdienste':
+      return l10n.category_reparaturdienste;
+    case 'category_seniorenbetreuung':
+      return l10n.category_seniorenbetreuung;
+    case 'category_social_media':
+      return l10n.category_social_media;
+    case 'category_sonstige':
+      return l10n.category_sonstige;
+    case 'category_sprachunterricht':
+      return l10n.category_sprachunterricht;
+    case 'category_steuerberatung':
+      return l10n.category_steuerberatung;
+    case 'category_tischler':
+      return l10n.category_tischler;
+    case 'category_transport':
+      return l10n.category_transport;
+    case 'category_umzugstransporte':
+      return l10n.category_umzugstransporte;
+    case 'category_umzugshelfer':
+      return l10n.category_umzugshelfer;
+    case 'category_uebersetzungen':
+      return l10n.category_uebersetzungen;
+    case 'category_waescheservice':
+      return l10n.category_waescheservice;
+    case 'category_webdesign':
+      return l10n.category_webdesign;
+    case 'category_einkaufsservice':
+      return l10n.category_einkaufsservice;
+    case 'category_haustierbetreuung':
+      return l10n.category_haustierbetreuung;
+    default:
+      return key;
+  }
+}
+// ---- Ende Helper ----
+
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
 
@@ -23,7 +134,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _beschreibungController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
-  String _selectedKategorie = kategorieListe.first;
+  String _selectedKategorie = kategorieKeys.first;
   final _adresseController = TextEditingController();
 
   bool _isLoading = false;
@@ -66,10 +177,10 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
         _beschreibungController.text = data['beschreibung'] as String? ?? '';
-        final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieListe.first;
-        _selectedKategorie = kategorieListe.contains(gespeicherteKategorie)
+        final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieKeys.first;
+        _selectedKategorie = kategorieKeys.contains(gespeicherteKategorie)
             ? gespeicherteKategorie
-            : kategorieListe.first;
+            : kategorieKeys.first;
         _adresseController.text = data['adresse'] as String? ?? '';
         _telefonController.text = data['telefon'] as String? ?? '';
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
@@ -329,6 +440,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     Widget? limitHinweis;
     final isFree = (_aboTyp ?? 'free') == 'free';
     if (isFree && _lastProfileChange != null) {
@@ -338,7 +450,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         limitHinweis = Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: Text(
-            AppLocalizations.of(context)!.changeLimitHint(
+            l10n.changeLimitHint(
               naechstesDatum.toLocal().toString().substring(0, 10),
             ),
             style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
@@ -350,7 +462,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.profileAppBar),
+        title: Text(l10n.profileAppBar),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: primaryColor,
@@ -401,7 +513,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     ),
                                     const SizedBox(width: 9),
                                     Text(
-                                      AppLocalizations.of(context)!.ratingsCount(
+                                      l10n.ratingsCount(
                                         _anzahlBewertungen.toString(),
                                       ),
                                       style: TextStyle(
@@ -413,7 +525,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 )
                               else
                                 Text(
-                                  AppLocalizations.of(context)!.noRatingsYet,
+                                  l10n.noRatingsYet,
                                   style: TextStyle(
                                     color: Colors.black54,
                                     fontSize: 15,
@@ -423,26 +535,26 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                               const SizedBox(height: 26),
                               TextFormField(
                                 controller: _nameController,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.nameLabel),
+                                decoration: _inputDecoration(l10n.nameLabel),
                                 validator: (value) =>
                                     (value == null || value.isEmpty)
-                                        ? AppLocalizations.of(context)!.nameValidator
+                                        ? l10n.nameValidator
                                         : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _beschreibungController,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.descriptionLabel),
+                                decoration: _inputDecoration(l10n.descriptionLabel),
                                 maxLines: 3,
                               ),
                               const SizedBox(height: 18),
                               DropdownButtonFormField<String>(
                                 value: _selectedKategorie,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.categoryLabel),
-                                items: kategorieListe.map((kategorie) {
+                                decoration: _inputDecoration(l10n.categoryLabel),
+                                items: kategorieKeys.map((kategorie) {
                                   return DropdownMenuItem(
                                     value: kategorie,
-                                    child: Text(kategorie),
+                                    child: Text(getKategorieLabel(kategorie, l10n)),
                                   );
                                 }).toList(),
                                 onChanged: (wert) {
@@ -453,36 +565,36 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   }
                                 },
                                 validator: (value) => (value == null || value.isEmpty)
-                                    ? AppLocalizations.of(context)!.categoryValidator
+                                    ? l10n.categoryValidator
                                     : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _adresseController,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.addressLabel),
+                                decoration: _inputDecoration(l10n.addressLabel),
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _telefonController,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.phoneLabel),
+                                decoration: _inputDecoration(l10n.phoneLabel),
                                 keyboardType: TextInputType.phone,
                                 validator: (value) =>
                                     (value == null || value.isEmpty)
-                                        ? AppLocalizations.of(context)!.phoneValidator
+                                        ? l10n.phoneValidator
                                         : null,
                               ),
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _emailController,
-                                decoration: _inputDecoration(AppLocalizations.of(context)!.emailLabel),
+                                decoration: _inputDecoration(l10n.emailLabel),
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!.emailEmptyValidator;
+                                    return l10n.emailEmptyValidator;
                                   }
                                   final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                                   if (!emailRegExp.hasMatch(value)) {
-                                    return AppLocalizations.of(context)!.emailInvalidValidator;
+                                    return l10n.emailInvalidValidator;
                                   }
                                   return null;
                                 },
@@ -492,7 +604,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: Text(
-                                    "${AppLocalizations.of(context)!.errorPrefix(_errorMessage!)}",
+                                    "${l10n.errorPrefix(_errorMessage!)}",
                                     style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -500,7 +612,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 width: double.infinity,
                                 child: ElevatedButton.icon(
                                   icon: const Icon(Icons.save),
-                                  label: Text(AppLocalizations.of(context)!.profileSaveButton),
+                                  label: Text(l10n.profileSaveButton),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: primaryColor,
                                     foregroundColor: Colors.white,
