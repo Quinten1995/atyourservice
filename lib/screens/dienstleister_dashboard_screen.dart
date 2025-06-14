@@ -101,7 +101,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _laufendeAuftraegeMitUser = _alleLaufendenAuftraegeRaw;
 
       // Radius nach Abo-Typ bestimmen
-      double radiusKm = 10.0;
+      double radiusKm = 5.0;
       if (_aboTyp == 'silver') {
         radiusKm = 30.0;
       } else if (_aboTyp == 'gold') {

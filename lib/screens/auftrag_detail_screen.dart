@@ -3,7 +3,7 @@ import 'package:flutter/services.dart'; // Für Clipboard
 import 'package:url_launcher/url_launcher.dart'; // Für Anrufen
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
-import 'bewertung_dialog.dart'; // Passe ggf. den Pfad an!
+import 'bewertung_dialog.dart';
 import '../l10n/app_localizations.dart';
 
 class AuftragDetailScreen extends StatefulWidget {
@@ -30,10 +30,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   // Profilbild-URL des Dienstleisters
   String? _dienstleisterProfilbildUrl;
 
-  // Abo-Typ
+  // Abo-Typ (eigener)
   String? _aboTyp;
 
-  // NEU: E-Mail als Name
+  // Abo-Typ des Dienstleisters (für Badge!)
+  String? _dienstleisterAboTyp;
+
+  // E-Mail als Name
   String? _kundenName;
   String? _dienstleisterName;
 
@@ -62,6 +65,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       _dienstleisterProfilbildUrl = null;
       _kundenName = null;
       _dienstleisterName = null;
+      _dienstleisterAboTyp = null;
     });
 
     try {
@@ -70,7 +74,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       }
 
-      // Rolle und Abo-Typ laden
+      // Rolle und Abo-Typ laden (eigener User)
       final userResponse = await _supabase
           .from('users')
           .select('rolle, abo_typ')
@@ -131,24 +135,25 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       if (aktuellerAuftrag.dienstleisterId != null) {
         await _ladeDienstleisterBewertung(aktuellerAuftrag.dienstleisterId!);
 
-        // PROFILBILD-URL laden
+        // PROFILBILD-URL + ABOTYP laden
         final details = await _supabase
             .from('dienstleister_details')
-            .select('profilbild_url')
+            .select('profilbild_url, user_id')
             .eq('user_id', aktuellerAuftrag.dienstleisterId!)
             .maybeSingle();
         setState(() {
           _dienstleisterProfilbildUrl = details?['profilbild_url'];
         });
 
-        // Dienstleister-E-Mail laden
+        // Dienstleister-E-Mail & AboTyp laden
         final dl = await _supabase
             .from('users')
-            .select('email')
+            .select('email, abo_typ')
             .eq('id', aktuellerAuftrag.dienstleisterId!)
             .maybeSingle();
         setState(() {
           _dienstleisterName = dl?['email'];
+          _dienstleisterAboTyp = dl?['abo_typ'] ?? 'free';
         });
       }
 
@@ -221,7 +226,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      int wochenLimit = 2; // Default: free
+      int wochenLimit = 1; // Default: free
       if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 5;
       if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999; // "unbegrenzt"
 
@@ -351,7 +356,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // ---- Übersetzungsfunktionen überall korrekt! ----
   Widget _zeitplanungAnzeige() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
@@ -418,6 +422,28 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  Widget _premiumBadge() {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(left: 6.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.workspace_premium, color: Colors.amber[800], size: 20),
+          const SizedBox(width: 3),
+          Text(
+            l10n.premiumBadgeLabel,
+            style: TextStyle(
+              color: Colors.amber[900],
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _kopfbereichMitProfilbild() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
@@ -449,25 +475,27 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              Row(
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 5,
                 children: [
+                  Icon(Icons.star, color: Colors.amber, size: 22),
+                  Text(
+                    _dlDurchschnitt != null
+                        ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
+                        : '—',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
+                    Text(
+                      l10n.ratingsCount(_dlAnzahlBewertungen!),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    ),
                   if (!_isDienstleister &&
                       ad.dienstleisterId != null &&
-                      (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen')) ...[
-                    Icon(Icons.star, color: Colors.amber, size: 22),
-                    const SizedBox(width: 3),
-                    Text(
-                      _dlDurchschnitt != null
-                          ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
-                          : '—',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
-                      Text(
-                        l10n.ratingsCount(_dlAnzahlBewertungen!),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                  ],
+                      (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen') &&
+                      _dienstleisterAboTyp == 'gold')
+                    _premiumBadge(),
                 ],
               ),
             ],

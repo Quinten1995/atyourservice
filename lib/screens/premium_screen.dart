@@ -101,6 +101,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumFreeFeature1,
                       l10n.premiumFreeFeature2,
                       l10n.premiumFreeFeature3,
+                      l10n.premiumFreeFeature4,
                     ],
                     highlighted: _aboTyp == 'free',
                     showButton: false, // Kein Button!
@@ -117,7 +118,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
                       l10n.premiumSilverFeature3,
-                      l10n.premiumSilverFeature4,
                     ],
                     highlighted: _aboTyp == 'silver',
                     showButton: true,
@@ -139,7 +139,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumGoldFeature2,
                       l10n.premiumGoldFeature3,
                       l10n.premiumGoldFeature4,
-                      l10n.premiumGoldFeature5,
                     ],
                     highlighted: _aboTyp == 'gold',
                     showButton: true,

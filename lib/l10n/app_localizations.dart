@@ -413,53 +413,11 @@ abstract class AppLocalizations {
   /// **'free'**
   String get premiumFreePrice;
 
-  /// No description provided for @premiumFreeFeature1.
-  ///
-  /// In en, this message translates to:
-  /// **'Job radius: 10 km'**
-  String get premiumFreeFeature1;
-
-  /// No description provided for @premiumFreeFeature2.
-  ///
-  /// In en, this message translates to:
-  /// **'Max. 2 jobs/week'**
-  String get premiumFreeFeature2;
-
-  /// No description provided for @premiumFreeFeature3.
-  ///
-  /// In en, this message translates to:
-  /// **'Category/address rarely changeable'**
-  String get premiumFreeFeature3;
-
   /// No description provided for @premiumSilverPrice.
   ///
   /// In en, this message translates to:
   /// **'€4.99 / month'**
   String get premiumSilverPrice;
-
-  /// No description provided for @premiumSilverFeature1.
-  ///
-  /// In en, this message translates to:
-  /// **'Job radius: 30 km'**
-  String get premiumSilverFeature1;
-
-  /// No description provided for @premiumSilverFeature2.
-  ///
-  /// In en, this message translates to:
-  /// **'Max. 5 jobs/week'**
-  String get premiumSilverFeature2;
-
-  /// No description provided for @premiumSilverFeature3.
-  ///
-  /// In en, this message translates to:
-  /// **'Change category/address anytime'**
-  String get premiumSilverFeature3;
-
-  /// No description provided for @premiumSilverFeature4.
-  ///
-  /// In en, this message translates to:
-  /// **'Normal visibility'**
-  String get premiumSilverFeature4;
 
   /// No description provided for @premiumGoldPrice.
   ///
@@ -467,35 +425,71 @@ abstract class AppLocalizations {
   /// **'€9.99 / month'**
   String get premiumGoldPrice;
 
+  /// No description provided for @premiumFreeFeature1.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept 1 job per week'**
+  String get premiumFreeFeature1;
+
+  /// No description provided for @premiumFreeFeature2.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs within a 5 km radius'**
+  String get premiumFreeFeature2;
+
+  /// No description provided for @premiumFreeFeature3.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic categories only'**
+  String get premiumFreeFeature3;
+
+  /// No description provided for @premiumFreeFeature4.
+  ///
+  /// In en, this message translates to:
+  /// **'Category change only every 20 days'**
+  String get premiumFreeFeature4;
+
+  /// No description provided for @premiumSilverFeature1.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited job acceptance'**
+  String get premiumSilverFeature1;
+
+  /// No description provided for @premiumSilverFeature2.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs within a 15 km radius'**
+  String get premiumSilverFeature2;
+
+  /// No description provided for @premiumSilverFeature3.
+  ///
+  /// In en, this message translates to:
+  /// **'All categories available'**
+  String get premiumSilverFeature3;
+
   /// No description provided for @premiumGoldFeature1.
   ///
   /// In en, this message translates to:
-  /// **'Job radius: 70 km'**
+  /// **'Unlimited job acceptance'**
   String get premiumGoldFeature1;
 
   /// No description provided for @premiumGoldFeature2.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited jobs'**
+  /// **'Jobs within a 40 km radius'**
   String get premiumGoldFeature2;
 
   /// No description provided for @premiumGoldFeature3.
   ///
   /// In en, this message translates to:
-  /// **'Highlighted profile'**
+  /// **'All categories available'**
   String get premiumGoldFeature3;
 
   /// No description provided for @premiumGoldFeature4.
   ///
   /// In en, this message translates to:
-  /// **'Premium support'**
+  /// **'Premium user badge (visible to clients)'**
   String get premiumGoldFeature4;
-
-  /// No description provided for @premiumGoldFeature5.
-  ///
-  /// In en, this message translates to:
-  /// **'Change category/address anytime'**
-  String get premiumGoldFeature5;
 
   /// No description provided for @premiumChooseButton.
   ///
@@ -1480,6 +1474,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pet care'**
   String get category_haustierbetreuung;
+
+  /// No description provided for @premiumBadgeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premiumBadgeLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

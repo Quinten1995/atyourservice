@@ -181,46 +181,43 @@ class AppLocalizationsFr extends AppLocalizations {
   String get premiumFreePrice => 'gratuit';
 
   @override
-  String get premiumFreeFeature1 => 'Rayon d\'intervention : 10 km';
-
-  @override
-  String get premiumFreeFeature2 => 'Max. 2 missions/semaine';
-
-  @override
-  String get premiumFreeFeature3 => 'Changement rare de catégorie/adresse';
-
-  @override
-  String get premiumSilverPrice => '4,99 € / mois';
-
-  @override
-  String get premiumSilverFeature1 => 'Rayon d\'intervention : 30 km';
-
-  @override
-  String get premiumSilverFeature2 => 'Max. 5 missions/semaine';
-
-  @override
-  String get premiumSilverFeature3 => 'Changer catégorie/adresse à tout moment';
-
-  @override
-  String get premiumSilverFeature4 => 'Visibilité normale';
+  String get premiumSilverPrice => '€4.99 / month';
 
   @override
   String get premiumGoldPrice => '9,99 € / mois';
 
   @override
-  String get premiumGoldFeature1 => 'Rayon d\'intervention : 70 km';
+  String get premiumFreeFeature1 => 'Accepter 1 mission par semaine';
 
   @override
-  String get premiumGoldFeature2 => 'Missions illimitées';
+  String get premiumFreeFeature2 => 'Missions dans un rayon de 5 km';
 
   @override
-  String get premiumGoldFeature3 => 'Profil mis en avant';
+  String get premiumFreeFeature3 => 'Catégories de base uniquement';
 
   @override
-  String get premiumGoldFeature4 => 'Support Premium';
+  String get premiumFreeFeature4 => 'Changement de catégorie seulement tous les 20 jours';
 
   @override
-  String get premiumGoldFeature5 => 'Changer catégorie/adresse à tout moment';
+  String get premiumSilverFeature1 => 'Missions illimitées';
+
+  @override
+  String get premiumSilverFeature2 => 'Missions dans un rayon de 15 km';
+
+  @override
+  String get premiumSilverFeature3 => 'Toutes les catégories disponibles';
+
+  @override
+  String get premiumGoldFeature1 => 'Missions illimitées';
+
+  @override
+  String get premiumGoldFeature2 => 'Missions dans un rayon de 40 km';
+
+  @override
+  String get premiumGoldFeature3 => 'Toutes les catégories disponibles';
+
+  @override
+  String get premiumGoldFeature4 => 'Badge utilisateur premium (visible pour les clients)';
 
   @override
   String premiumChooseButton(Object title) {
@@ -741,4 +738,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get category_haustierbetreuung => 'Garde d\'animaux';
+
+  @override
+  String get premiumBadgeLabel => 'Premium';
 }

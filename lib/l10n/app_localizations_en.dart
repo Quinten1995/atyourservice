@@ -181,46 +181,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumFreePrice => 'free';
 
   @override
-  String get premiumFreeFeature1 => 'Job radius: 10 km';
-
-  @override
-  String get premiumFreeFeature2 => 'Max. 2 jobs/week';
-
-  @override
-  String get premiumFreeFeature3 => 'Category/address rarely changeable';
-
-  @override
   String get premiumSilverPrice => '€4.99 / month';
-
-  @override
-  String get premiumSilverFeature1 => 'Job radius: 30 km';
-
-  @override
-  String get premiumSilverFeature2 => 'Max. 5 jobs/week';
-
-  @override
-  String get premiumSilverFeature3 => 'Change category/address anytime';
-
-  @override
-  String get premiumSilverFeature4 => 'Normal visibility';
 
   @override
   String get premiumGoldPrice => '€9.99 / month';
 
   @override
-  String get premiumGoldFeature1 => 'Job radius: 70 km';
+  String get premiumFreeFeature1 => 'Accept 1 job per week';
 
   @override
-  String get premiumGoldFeature2 => 'Unlimited jobs';
+  String get premiumFreeFeature2 => 'Jobs within a 5 km radius';
 
   @override
-  String get premiumGoldFeature3 => 'Highlighted profile';
+  String get premiumFreeFeature3 => 'Basic categories only';
 
   @override
-  String get premiumGoldFeature4 => 'Premium support';
+  String get premiumFreeFeature4 => 'Category change only every 20 days';
 
   @override
-  String get premiumGoldFeature5 => 'Change category/address anytime';
+  String get premiumSilverFeature1 => 'Unlimited job acceptance';
+
+  @override
+  String get premiumSilverFeature2 => 'Jobs within a 15 km radius';
+
+  @override
+  String get premiumSilverFeature3 => 'All categories available';
+
+  @override
+  String get premiumGoldFeature1 => 'Unlimited job acceptance';
+
+  @override
+  String get premiumGoldFeature2 => 'Jobs within a 40 km radius';
+
+  @override
+  String get premiumGoldFeature3 => 'All categories available';
+
+  @override
+  String get premiumGoldFeature4 => 'Premium user badge (visible to clients)';
 
   @override
   String premiumChooseButton(Object title) {
@@ -741,4 +738,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get category_haustierbetreuung => 'Pet care';
+
+  @override
+  String get premiumBadgeLabel => 'Premium';
 }

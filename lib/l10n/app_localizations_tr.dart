@@ -181,46 +181,43 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumFreePrice => 'ücretsiz';
 
   @override
-  String get premiumFreeFeature1 => 'İş yarıçapı: 10 km';
-
-  @override
-  String get premiumFreeFeature2 => 'Maks. 2 iş/hafta';
-
-  @override
-  String get premiumFreeFeature3 => 'Kategori/adres nadiren değiştirilebilir';
-
-  @override
   String get premiumSilverPrice => 'Aylık €4,99';
-
-  @override
-  String get premiumSilverFeature1 => 'İş yarıçapı: 30 km';
-
-  @override
-  String get premiumSilverFeature2 => 'Maks. 5 iş/hafta';
-
-  @override
-  String get premiumSilverFeature3 => 'Kategori/adres istediğiniz zaman değiştirilebilir';
-
-  @override
-  String get premiumSilverFeature4 => 'Normal görünürlük';
 
   @override
   String get premiumGoldPrice => 'Aylık €9,99';
 
   @override
-  String get premiumGoldFeature1 => 'İş yarıçapı: 70 km';
+  String get premiumFreeFeature1 => 'Haftada 1 iş kabul et';
 
   @override
-  String get premiumGoldFeature2 => 'Sınırsız iş';
+  String get premiumFreeFeature2 => '5 km çapında işler';
 
   @override
-  String get premiumGoldFeature3 => 'Öne çıkan profil';
+  String get premiumFreeFeature3 => 'Sadece temel kategoriler';
 
   @override
-  String get premiumGoldFeature4 => 'Premium destek';
+  String get premiumFreeFeature4 => 'Kategori değişimi sadece 20 günde bir';
 
   @override
-  String get premiumGoldFeature5 => 'Kategori/adres istediğiniz zaman değiştirilebilir';
+  String get premiumSilverFeature1 => 'Sınırsız iş kabul et';
+
+  @override
+  String get premiumSilverFeature2 => '15 km çapında işler';
+
+  @override
+  String get premiumSilverFeature3 => 'Tüm kategorilere erişim';
+
+  @override
+  String get premiumGoldFeature1 => 'Sınırsız iş kabul et';
+
+  @override
+  String get premiumGoldFeature2 => '40 km çapında işler';
+
+  @override
+  String get premiumGoldFeature3 => 'Tüm kategorilere erişim';
+
+  @override
+  String get premiumGoldFeature4 => 'Premium kullanıcı rozeti (müşteriler tarafından görünür)';
 
   @override
   String premiumChooseButton(Object title) {
@@ -741,4 +738,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get category_haustierbetreuung => 'Evcil hayvan bakımı';
+
+  @override
+  String get premiumBadgeLabel => 'Premium';
 }

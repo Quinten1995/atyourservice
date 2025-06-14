@@ -288,16 +288,19 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
+        // ---- FIX: Nur den Dateinamen/Key an getPublicUrl() übergeben ----
+        final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         final storageResponse = await _supabase.storage
             .from('profile-pics')
             .upload(
-              '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+              fileName,
               _neuesProfilbild!,
               fileOptions: const FileOptions(upsert: true),
             );
+        // Der Key ist jetzt einfach fileName, KEIN ganzer Pfad mehr!
         final String publicUrl = _supabase.storage
             .from('profile-pics')
-            .getPublicUrl(storageResponse);
+            .getPublicUrl(fileName); // <<< FIX HIER!
         profilbildUrl = publicUrl;
       }
 
@@ -363,15 +366,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   }
 
   InputDecoration _inputDecoration(String label) => InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-      );
+  labelText: label,
+  filled: true,
+  fillColor: Colors.white,
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: const BorderSide(color: primaryColor, width: 2),
+  ),
+);
+
 
   Widget _profilbildWidget() {
     final double avatarSize = 96;
