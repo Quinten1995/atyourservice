@@ -741,4 +741,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get premiumBadgeLabel => 'Premium';
+
+  @override
+  String get statusOffen => 'Abierto';
+
+  @override
+  String get statusInBearbeitung => 'En progreso';
+
+  @override
+  String get statusAbgeschlossen => 'Completado';
 }

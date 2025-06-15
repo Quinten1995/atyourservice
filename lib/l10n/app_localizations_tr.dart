@@ -741,4 +741,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumBadgeLabel => 'Premium';
+
+  @override
+  String get statusOffen => 'Açık';
+
+  @override
+  String get statusInBearbeitung => 'Devam ediyor';
+
+  @override
+  String get statusAbgeschlossen => 'Tamamlandı';
 }

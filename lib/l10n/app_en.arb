@@ -235,6 +235,10 @@
   "category_webdesign": "Web design",
   "category_einkaufsservice": "Shopping service",
   "category_haustierbetreuung": "Pet care",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "statusOffen": "Open",
+  "statusInBearbeitung": "In progress",
+  "statusAbgeschlossen": "Completed"
+
 
 }

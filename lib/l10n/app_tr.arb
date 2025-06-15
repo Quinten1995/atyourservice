@@ -235,6 +235,10 @@
   "category_webdesign": "Web tasarım",
   "category_einkaufsservice": "Alışveriş servisi",
   "category_haustierbetreuung": "Evcil hayvan bakımı",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "statusOffen": "Açık",
+  "statusInBearbeitung": "Devam ediyor",
+  "statusAbgeschlossen": "Tamamlandı"
+
 
 }

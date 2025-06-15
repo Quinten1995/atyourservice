@@ -35,7 +35,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   @override
   void initState() {
     super.initState();
-    // Korrektes Pattern: Laden erst nach erstem Frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _ladeProfilUndAuftraege();
     });
@@ -103,9 +102,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       // Radius nach Abo-Typ bestimmen
       double radiusKm = 5.0;
       if (_aboTyp == 'silver') {
-        radiusKm = 30.0;
+        radiusKm = 15.0;
       } else if (_aboTyp == 'gold') {
-        radiusKm = 70.0;
+        radiusKm = 40.0;
       }
 
       // Offene Aufträge, nur im passenden Radius!
@@ -208,7 +207,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                         ),
                         const SizedBox(height: 7),
                         SizedBox(
-                          height: 135,
+                          height: 155,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: _laufendeAuftraegeMitUser.length,
@@ -263,7 +262,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                             Icon(Icons.assignment, size: 17, color: primaryColor),
                                             const SizedBox(width: 5),
                                             Text(
-                                              l10n.statusPrefix(auftrag.status),
+                                              l10n.statusPrefix(l10n.statusValue(auftrag.status)),
                                               style: const TextStyle(fontSize: 13),
                                             ),
                                           ],
@@ -272,6 +271,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                                         Text(
                                           l10n.kundePrefix(kundenEmail),
                                           style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),

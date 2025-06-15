@@ -233,7 +233,11 @@
   "category_webdesign": "Webdesign",
   "category_einkaufsservice": "Einkaufsservice",
   "category_haustierbetreuung": "Haustierbetreuung",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "statusOffen": "Offen",
+  "statusInBearbeitung": "In Bearbeitung",
+  "statusAbgeschlossen": "Abgeschlossen"
+
 
 
 }

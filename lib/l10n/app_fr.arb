@@ -262,6 +262,10 @@
   "category_webdesign": "Webdesign",
   "category_einkaufsservice": "Service de courses",
   "category_haustierbetreuung": "Garde d'animaux",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "statusOffen": "Ouvert",
+  "statusInBearbeitung": "En cours",
+  "statusAbgeschlossen": "Terminé"
+
 
 }

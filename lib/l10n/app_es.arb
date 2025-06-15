@@ -235,5 +235,9 @@
   "category_waescheservice": "Servicio de lavandería",
   "category_webdesign": "Diseño web",
   "category_einkaufsservice": "Servicio de compras",
-  "category_haustierbetreuung": "Cuidado de mascotas"
+  "category_haustierbetreuung": "Cuidado de mascotas",
+  "statusOffen": "Abierto",
+  "statusInBearbeitung": "En progreso",
+  "statusAbgeschlossen": "Completado"
+
 }

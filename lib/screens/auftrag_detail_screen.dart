@@ -45,6 +45,20 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
+  // Status-Lokalisierung
+  String _getLocalizedStatus(String status, AppLocalizations l10n) {
+    switch (status) {
+      case 'offen':
+        return l10n.statusOffen;
+      case 'in bearbeitung':
+        return l10n.statusInBearbeitung;
+      case 'abgeschlossen':
+        return l10n.statusAbgeschlossen;
+      default:
+        return status;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -584,7 +598,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               const SizedBox(width: 10),
               Chip(
                 label: Text(
-                  ad.status.toUpperCase(),
+                  _getLocalizedStatus(ad.status, l10n),
                   style: TextStyle(
                     color: ad.status == 'abgeschlossen'
                         ? Colors.white

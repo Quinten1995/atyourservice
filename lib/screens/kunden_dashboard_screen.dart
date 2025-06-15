@@ -38,14 +38,14 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  List<Auftrag> _laufendeAuftraege = [];
+  // Raw-Listen, damit wir die Dienstleister-Objekte greifen können
+  List<Map<String, dynamic>> _laufendeAuftraegeRaw = [];
   List<Auftrag> _offeneAuftraege = [];
   List<Auftrag> _abgeschlosseneAuftraege = [];
 
   @override
   void initState() {
     super.initState();
-    // Sicherstellen, dass context/L10n da ist:
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _ladeAuftraege();
     });
@@ -61,22 +61,29 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception(l10n.notLoggedIn);
 
+      // JOIN auf users für Dienstleister-Email!
       final auftraegeRaw = await supabase
           .from('auftraege')
-          .select()
+          .select('*, dienstleister:users!auftraege_dienstleister_id_fkey(email)')
           .eq('kunde_id', user.id)
           .or('kunde_auftragsstatus.is.null,kunde_auftragsstatus.neq.entfernt')
           .order('erstellt_am', ascending: false);
 
-      final auftraege = (auftraegeRaw as List)
-          .map((map) => Auftrag.fromJson(map as Map<String, dynamic>))
-          .toList();
+      // Die rohen Maps speichern (für die Dienstleister-Email)
+      final auftraegeMaps = (auftraegeRaw as List).cast<Map<String, dynamic>>();
 
-      _laufendeAuftraege =
-          auftraege.where((a) => a.status == 'in bearbeitung').toList();
-      _offeneAuftraege = auftraege.where((a) => a.status == 'offen').toList();
-      _abgeschlosseneAuftraege =
-          auftraege.where((a) => a.status == 'abgeschlossen').toList();
+      // Jetzt aufteilen nach Status
+      _laufendeAuftraegeRaw = auftraegeMaps
+          .where((map) => map['status'] == 'in bearbeitung')
+          .toList();
+      _offeneAuftraege = auftraegeMaps
+          .where((map) => map['status'] == 'offen')
+          .map((map) => Auftrag.fromJson(map))
+          .toList();
+      _abgeschlosseneAuftraege = auftraegeMaps
+          .where((map) => map['status'] == 'abgeschlossen')
+          .map((map) => Auftrag.fromJson(map))
+          .toList();
 
       setState(() => _isLoading = false);
     } catch (e) {
@@ -153,7 +160,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                       _dashboardHeader(),
 
                       // ----------- Laufende Aufträge (horizontal) -----------
-                      if (_laufendeAuftraege.isNotEmpty) ...[
+                      if (_laufendeAuftraegeRaw.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
                           l10n.laufendeAuftraege,
@@ -164,10 +171,14 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                           height: 160,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _laufendeAuftraege.length,
+                            itemCount: _laufendeAuftraegeRaw.length,
                             separatorBuilder: (context, i) => const SizedBox(width: 13),
                             itemBuilder: (context, index) {
-                              final auftrag = _laufendeAuftraege[index];
+                              final map = _laufendeAuftraegeRaw[index];
+                              final auftrag = Auftrag.fromJson(map);
+                              final dienstleister = map['dienstleister'];
+                              final dienstleisterEmail = dienstleister != null ? dienstleister['email'] as String? : null;
+
                               return Material(
                                 elevation: 3,
                                 borderRadius: BorderRadius.circular(14),
@@ -226,10 +237,10 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                             ),
                                           ],
                                         ),
-                                        // Dienstleister anzeigen, falls gewünscht
-                                        if (auftrag.dienstleisterId != null)
+                                        // Dienstleister anzeigen, falls vorhanden
+                                        if (dienstleisterEmail != null)
                                           Text(
-                                            l10n.dienstleisterPrefix(auftrag.dienstleisterId!),
+                                            l10n.dienstleisterPrefix(dienstleisterEmail),
                                             style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                                             overflow: TextOverflow.ellipsis,
                                           ),
