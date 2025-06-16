@@ -750,4 +750,8 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statusAbgeschlossen => 'Completado';
+
+  @override
+String get privacyButton => 'Privacidad y aviso legal';
+
 }

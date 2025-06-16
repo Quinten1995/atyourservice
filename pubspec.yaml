@@ -42,6 +42,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -54,3 +55,8 @@ flutter:
   #   arb-dir: lib/l10n
   #   template-arb-file: app_de.arb
   #   output-localization-file: app_localizations.dart
+
+flutter_icons:
+  image_path: "assets/icon/app_icon.png"   # Passe den Pfad ggf. an!
+  android: true
+  ios: true

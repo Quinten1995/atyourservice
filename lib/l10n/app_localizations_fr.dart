@@ -750,4 +750,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get statusAbgeschlossen => 'Terminé';
+
+  @override
+String get privacyButton => 'Confidentialité & mentions légales';
+
 }

@@ -750,4 +750,8 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get statusAbgeschlossen => 'Tamamlandı';
+
+  @override
+String get privacyButton => 'Gizlilik ve Yasal Bilgiler';
+
 }
