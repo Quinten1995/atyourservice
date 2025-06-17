@@ -1,0 +1,59 @@
+name: atyourservice
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Supabase-Client für Flutter
+  supabase_flutter: ^2.9.0
+
+  # UUID-Generator für eindeutige IDs
+  uuid: ^3.0.6
+
+  # HTTP-Paket für Geocoding-Anfragen
+  http: ^0.13.0
+
+  # Sterne-Bewertungs-Widget
+  flutter_rating_bar: ^4.0.1
+
+  # === Profilbild-Upload ===
+  image_picker: ^1.0.7
+
+  # === Lokalisierung (Mehrsprachigkeit) ===
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+  change_app_package_name: ^1.1.0
+
+flutter:
+  uses-material-design: true
+
+  # Für automatische Generierung der Lokalisationen (optional, aber empfohlen)
+  generate: true
+
+  # Optional, falls du was anpassen willst:
+  # l10n:
+  #   arb-dir: lib/l10n
+  #   template-arb-file: app_de.arb
+  #   output-localization-file: app_localizations.dart
+
+flutter_icons:
+  image_path: "assets/icon/app_icon.png"   # Passe den Pfad ggf. an!
+  android: true
+  ios: true

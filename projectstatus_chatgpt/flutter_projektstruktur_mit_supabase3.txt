@@ -1,0 +1,52 @@
+📁 Flutter-Projektstruktur mit Supabase (Stand: 2025-05-31)
+
+Ordnerstruktur:
+/lib
+│
+├── main.dart
+│
+├── /models
+│   └── dienstleister.dart              // Modellklasse für Dienstleister
+│
+├── /data
+│   └── dienstleister_daten.dart        // Beispiel-Daten für Dienstleister
+│
+├── /screens
+│   ├── start_screen.dart               // Startbildschirm mit zwei Buttons (Suche / Bin Dienstleister)
+│   ├── login_kunde_screen.dart         // Login-Screen für Kunden mit Supabase-Login
+│   ├── login_dienstleister_screen.dart // Login-Screen für Dienstleister mit Supabase-Login
+│   ├── kunden_dashboard_screen.dart    // Kunden-Dashboard (Neuen Auftrag erstellen, Meine Aufträge)
+│   ├── auftrag_erstellen_screen.dart   // Formular zur Auftragserstellung
+│   ├── meine_auftraege_screen.dart     // Übersicht der Kundenaufträge (Dummy-Daten)
+│   └── dienstleister_dashboard_screen.dart // Dienstleister-Dashboard mit offenen Aufträgen
+│
+├── /utils
+│   ├── dienstleister_filter.dart       // Dienstleister-Filterlogik (z. B. nach Kategorie, Entfernung)
+│   ├── entfernung_utils.dart           // Hilfsfunktionen zur Entfernungsberechnung
+│   └── supabase_client.dart            // Supabase-Client (Verbindung zum Backend)
+│
+└── [Zielstruktur ist modular und vollständig funktionstüchtig ohne Backend-Anbindung – Stand: lokal]
+
+──────────────────────────────────────────────
+✅ Supabase-Zusammenfassung (Stand: 2025-05-31)
+
+Supabase-Integration:
+- Supabase wurde eingerichtet und der Client befindet sich unter:
+  /lib/utils/supabase_client.dart
+
+- Die Verbindung zu Supabase ist hergestellt über:
+  SupabaseClient('https://<your-project>.supabase.co', 'public-anon-key')
+
+- Aktuell verwendete Supabase-Funktionen:
+  • Kunden-Login (`login_kunde_screen.dart`)
+     → Authentifizierung mit: supabase.auth.signInWithPassword(...)
+  • Dienstleister-Login (`login_dienstleister_screen.dart`)
+     → Ebenfalls via supabase.auth.signInWithPassword(...)
+
+- Noch nicht umgesetzt:
+  • Registrierung (Signup) für beide Nutzergruppen
+  • Speichern und Abfragen von Aufträgen
+  • Online-Status-Logik (z. B. zuletztOnline)
+  • Token-Handling, Error-Handling, Sessions etc.
+
+Tipp: Dieser Stand kann als Referenz für neue Chats verwendet werden.

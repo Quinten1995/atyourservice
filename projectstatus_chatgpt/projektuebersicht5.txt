@@ -1,0 +1,142 @@
+### Zusammenfassung der bisherigen Schritte in „atyourservice“
+
+**Projektziel:** Eine Flutter-App „atyourservice“ mit Supabase-Backend, in der sich Kunden und Dienstleister registrieren/können und Aufträge anlegen/empfangen.
+
+---
+## 1. Setup & Ordnerstruktur
+
+- **Flutter-Ordner**: `/lib` mit Unterverzeichnissen:
+  - `main.dart` – Initialisiert Supabase (SupabaseClientManager.init()), StartScreen als Home.
+  - **`/utils`**: 
+    - `supabase_client.dart` – SupabaseClientManager (init mit URL/anonKey).
+    - `entfernung_utils.dart` – Haversine-Formel für Entfernungsberechnung.
+    - `dienstleister_filter.dart` – Filter-Funktion für Dienstleister nach Kategorie und Distanz.
+  - **`/models`**:
+    - `dienstleister.dart` – Klasse `Dienstleister` (id, name, kategorie, latitude, longitude, zuletztOnline).
+    - `auftrag.dart` – Klasse `Auftrag` (id, kundeId, titel, beschreibung, kategorie, adresse?, latitude?, longitude?, status, erstelltAm, aktualisiertAm) mit `fromJson()`/`toJson()`.
+  - **`/data`**:
+    - `dienstleister_daten.dart` – Statische Beispieldaten für Dienstleister.
+  - **`/screens`**:
+    - `start_screen.dart` – Buttons: "Ich suche Hilfe (Kunde)", "Ich biete Hilfe an (Dienstleister)", optionaler Test-Button.
+    - `login_kunde_screen.dart` & `login_dienstleister_screen.dart` – E-Mail/Passwort, Login mit Supabase `signInWithPassword()`, Upsert in `users`-Tabelle, Navigieren zu Dashboard.
+    - `registrierung_screen.dart` – Rolle (Dropdown), E-Mail, Passwort, `signUp()`, Snackbar, Pop (zurück zum Login).
+    - `kunden_dashboard_screen.dart` – Buttons: "Neuen Auftrag erstellen" → `auftrag_erstellen_screen.dart`, "Meine Aufträge" → `meine_auftraege_screen.dart`.
+    - `dienstleister_dashboard_screen.dart` – ActionChips für Kategorien, Platzhalter, Button "Meine Aufträge".
+    - `auftrag_erstellen_screen.dart` – Formular: Titel, Beschreibung, Kategorie, (optional) Adresse, Latitude, Longitude; `_auftragAbschicken()`: `upsert` in `users`, `insert` in `auftraege` mit `status = 'offen'`.
+    - `meine_auftraege_screen.dart` – ListView aller Aufträge des kunden (`select().eq('kunde_id', user.id)`), mit Refresh.
+    - `auftrag_detail_screen.dart` – (angedacht) Detail-Ansicht, Status-Update, Delete.
+    - `profil_dienstleister_screen.dart` – Formular: Name, Kategorie, Latitude, Longitude, Profil speichern.
+
+---
+## 2. Datenbank & Tabellenstruktur (Supabase / PostgreSQL)
+
+### 2.1 Tabellen
+
+1. **`users`**:
+   ```sql
+   CREATE TABLE public.users (
+     id UUID PRIMARY KEY,
+     email TEXT NOT NULL UNIQUE,
+     rolle TEXT NOT NULL CHECK (rolle IN ('kunde', 'dienstleister')),
+     erstellt_am TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+   ```
+2. **`dienstleister_details`**:
+   ```sql
+   CREATE TABLE public.dienstleister_details (
+     id UUID PRIMARY KEY,
+     user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+     name TEXT NOT NULL,
+     kategorie TEXT NOT NULL,
+     latitude DOUBLE PRECISION NOT NULL,
+     longitude DOUBLE PRECISION NOT NULL,
+     zuletzt_online TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   ALTER TABLE public.dienstleister_details ENABLE ROW LEVEL SECURITY;
+   ```
+3. **`auftraege`**:
+   ```sql
+   CREATE TABLE public.auftraege (
+     id UUID PRIMARY KEY,
+     kunde_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+     titel TEXT NOT NULL,
+     beschreibung TEXT,
+     kategorie TEXT NOT NULL,
+     adresse TEXT,
+     latitude DOUBLE PRECISION,
+     longitude DOUBLE PRECISION,
+     status TEXT NOT NULL CHECK (status IN ('offen', 'in bearbeitung', 'abgeschlossen')),
+     dienstleister_id UUID REFERENCES public.users(id),
+     erstellt_am TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+     aktualisiert_am TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+   );
+   ALTER TABLE public.auftraege ENABLE ROW LEVEL SECURITY;
+   ```
+
+### 2.2 RLS-Policies (ursprünglich)
+
+- **`users`**:
+  - `insert_user_data_policy`  → INSERT nur, wenn `auth.uid() = id`.
+  - `select_user_policy`       → SELECT nur, wenn `auth.uid() = id`.
+  - `update_user_data_policy`  → UPDATE nur, wenn `auth.uid() = id` und `WITH CHECK auth.uid() = id`.
+- **`dienstleister_details`**:
+  - `insert_dienstleister_details_policy` → INSERT nur, wenn `auth.uid() = user_id`.
+  - `select_dienstleister_policy`          → SELECT nur, wenn `auth.uid() = user_id`.
+  - `update_dienstleister_details_policy`  → UPDATE nur, wenn `auth.uid() = user_id`.
+  - `delete_dienstleister_details_policy`  → DELETE nur, wenn `auth.uid() = user_id` (optional).
+- **`auftraege`**:
+  - `select_auftrag_policy`                → SELECT nur, wenn `auth.uid() = kunde_id`.
+  - `insert_auftrag_policy`               → INSERT nur, wenn `auth.uid() = kunde_id`.
+  - `update_auftrag_policy`               → UPDATE nur, wenn `auth.uid() = kunde_id AND status = 'offen'`.
+  - `delete_auftrag_policy`               → DELETE nur, wenn `auth.uid() = kunde_id AND status = 'offen'`.
+  - `allow_dienstleister_select_offene_auftraege` → SELECT nur, wenn `rolle = 'dienstleister' AND status = 'offen'`.
+  - `allow_dienstleister_select_assigned_auftraege` → SELECT nur, wenn `auth.uid() = dienstleister_id` (optional).
+  - **`allow_dienstleister_update_assigned_auftraege`** → UPDATE nur, wenn `rolle = 'dienstleister' AND status = 'offen'` und `WITH CHECK` `status = 'in bearbeitung' AND dienstleister_id = auth.uid()`.
+
+---
+## 3. Bisherige Implementierung & Fehlerbehebungen
+
+1. **Login-Screens**:
+   - Kunde und Dienstleister konnten sich registrieren und einloggen. RLS schützt, dass nur passende Zeilen in `users` angelegt/ausgelesen werden.
+   - Problem: Dienstleister-Login konnte auch zum Kunden-Dashboard führen und umgekehrt. Gelöst durch Upsert in `users` mit `rolle` und Navigation an richtige Stelle.
+
+2. **Aufträge anlegen**:
+   - Kunde kann über `auftrag_erstellen_screen.dart` Aufträge mit `status='offen'` anlegen. Koordinaten müssen manuell eingegeben werden.
+   - Anfangs fehlten Koordinaten in einigen Aufträgen (latitude/longitude = null), die im Filter unsichtbar waren.
+
+3. **Dashboard-Logik Dienstleister**:
+   - `dienstleister_dashboard_screen.dart` lädt Profil (Kategorie + Koordinaten) per Supabase-Select.
+   - Dann lädt alle Aufträge mit `.eq('kategorie', kategorie).eq('status', 'offen')`, wandelt in `Auftrag.fromJson()` und filtert nach Entfernung (≤ 50 km).
+   - Fehler „JSON object requested...“ trat auf, weil mehrere oder keine Zeilen im Profil waren. Gelöst durch `profilList.first` und Duplikate in DB löschen.
+
+4. **Debugging**:
+   - Debug-`print` in `_ladeProfilUndAuftraege()` eingefügt, um zu sehen: User-ID, `profilList`, Profil-Werte, `rawAuftragsData`, Distanz-Filter.
+   - Festgestellt: `rawAuftragsData` = `[]`, obwohl SQL-Editor Zeile lieferte. Ursache: RLS blockiert.
+
+5. **RLS-Policy-Review & Korrektur**:
+   - Alte Policies gelöscht (DROP POLICY IF EXISTS).
+   - Neue minimal notwendige Policies angelegt:
+     - **`users`**: `select_user_policy`, `insert_user_data_policy`, `update_user_data_policy`.
+     - **`dienstleister_details`**: `select_dienstleister_policy`, `insert_dienstleister_details_policy`, `update_dienstleister_details_policy`, optional `delete_dienstleister_details_policy`.
+     - **`auftraege`**: 
+       - Kunden: `select_auftrag_policy`, `insert_auftrag_policy`, `update_auftrag_policy` (`status = 'offen'`), `delete_auftrag_policy` (`status = 'offen'`).
+       - Dienstleister: `allow_dienstleister_select_offene_auftraege` (`rolle = 'dienstleister' AND status = 'offen'`).
+       - Fehlende UPDATE-Policy `allow_dienstleister_update_assigned_auftraege` wurde ergänzt.
+       - Optional: `allow_dienstleister_select_assigned_auftraege` (`dienstleister_id = auth.uid()`).
+   - Alle Tabellen wieder mit `ENABLE ROW LEVEL SECURITY` versehen.
+
+6. **Status**:
+   - RLS ist wieder aktiviert.
+   - Fehlende `allow_dienstleister_update_assigned_auftraege` Policy wurde hinzugefügt, damit Dienstleister Auftrag annehmen können.
+
+---
+## 4. Aktuelle Phase
+
+Derzeit prüfen wir, ob **alle benötigten Policies** korrekt angelegt sind und funktionieren. Insbesondere:
+- Die UPDATE-Policy `allow_dienstleister_update_assigned_auftraege` für `auftraege` wurde ergänzt, damit Dienstleister Aufträge annehmen können.
+- Das Dashboard liefert jetzt in Debug-Log `rawAuftragsData` mit dem Auftrag, wenn RLS korrekt eingestellt ist.
+
+---
+
+*Ende der Zusammenfassung.*

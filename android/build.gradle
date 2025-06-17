@@ -1,0 +1,23 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath 'com.google.gms:google-services:4.4.1'
+        // weitere classpath-Einträge falls benötigt ...
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Clean-Task (Standard, optional)
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
+}

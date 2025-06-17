@@ -1,0 +1,370 @@
+
+Aktueller Projektstand (“supabase-final” Branch)
+
+---
+
+1. Übersicht & Architektur
+
+- Flutter-Frontend mit Supabase-Integration
+  - Zwei Hauptrollen: Kunde und Dienstleister.
+  - Authentifizierung über Supabase Auth (E-Mail/Passwort).
+  - Nach erstem Login wird in der Tabelle `users` ein Datensatz mit id, email, rolle (“kunde”/“dienstleister”) und erstellt_am angelegt.
+
+- Datenbank-Struktur (Supabase/Postgres)
+  1. `users`
+     - id (UUID, Primärschlüssel, entspricht Supabase-UID)
+     - email (String)
+     - rolle (String: “kunde” oder “dienstleister”)
+     - erstellt_am (Timestamp)
+     - RLS-Policies: Authentifizierte Nutzer dürfen nur ihre eigene Zeile lesen/aktualisieren/einfügen.
+  2. `dienstleister_details`
+     - user_id (UUID, Primärschlüssel, Referenz auf users.id)
+     - name (String)
+     - beschreibung (String)
+     - kategorie (String)
+     - adresse (String, optional)
+     - latitude, longitude (Double, optional)
+     - aktualisiert_am (Timestamp)
+     - RLS-Policies (public):
+       - SELECT: öffentlich (App filtert im Code)
+       - INSERT: nur Dienstleister (auth.uid() = user_id und Rolle = “dienstleister”)
+       - UPDATE: nur Dienstleister für eigene Zeile (auth.uid() = user_id)
+       - DELETE: nur Dienstleister für eigene Zeile (auth.uid() = user_id)
+     - Korrektur: In Flutter `"id": user.id` durch `"user_id": user.id` ersetzt und Aufrufe mit `.select()` ergänzt, um RLS-Fehler zu vermeiden.
+
+  3. `auftraege`
+     - id (UUID, Primärschlüssel)
+     - kunde_id (UUID, Referenz auf users.id)
+     - dienstleister_id (UUID, optional, Referenz auf users.id)
+     - titel (String)
+     - beschreibung (String)
+     - kategorie (String)
+     - adresse (String, optional)
+     - latitude, longitude (Double, optional)
+     - status (String: “offen”, “in bearbeitung”, “abgeschlossen”)
+     - erstellt_am, aktualisiert_am (Timestamp)
+     - RLS-Policies:
+       - SELECT:
+         - Kunde: nur eigene Aufträge (kunde_id = auth.uid())
+         - Dienstleister: alle offenen (status = 'offen', App filtert nach Kategorie und Entfernung)
+       - INSERT: nur Kunde (kunde_id = auth.uid())
+       - UPDATE:
+         - Kunde kann eigenen Auftrag ggf. stornieren (sofern nicht abgeschlossen)
+         - Dienstleister kann `dienstleister_id` und `status = 'in bearbeitung'` setzen (Auftrag annehmen) und später `status = 'abgeschlossen'` (Auftrag abschließen)
+       - DELETE: nicht vorgesehen
+
+---
+
+2. Wesentliche Models
+
+2.1 lib/models/dienstleister.dart
+--------------------------------------------------------------------------------
+class Dienstleister {
+  final String id;
+  final String name;
+  final String kategorie;
+  final double latitude;
+  final double longitude;
+  final DateTime zuletztOnline;
+  Dienstleister({
+    required this.id,
+    required this.name,
+    required this.kategorie,
+    required this.latitude,
+    required this.longitude,
+    required this.zuletztOnline,
+  });
+}
+--------------------------------------------------------------------------------
+Beispiel-Daten (`dienstleisterDaten`) zum Testen (Berlin/München).
+
+2.2 lib/models/auftrag.dart
+--------------------------------------------------------------------------------
+class Auftrag {
+  final String id;
+  final String kundeId;
+  final String? dienstleisterId;
+  final String titel;
+  final String beschreibung;
+  final String kategorie;
+  final String? adresse;
+  final double? latitude;
+  final double? longitude;
+  final String status;
+  final DateTime erstelltAm;
+  final DateTime aktualisiertAm;
+
+  Auftrag({
+    required this.id,
+    required this.kundeId,
+    this.dienstleisterId,
+    required this.titel,
+    required this.beschreibung,
+    required this.kategorie,
+    this.adresse,
+    this.latitude,
+    this.longitude,
+    required this.status,
+    required this.erstelltAm,
+    required this.aktualisiertAm,
+  });
+
+  factory Auftrag.fromJson(Map<String, dynamic> json) => Auftrag(
+        id: json['id'] as String,
+        kundeId: json['kunde_id'] as String,
+        dienstleisterId: json['dienstleister_id'] as String?,
+        titel: json['titel'] as String,
+        beschreibung: json['beschreibung'] as String,
+        kategorie: json['kategorie'] as String,
+        adresse: json['adresse'] as String?,
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
+        status: json['status'] as String,
+        erstelltAm: DateTime.parse(json['erstellt_am'] as String),
+        aktualisiertAm: DateTime.parse(json['aktualisiert_am'] as String),
+      );
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{
+      'id': id,
+      'kunde_id': kundeId,
+      'titel': titel,
+      'beschreibung': beschreibung,
+      'kategorie': kategorie,
+      if (adresse != null) 'adresse': adresse,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      'status': status,
+      'erstellt_am': erstelltAm.toIso8601String(),
+      'aktualisiert_am': aktualisiertAm.toIso8601String(),
+    };
+    if (dienstleisterId != null) {
+      map['dienstleister_id'] = dienstleisterId;
+    }
+    return map;
+  }
+
+  Auftrag copyWith({
+    String? titel,
+    String? beschreibung,
+    String? kategorie,
+    String? adresse,
+    double? latitude,
+    double? longitude,
+    String? status,
+    String? dienstleisterId,
+    DateTime? aktualisiertAm,
+  }) {
+    return Auftrag(
+      id: id,
+      kundeId: kundeId,
+      dienstleisterId: dienstleisterId ?? this.dienstleisterId,
+      titel: titel ?? this.titel,
+      beschreibung: beschreibung ?? this.beschreibung,
+      kategorie: kategorie ?? this.kategorie,
+      adresse: adresse ?? this.adresse,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      status: status ?? this.status,
+      erstelltAm: erstelltAm,
+      aktualisiertAm: aktualisiertAm ?? this.aktualisiertAm,
+    );
+  }
+}
+--------------------------------------------------------------------------------
+
+---
+
+3. Wichtige Screens & Logik
+
+3.1 StartScreen (lib/screens/start_screen.dart)
+- Zwei Buttons → LoginKundeScreen oder LoginDienstleisterScreen
+
+3.2 RegistrierungScreen (lib/screens/registrierung_screen.dart)
+- Formular: Rolle (kunde/dienstleister), E-Mail, Passwort
+- Existenz-Check via `signInWithPassword` mit Dummy-Passwort
+- Bei “user not found” → `signUp`
+- Snackbar “Registrierung erfolgreich! Bitte E-Mail bestätigen.”
+
+3.3 LoginDienstleisterScreen (lib/screens/login_dienstleister_screen.dart)
+- Formular: E-Mail, Passwort
+- Nach `signInWithPassword`:
+  1. Prüfen, ob `users`-Eintrag existiert (`select rolle where id = user.id`)
+  2. Wenn nicht, Insert in `users` mit rolle = “dienstleister”
+  3. Wenn existiert, aber rolle ≠ “dienstleister” → Logout + Snackbar
+- Bei Erfolg → Navigator zu DienstleisterDashboardScreen
+
+3.4 LoginKundeScreen (lib/screens/login_kunde_screen.dart)
+- Analog, rolle = “kunde”
+- Erstes Login: Insert in `users` mit rolle = “kunde”
+- Bei falscher Rolle → Logout + Snackbar
+
+3.5 KundenDashboardScreen (lib/screens/kunden_dashboard_screen.dart)
+- Buttons: “Neuen Auftrag erstellen” → AuftragErstellenScreen, “Meine Aufträge” → MeineAuftraegeScreen
+
+3.6 AuftragErstellenScreen (lib/screens/auftrag_erstellen_screen.dart)
+- Formular: Titel, Beschreibung, Kategorie, Adresse (optional)
+- Geocoding via GeocodingService (OSM Nominatim)
+- Upsert in `users` (falls Kunde nicht vorhanden)
+- Insert in `auftraege` mit Feldern: id (UUID), kunde_id, titel, beschreibung, kategorie, adresse, latitude, longitude, status = “offen”, timestamps
+- Snackbar “Auftrag wurde erfolgreich gespeichert!” + Navigator.pop()
+
+3.7 MeineAuftraegeScreen (lib/screens/meine_auftraege_screen.dart)
+- Lädt `auftraege` für `kunde_id = user.id`, sortiert nach erstellt_am
+- ListView mit Titel, Kategorie, Status; Tap → AuftragDetailScreen
+
+3.8 DienstleisterDashboardScreen (lib/screens/dienstleister_dashboard_screen.dart)
+- initState → _ladeProfilUndAuftraege()
+- _ladeProfilUndAuftraege():
+  1. Profil-Daten aus `dienstleister_details` (select kategorie, latitude, longitude wo user_id = user.id)
+     - Wenn leer → Exception “Bitte zunächst dein Profil anlegen”
+  2. Alle offenen Aufträge derselben Kategorie: `from('auftraege').select().eq('kategorie', kategorie).eq('status','offen')`
+  3. Lokal filtern nach Entfernung ≤ 50 km via berechneEntfernung()
+- Setze _meineKategorie, _meineLatitude, _meineLongitude, _passendeAuftraege
+- Build: ListView der _passendeAuftraege, Anzeige Titel + Distanz; Tap → AuftragDetailScreen
+- AppBar-Icon → Navigator zu ProfilDienstleisterScreen, nach Rückkehr _ladeProfilUndAuftraege()
+
+3.9 ProfilDienstleisterScreen (lib/screens/profil_dienstleister_screen.dart)
+- Formular: Name, Beschreibung, Kategorie, Adresse
+- initState: JWT in Konsole ausgeben (zur RLS-Debug)
+- _ladeProfil(): `select() from 'dienstleister_details' where user_id = user.id maybeSingle()`
+  - Wenn Daten vorhanden → fülle Controller-Textfelder
+- _profilSpeichern():
+  - Adresse → GeocodingService.getCoordinates()
+  - **Lösung A: Update (Datensatz existiert)**
+    ```
+    await supabase
+      .from('dienstleister_details')
+      .update({
+        'name': name,
+        'beschreibung': beschreibung,
+        'kategorie': kategorie,
+        'adresse': adresse.isEmpty ? null : adresse,
+        'latitude': lat,
+        'longitude': lon,
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      })
+      .eq('user_id', user.id)
+      .select();
+    ```
+  - Snackbar “Profil wurde erfolgreich aktualisiert!”
+  - catch (e) → _errorMessage = e.toString()
+
+3.10 AuftragDetailScreen (lib/screens/auftrag_detail_screen.dart)
+- initState → _ladeRolleUndAktuellenAuftrag()
+- _ladeRolleUndAktuellenAuftrag():
+  1. Rolle des Nutzers: `select rolle from users where id = user.id maybeSingle()`
+     - `_isDienstleister = (rolle == 'dienstleister')`
+  2. Neuesten Auftrag laden: `select * from auftraege where id = initialAuftrag.id maybeSingle()`
+     - setze `_auftragDetails = Auftrag.fromJson(...)`
+- _auftragAnnehmen():
+  ```
+  final updated = await supabase
+    .from('auftraege')
+    .update({
+      'status': 'in bearbeitung',
+      'dienstleister_id': user.id,
+      'aktualisiert_am': nowUtc,
+    })
+    .eq('id', _auftragDetails!.id)
+    .select()
+    .single();
+  _auftragDetails = Auftrag.fromJson(updated);
+  ```
+- _auftragAbschliessen():
+  ```
+  final updated = await supabase
+    .from('auftraege')
+    .update({
+      'status': 'abgeschlossen',
+      'aktualisiert_am': nowUtc,
+    })
+    .eq('id', _auftragDetails!.id)
+    .select()
+    .single();
+  _auftragDetails = Auftrag.fromJson(updated);
+  ```
+
+---
+
+4. Utility-Funktionen & -Klassen
+
+4.1 lib/utils/geocoding_service.dart
+- `Future<Map<String, double>?> getCoordinates(String address)` → OSM Nominatim, gibt `{ 'lat': x, 'lng': y }` oder `null`.
+
+4.2 lib/utils/entfernung_utils.dart
+- `double berechneEntfernung(double lat1, double lon1, double lat2, double lon2)` → Haversine-Formel → Distanz in km.
+- `List<Dienstleister> findePassendeDienstleister(...)` (Test-Helper).
+
+4.3 lib/utils/supabase_client.dart
+```dart
+class SupabaseClientManager {
+  static final SupabaseClient client = Supabase.instance.client;
+  static Future<void> init() async {
+    await Supabase.initialize(
+      url: 'https://...supabase-url...',
+      anonKey: '...anon-key...',
+    );
+  }
+}
+```
+- Wird in main.dart aufgerufen.
+
+main.dart
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseClientManager.init();
+  runApp(const MyApp());
+}
+class MyApp extends StatelessWidget { ... }
+```
+
+---
+
+5. RLS-Policy-Probleme & Lösungen
+
+- Ursprünglicher Fehler: In ProfilScreen wurde `"id": user.id` statt `"user_id": user.id` eingesetzt → Upsert hat immer Insert versucht → „duplicate key value violates unique constraint“.
+- **Fix:**
+  1. Feld in Flutter-Maps zu `dienstleister_details` von `id` auf `user_id` ändern.
+  2. Bei Update/Upsert in Flutter immer `.select()` hinzufügen, damit Anfrage ausgeführt und RLS-Fehler (PostgrestException) gefangen werden.
+  3. Fehlerbehandlung per `try/catch`, kein Abfragen von `response.error`, da heute `update(...).select()` eine `List` zurückgibt.
+
+- Aktuell:  
+  - Dienstleister-Profil kann angelegt und geändert werden, RLS-Policies greifen korrekt.  
+  - Auftragserstellung, -ankauf und -abschluss funktionieren mit RLS-Policy für `auftraege`.  
+  - Dienstleister-Dashboard filtert Aufträge in Nähe (≤ 50 km) nach Kategorie.
+
+---
+
+6. Kurzanleitung für nächsten Chat
+
+**A) Einleitung**  
+- Ziel: Flutter-App „atyourservice“ für Kunden/Dienstleister, Supabase-Backend, Geo-Filter, RLS-Datenschutz.
+
+**B) Models & DB**  
+- `Dienstleister` (inkl. `zuletztOnline`), `Auftrag` (mit `dienstleisterId`), Tabellen: `users`, `dienstleister_details`, `auftraege`.
+
+**C) Screens (in Kurzform)**  
+1. StartScreen → LoginKunde/LoginDienstleister.  
+2. RegistrierungScreen (je Rolle, E-Mail-Existenz-Check).  
+3. LoginKunde/LoginDienstleister (Insert in `users`).  
+4. KundenDashboard → AuftragErstellen + MeineAuftraege.  
+5. DienstleisterDashboard → Profil-Button + Auftragsliste (Kategorie & ≤ 50 km).  
+6. ProfilDienstleisterScreen (RLS-Fix, Insert vs. Update, `.select()`).  
+7. AuftragDetailScreen (Rollencheck, annehmen & abschließen).
+
+**D) Utilities**  
+- GeocodingService (OSM), berechneEntfernung (Haversine), SupabaseClientManager (Initialisierung).
+
+**E) RLS-Policies**  
+- `dienstleister_details`: INSERT/UPDATE/DELETE nur eigener `user_id`, SELECT öffentlich.  
+- `auftraege`: Kunden nur eigene (SELECT, INSERT), Dienstleister alle offenen (SELECT), Update-Übergänge für Status & `dienstleister_id`.
+
+**F) Status**  
+- Branch `supabase-final`: RLS-Profiländerungen behoben, alles testbar.  
+- Zum Weiterarbeiten passende Dateien: alle oben aufgelisteten Dart-Skripte und Utility-Dateien.
+
+---
+
+Damit hast du im neuen Chat eine vollständige Zusammenfassung, die direkt erläutert, wo dein Projekt steht und was implementiert wurde.

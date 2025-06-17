@@ -1,0 +1,221 @@
+
+Projektübersicht: „AtYourService“ – Vermittlungs-App für Dienstleister aller Art
+
+Ziel
+Eine App ähnlich MyHammer, aber für viel mehr Berufe (Handwerker, Babysitter, Reinigungskräfte, Nachhilfe u.v.m.) — sowohl für Kunden (die Aufträge einstellen) als auch für Dienstleister (die Aufträge sehen und annehmen).
+
+---
+
+Aktueller Stand / Architektur
+
+1. Hauptstruktur
+
+- Flutter App mit modularer Dateistruktur:
+  - /lib/main.dart — Einstiegspunkt mit MaterialApp, Themes und Navigation
+  - /lib/screens/ — alle Screens (Login, Dashboard, Auftrag erstellen etc.)
+  - /lib/models/ — (geplant) für Datenmodelle (z.B. Auftrag, Nutzer)
+  - /lib/data/ — (geplant) für Dummy-Daten oder Datenservices
+
+2. Wichtige Screens & ihre Rollen
+
+| Screen-Datei                   | Funktion / Beschreibung                                    |
+|-------------------------------|------------------------------------------------------------|
+| start_screen.dart              | Startbildschirm mit Auswahl: „Kunde“ oder „Dienstleister“ |
+| login_kunde_screen.dart        | Login für Kunden (E-Mail + Passwort, Demo-Login)           |
+| kunden_dashboard_screen.dart   | Dashboard Kunden mit Buttons „Neuen Auftrag erstellen“ und „Meine Aufträge“ |
+| auftrag_erstellen_screen.dart | Formular zum Erstellen eines neuen Auftrags               |
+| meine_auftraege_screen.dart    | Liste der Aufträge des Kunden (aktuell Dummy-Daten)        |
+| dienstleister_dashboard_screen.dart | Dashboard Dienstleister mit Kategorie-Chips und „Meine Aufträge“ Button |
+| (gelöschte Datei) login_handwerker_screen.dart | Nicht mehr verwendet, durch Auswahl am Start ersetzt    |
+
+---
+
+3. Design & UI
+
+- App-Theme über ThemeData mit Farbpalette:
+  - Primärfarbe: Blau (#1976D2)
+  - Sekundärfarbe: Orange (#F57C00)
+  - Buttons groß, gut sichtbar, zentriert auf Screens
+- Buttons haben Icons für bessere Usability
+- Startscreen als zentrale Auswahl, um Kunden/Dienstleister-Flows zu trennen
+
+---
+
+4. Beispiel-Code-Ausschnitte (vereinfacht)
+
+main.dart (Einstieg mit Routing & Theme)
+
+void main() => runApp(AtYourServiceApp());
+
+class AtYourServiceApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'AtYourService',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: StartScreen(),
+    );
+  }
+}
+
+start_screen.dart (Auswahl Kunde/Dienstleister)
+
+class StartScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('AtYourService')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LoginKundeScreen())),
+              child: Text('Ich suche einen Dienstleister'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DienstleisterDashboardScreen())),
+              child: Text('Ich bin Dienstleister'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+login_kunde_screen.dart (Login Kunden, Demo)
+
+class LoginKundeScreen extends StatefulWidget { ... }
+class _LoginKundeScreenState extends State<LoginKundeScreen> {
+  final _emailController = TextEditingController();
+  final _passwortController = TextEditingController();
+
+  void _login() {
+    // Demo: Einfach SnackBar und keine echte Auth
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Login erfolgreich (Demo)')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Kunden-Login')),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(controller: _emailController, decoration: InputDecoration(labelText: 'E-Mail')),
+            SizedBox(height: 20),
+            TextField(controller: _passwortController, decoration: InputDecoration(labelText: 'Passwort'), obscureText: true),
+            SizedBox(height: 30),
+            ElevatedButton(onPressed: _login, child: Text('Login')),
+            TextButton(
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registrierung folgt später'))),
+              child: Text('Noch kein Konto? Jetzt registrieren'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+kunden_dashboard_screen.dart (Buttons zentriert)
+
+class KundenDashboardScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Kunden-Dashboard')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: Icon(Icons.add),
+              label: Text('Neuen Auftrag erstellen'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AuftragErstellenScreen())),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              icon: Icon(Icons.assignment),
+              label: Text('Meine Aufträge'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeineAuftraegeScreen())),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+dienstleister_dashboard_screen.dart (Kategoriechips + Auftragsliste)
+
+class DienstleisterDashboardScreen extends StatelessWidget {
+  final List<String> kategorien = ['Babysitter', 'Reinigung', 'Handwerk', 'Nachhilfe', 'IT & Technik', 'Umzug', 'Gartenarbeit'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Dienstleister-Dashboard')),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: kategorien.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: ActionChip(
+                      label: Text(kategorien[index]),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Kategorie: \${kategorien[index]}')),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: Center(child: Text('Hier werden passende Aufträge angezeigt')),
+            ),
+            ElevatedButton.icon(
+              icon: Icon(Icons.assignment),
+              label: Text('Meine Aufträge'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeineAuftraegeScreen())),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+---
+
+ToDos / Nächste Schritte
+
+- Registrierungssystem (Kunden und Dienstleister)
+- Profilverwaltung
+- Auftragsdatenbank (lokal/Backend)
+- Filter- und Suchfunktionen nach Kategorien
+- Echte Authentifizierung (Firebase o.ä.)
+- Auftragsdetails und Chat zwischen Kunde/Dienstleister
+
+---
+
+Diese Zusammenfassung kannst du in einem neuen Chat nutzen, um nahtlos weiterzumachen.

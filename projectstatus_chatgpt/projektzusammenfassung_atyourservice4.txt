@@ -1,0 +1,60 @@
+Projektzusammenfassung – Stand: Supabase Registrierung erfolgreich
+
+📦 Projektname: atyourservice (Flutter App)
+
+✅ Letzter erfolgreicher Meilenstein:
+- Supabase-Registrierung ist implementiert und getestet
+- Daten werden korrekt in Supabase gespeichert (Tabelle `users`)
+- RLS Policies funktionieren wie gewünscht
+- Erfolgreicher Commit in GitHub-Branch `supabase-registration`
+
+📁 Aktuelle Projektstruktur:
+/lib
+│
+├── main.dart                    # Startpunkt der App mit Supabase-Initialisierung
+│
+├── /screens
+│   ├── start_screen.dart        # Einstieg mit Auswahl: Kunde oder Dienstleister
+│   ├── login_kunde_screen.dart
+│   ├── login_dienstleister_screen.dart
+│   ├── registrierung_screen.dart  ✅ mit vorgefülltem Test-Account (Email + Passwort)
+│   ├── kunden_dashboard_screen.dart
+│   ├── auftrag_erstellen_screen.dart
+│   ├── meine_auftraege_screen.dart
+│   ├── dienstleister_dashboard_screen.dart
+│
+├── /models
+│   ├── dienstleister.dart
+│   ├── auftrag.dart             # Neu erstellt für Auftragsmodell
+│
+├── /data
+│   └── dienstleister_daten.dart
+│
+├── /utils
+│   ├── supabase_client.dart     # Enthält SupabaseClientManager zur Initialisierung
+│   ├── entfernung_utils.dart    # Haversine-Funktion zur Entfernungsberechnung
+│   ├── dienstleister_filter.dart # Dienstleisterfilter nach Kategorie + Entfernung
+
+🛠️ Supabase:
+- Projekt-URL + anon key sind eingebunden
+- Auth funktioniert (SignUp mit Email/Passwort)
+- Tabelle `users` speichert Rollen (kunde/dienstleister)
+- RLS aktiviert auf allen Tabellen:
+  - `users`, `dienstleister_details`, `auftraege`
+
+📋 SQL-Struktur:
+- 3 Tabellen: users, dienstleister_details, auftraege
+- UUID + Zeitstempel + Geo-Koordinaten
+- RLS-Policies erlauben nur Zugriff auf eigene Daten
+
+🔐 Testaccount (vorausgefüllt):
+- Email: quintenhessmann1995@yahoo.com
+- Passwort: test1234
+
+🌿 Git:
+- Branches:
+  - `master` = Flutter App ohne Backend
+  - `first-backend-initialisation` = Supabase init
+  - `supabase-registration` = aktuelle Version mit Registrierung
+
+Bereit für den nächsten Schritt!

@@ -1,0 +1,62 @@
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'dev.flutter.flutter-gradle-plugin'
+
+android {
+    namespace "com.quinten.atyourservice"
+    compileSdkVersion flutter.compileSdkVersion
+
+    // *** Wichtig: NDK-Version auf 27.0.12077973 festlegen! ***
+    ndkVersion "27.0.12077973"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+    defaultConfig {
+        applicationId "com.quinten.atyourservice"
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+    }
+
+    // === DEBUG AUSGABE BEGINN ===
+    println("=== KEYSTORE DEBUG ===")
+    println("storeFile: ${keystoreProperties['storeFile']}")
+    println("storePassword: ${keystoreProperties['storePassword']}")
+    println("keyAlias: ${keystoreProperties['keyAlias']}")
+    println("keyPassword: ${keystoreProperties['keyPassword']}")
+    println("======================")
+    // === DEBUG AUSGABE ENDE ===
+
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}

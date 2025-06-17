@@ -1,0 +1,37 @@
+# Flutter/Dart Standard
+build/
+.dart_tool/
+.packages
+.pub/
+.idea/
+.vscode/
+
+# Android
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+.cxx/
+
+# iOS
+Pods/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.xcworkspace
+DerivedData/
+*.xcuserstate
+
+# Keystore und Schlüssel NIE committen!
+key.properties
+**/*.keystore
+**/*.jks
+
+# Sonstiges
+*.iml
+*.log
+*.tmp

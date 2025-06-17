@@ -1,0 +1,145 @@
+
+Zusammenfassung des Projekts "atyourservice" (Handwerker-App)
+
+1. Allgemeiner Zweck der App
+---------------------------
+Die Flutter-App "atyourservice" soll Kunden und Dienstleister (z.B. Maler, Elektriker, Klempner) zusammenbringen. Kunden können über die App Aufträge erstellen (z.B. Renovierungsarbeiten, Reparaturen) und Dienstleister können in der Nähe nach passenden offenen Aufträgen suchen, diese annehmen und als "in Bearbeitung" beziehungsweise "abgeschlossen" markieren.
+
+2. Hauptfunktionen und bisherige Umsetzung
+------------------------------------------
+- **Registrierung & Login**  
+  - Kunden und Dienstleister registrieren sich jeweils mit E-Mail und Passwort.  
+  - Nach der Registrierung bekommt der Nutzer (Kunde oder Dienstleister) seine Rolle zugewiesen (Tabelle "users" in Supabase).  
+  - Jeweils separate Login-Screens für Kunden (`LoginKundeScreen`) und Dienstleister (`LoginDienstleisterScreen`).
+
+- **Kunden-Workflow**  
+  1. **Auftrag erstellen** (`AuftragErstellenScreen`):  
+     - Kunde gibt Titel, Beschreibung, Kategorie (Elektriker, Klempner, Maler), Adresse und Telefonnummer ein.  
+     - Über `GeocodingService` wird die Adresse in Latitude/Longitude umgewandelt.  
+     - Der Auftrag wird in Supabase in der Tabelle "auftraege" mit Status="offen" gespeichert.  
+  2. **Eigene Aufträge einsehen** (`MeineAuftraegeScreen`):  
+     - Kunde sieht eine Liste seiner Aufträge (sortiert nach Erstellungsdatum).  
+     - Klick auf einen Auftrag öffnet `AuftragDetailScreen`, in dem Details und Status angezeigt werden.
+
+- **Dienstleister-Workflow**  
+  1. **Profil anlegen & bearbeiten** (`ProfilDienstleisterScreen`):  
+     - Dienstleister legt Name, Beschreibung, Kategorie und Adresse an.  
+     - Adresse wird per `GeocodingService` zu Koordinaten (Latitude/Longitude).  
+     - Profil in Supabase in der Tabelle "dienstleister_details" gespeichert (mit `upsert` für Insert/Update).  
+  2. **Dashboard** (`DienstleisterDashboardScreen`):  
+     - Beim Laden werden Profilinformationen (Kategorie, eigene Koordinaten) geholt.  
+     - Es werden **zwei Bereiche** angezeigt:
+       a) **Mein laufende Aufträge** (Status="in bearbeitung" und `dienstleister_id = currentUser.id`)  
+       b) **Offene, passende Aufträge** (Status="offen", gleiche Kategorie, Entfernung &le; 50 km).  
+     - Durch klicken auf einen offenen Auftrag gelangt man zu `AuftragDetailScreen`.
+     - Annahme eines Auftrags setzt Status auf "in bearbeitung" und speichert `dienstleister_id = currentUser.id`.  
+     - Abschließen eines Auftrags setzt Status auf "abgeschlossen".  
+     - Nach Annahme/Abschluss wird das Dashboard (Liste) automatisch per Refresh neu geladen, sodass der Auftrag in den korrekten Bereich wechselt.
+
+- **Auftragsdetail** (`AuftragDetailScreen`):  
+  - Zeigt Titel, Beschreibung, Kategorie, Adresse/Koordinaten, Status.  
+  - Für Dienstleister:  
+    - Button "Auftrag annehmen" (falls Status="offen") → Aktualisiert Status + `dienstleister_id`.  
+    - Button "Auftrag abschließen" (falls Status="in bearbeitung" und `dienstleister_id = eigener User`) → Aktualisiert Status auf "abgeschlossen".
+
+3. Supabase-Anbindung
+---------------------
+- **Tabellenstruktur** (vereinfacht):
+  - `users`: Spalten `id` (UUID, Primary Key), `email`, `rolle` ("kunde" oder "dienstleister"), `erstellt_am`.
+  - `dienstleister_details`: `id` (PK), `user_id` (Unique, FK zu users.id), `name`, `beschreibung`, `kategorie`, `adresse`, `latitude`, `longitude`, `aktualisiert_am`.
+  - `auftraege`: `id` (UUID, PK), `kunde_id` (FK zu users.id), `dienstleister_id` (FK, nullable), `titel`, `beschreibung`, `kategorie`, `adresse`, `latitude`, `longitude`, `status` ("offen", "in bearbeitung", "abgeschlossen"), `telefon`, `erstellt_am`, `aktualisiert_am`.
+
+- **SupabaseClientManager** (`lib/utils/supabase_client.dart`):  
+  Initialisiert Supabase in `main.dart` mit URL und anonKey.
+
+4. Übersicht der bereitgestellten Skripte und deren Zweck
+---------------------------------------------------------
+
+### Modelle
+1. **`lib/models/dienstleister.dart`**  
+   - Klasse `Dienstleister` mit Feldern `id`, `name`, `kategorie`, `latitude`, `longitude`, `zuletztOnline`.  
+   - Dient (im Prototyp) als lokales Beispiel, um Filter- und Entfernungsfunktionen zu testen.
+
+2. **`lib/models/auftrag.dart`**  
+   - Klasse `Auftrag` mit Feldern `id`, `kundeId`, `dienstleisterId`, `titel`, `beschreibung`, `kategorie`, `adresse`, `latitude`, `longitude`, `status`, `erstelltAm`, `aktualisiertAm`.  
+   - Mit `fromJson()` und `toJson()`, um Aufträge aus/in Supabase-JSON umzuwandeln.  
+   - `copyWith()`-Methode zum Erstellen einer aktualisierten Kopie.
+
+### Screens (UI)
+1. **`lib/screens/start_screen.dart`**  
+   - Startbildschirm der App. Wahl: Kunde-Login oder Dienstleister-Login.
+
+2. **`lib/screens/login_kunde_screen.dart`**  
+   - Login-Formular für Kunden. Prüft E-Mail/Passwort, ruft Supabase `signInWithPassword()`, speichert Rolle "kunde" in `users` via `upsert()`. Leitet nach erfolgreichem Login zum `KundenDashboardScreen` weiter.
+
+3. **`lib/screens/login_dienstleister_screen.dart`**  
+   - Login-Formular für Dienstleister. Wenn erstmaliger Login → Insert in `users` mit `rolle="dienstleister"`. Bei falscher Rolle → Logout und Fehlermeldung. Nach erfolgreichem Login → `DienstleisterDashboardScreen`.
+
+4. **`lib/screens/registrierung_screen.dart`**  
+   - Registrierungs-Formular (Kunde oder Dienstleister).  
+   - Verwendet `supabase.auth.signInWithPassword()` mit Dummy-PW, um zu prüfen, ob E-Mail schon existiert.  
+   - Bei "User not found" → `supabase.auth.signUp()`.  
+   - Zeigt Snackbars mit Erfolg/Fehler.
+
+5. **`lib/screens/kunden_dashboard_screen.dart`**  
+   - Zwei Buttons:  
+     - "Neuen Auftrag erstellen" → `AuftragErstellenScreen`.  
+     - "Meine Aufträge" → `MeineAuftraegeScreen`.
+
+6. **`lib/screens/auftrag_erstellen_screen.dart`**  
+   - Formular für neuen Auftrag: Titel, Beschreibung, Kategorie, Adresse, Telefonnummer.  
+   - Validierung: Titel + Telefonnummer erforderlich.  
+   - `GeocodingService` wandelt Adresse in Koordinaten um.  
+   - Fügt Auftrag in Supabase ein mit Status="offen".
+
+7. **`lib/screens/meine_auftraege_screen.dart`**  
+   - Zeigt Liste aller Aufträge des angemeldeten Kunden an (`kunden_id = currentUser.id`). Sortiert nach `erstellt_am` absteigend.  
+   - Klick auf einen Auftrag → `AuftragDetailScreen` zeigt Details.
+
+8. **`lib/screens/auftrag_detail_screen.dart`**  
+   - Zeigt Details eines Auftrags (Titel, Beschreibung, Kategorie, Adresse, Standort, Status).  
+   - Abhängig von Rolle/Dienstleister-Status werden Buttons „Auftrag annehmen“ (wenn offen) und „Auftrag abschließen“ (wenn in Bearbeitung und eigener Dienstleister) angezeigt.  
+   - Führt in Supabase entsprechende `update()`-Abfragen durch und liest zurück per `.select().single()`.
+
+9. **`lib/screens/dienstleister_dashboard_screen.dart`**  
+   - Lädt Profil-Daten des Dienstleisters aus `dienstleister_details` (Kategorie, Koordinaten).  
+   - Lädt:  
+     a) Offene Aufträge derselben Kategorie (Status="offen"), filtert nach Entfernung ≤50 km (mittels `entfernung_utils.berechneEntfernung()`).  
+     b) Laufende Aufträge (Status="in bearbeitung" und `dienstleister_id = currentUser.id`).  
+   - Zeigt zwei Abschnitte:  
+     - "Meine laufenden Aufträge" → ListTiles mit Titel, Status, und Kunde.  
+     - "Offene, passende Aufträge" → ListTiles mit Titel, Distanz, Kunde.  
+   - Navigation zu `AuftragDetailScreen`. Nach Rückkehr immer `refresh` (erneutes Laden).
+
+10. **`lib/screens/profil_dienstleister_screen.dart`**  
+    - Formular für Dienstleister-Profil: Name, Beschreibung, Kategorie, Adresse.  
+    - Lädt vorhandene Daten aus `dienstleister_details` per `maybeSingle()`.  
+    - Speichert/aktualisiert via `upsert()` in Supabase:  
+      - Daten inklusive `user_id`, `name`, `beschreibung`, `kategorie`, `adresse`, `latitude`, `longitude`, `aktualisiert_am`.  
+      - Nutzt `GeocodingService` zum Ermitteln von Koordinaten.
+
+### Utilities
+1. **`lib/utils/entfernung_utils.dart`**  
+   - Stellt Funktion `berechneEntfernung(lat1, lon1, lat2, lon2)` bereit, mit Haversine-Formel zur Entfernung in km zwischen zwei Geokoordinaten.
+
+2. **`lib/utils/geocoding_service.dart`**  
+   - Anfrage an OpenStreetMap Nominatim, um aus einer eingegebenen Adresse (String) mittels HTTP GET JSON mit Breiten-/Längengrad zurückzubekommen.
+
+3. **`lib/utils/supabase_client.dart`**  
+   - Klasse `SupabaseClientManager`, die in `main.dart` Supabase initialisiert mit URL und anonKey.
+
+### Hauptdatei und App-Start
+- **`lib/main.dart`**  
+  - Startet Flutter, initialisiert Supabase, ruft `runApp(MyApp())` auf.  
+  - `MyApp` definiert das Theme, Styling und setzt `home: StartScreen()`.
+
+### Bisherige Erweiterungen
+- **Dienstleister-Profilbearbeitung**  
+  - Ursprünglich fehlte Insert/Update in `dienstleister_details`. Jetzt mit `upsert(onConflict: 'user_id')` implementiert, sodass erst Insert (neu) oder Update (bestehendes Profil) erfolgt.  
+- **Dashboard-Refresh**  
+  - Nach Annahme/Abschluss eines Auftrags im Dashboard werden Listen automatisch neu geladen (`.then((_) => _ladeProfilUndAuftraege())`), damit die Auftragseinträge in Echtzeit umsortiert werden, ohne Aus- und Einloggen.  
+- **Auftragsfilterung**  
+  - Offene Aufträge werden nach Kategorie und Entfernung (<= 50 km) gefiltert.
+
+Fazit:  
+Die App ermöglicht Kunden, Aufträge zu erstellen, und Dienstleistern, ihr Profil anzulegen und passende Aufträge in ihrer Umgebung in Echtzeit zu akzeptieren und zu verwalten. Alle Daten liegen in Supabase und werden per Supabase-Client-Methoden synchronisiert. Die UI besteht aus mehreren Screens, die Login/Registrierung, Dashboard, Profil und Auftragserstellung bzw. -detail abdecken.
