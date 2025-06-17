@@ -2,25 +2,14 @@ import 'package:flutter/material.dart';
 import 'utils/supabase_client.dart'; // Supabase Client Manager
 import 'screens/start_screen.dart';  // StartScreen importieren
 
-// NEU: Firebase-Imports
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
 // NEU: Lokalisierungs-Imports
 import 'package:flutter_localizations/flutter_localizations.dart';
-import '../l10n/app_localizations.dart';
- // Automatisch generiert!
+import '../l10n/app_localizations.dart'; // Automatisch generiert!
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Zuerst Firebase initialisieren
-  await Firebase.initializeApp();
-  // Dann Supabase initialisieren
+  // Supabase initialisieren
   await SupabaseClientManager.init();
-
-  // NEU: FCM-Token ausgeben (zu Testzwecken)
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  print('FCM Token: $fcmToken');
 
   runApp(const MyApp());
 }
@@ -84,11 +73,10 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: const [
         Locale('de'), // Deutsch
-        Locale('en'), // Englisch (du kannst beliebig erweitern)
+        Locale('en'), // Englisch
       ],
 
       home: const StartScreen(),
-      // home: const SupabaseTestScreen(), // Zum Testen
     );
   }
 }
