@@ -266,7 +266,18 @@
   "statusOffen": "Ouvert",
   "statusInBearbeitung": "En cours",
   "statusAbgeschlossen": "Terminé",
-  "privacyButton": "Confidentialité"
+  "privacyButton": "Confidentialité",
+  "interval_weekly": "Hebdomadaire",
+  "interval_biweekly": "Toutes les 2 semaines",
+  "interval_monthly": "Mensuel",
+  "weekday_monday": "Lundi",
+  "weekday_tuesday": "Mardi",
+  "weekday_wednesday": "Mercredi",
+  "weekday_thursday": "Jeudi",
+  "weekday_friday": "Vendredi",
+  "weekday_saturday": "Samedi",
+  "weekday_sunday": "Dimanche"
+
 
 
 

@@ -239,7 +239,18 @@
   "statusOffen": "Açık",
   "statusInBearbeitung": "Devam ediyor",
   "statusAbgeschlossen": "Tamamlandı",
-  "privacyButton": "Gizlilik"
+  "privacyButton": "Gizlilik",
+  "interval_weekly": "Haftalık",
+  "interval_biweekly": "İki haftada bir",
+  "interval_monthly": "Aylık",
+  "weekday_monday": "Pazartesi",
+  "weekday_tuesday": "Salı",
+  "weekday_wednesday": "Çarşamba",
+  "weekday_thursday": "Perşembe",
+  "weekday_friday": "Cuma",
+  "weekday_saturday": "Cumartesi",
+  "weekday_sunday": "Pazar"
+
 
 
 

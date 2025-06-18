@@ -239,6 +239,17 @@
   "statusOffen": "Abierto",
   "statusInBearbeitung": "En progreso",
   "statusAbgeschlossen": "Completado",
-  "privacyButton": "Privacidad"
+  "privacyButton": "Privacidad",
+  "interval_weekly": "Semanal",
+  "interval_biweekly": "Cada 2 semanas",
+  "interval_monthly": "Mensual",
+  "weekday_monday": "Lunes",
+  "weekday_tuesday": "Martes",
+  "weekday_wednesday": "Miércoles",
+  "weekday_thursday": "Jueves",
+  "weekday_friday": "Viernes",
+  "weekday_saturday": "Sábado",
+  "weekday_sunday": "Domingo"
+
 
 }

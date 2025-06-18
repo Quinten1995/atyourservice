@@ -753,4 +753,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyButton => 'Datenschutz';
+
+  @override
+  String get interval_weekly => 'Wöchentlich';
+
+  @override
+  String get interval_biweekly => 'Alle 2 Wochen';
+
+  @override
+  String get interval_monthly => 'Monatlich';
+
+  @override
+  String get weekday_monday => 'Montag';
+
+  @override
+  String get weekday_tuesday => 'Dienstag';
+
+  @override
+  String get weekday_wednesday => 'Mittwoch';
+
+  @override
+  String get weekday_thursday => 'Donnerstag';
+
+  @override
+  String get weekday_friday => 'Freitag';
+
+  @override
+  String get weekday_saturday => 'Samstag';
+
+  @override
+  String get weekday_sunday => 'Sonntag';
 }

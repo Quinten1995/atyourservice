@@ -1504,6 +1504,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy'**
   String get privacyButton;
+
+  /// No description provided for @interval_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get interval_weekly;
+
+  /// No description provided for @interval_biweekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 2 weeks'**
+  String get interval_biweekly;
+
+  /// No description provided for @interval_monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get interval_monthly;
+
+  /// No description provided for @weekday_monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekday_monday;
+
+  /// No description provided for @weekday_tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekday_tuesday;
+
+  /// No description provided for @weekday_wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekday_wednesday;
+
+  /// No description provided for @weekday_thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekday_thursday;
+
+  /// No description provided for @weekday_friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekday_friday;
+
+  /// No description provided for @weekday_saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekday_saturday;
+
+  /// No description provided for @weekday_sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekday_sunday;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

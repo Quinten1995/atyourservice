@@ -753,4 +753,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get privacyButton => 'Gizlilik';
+
+  @override
+  String get interval_weekly => 'Haftalık';
+
+  @override
+  String get interval_biweekly => 'İki haftada bir';
+
+  @override
+  String get interval_monthly => 'Aylık';
+
+  @override
+  String get weekday_monday => 'Pazartesi';
+
+  @override
+  String get weekday_tuesday => 'Salı';
+
+  @override
+  String get weekday_wednesday => 'Çarşamba';
+
+  @override
+  String get weekday_thursday => 'Perşembe';
+
+  @override
+  String get weekday_friday => 'Cuma';
+
+  @override
+  String get weekday_saturday => 'Cumartesi';
+
+  @override
+  String get weekday_sunday => 'Pazar';
 }
