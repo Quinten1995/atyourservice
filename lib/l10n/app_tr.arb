@@ -249,7 +249,11 @@
   "weekday_thursday": "Perşembe",
   "weekday_friday": "Cuma",
   "weekday_saturday": "Cumartesi",
-  "weekday_sunday": "Pazar"
+  "weekday_sunday": "Pazar",
+  "kundenInfoBanner": "Müşteri olarak giriş yaptınız. Lütfen burada ihtiyacınız olan hizmeti açıklayın. Hizmet sağlayıcıları size teklif gönderecektir.",
+  "titelHint": "ör. dairem temizlensin",
+  "beschreibungHint": "Ne yapılması gerektiğini açıklayın – ör. 3 oda, mutfak ve banyo temizliği ..."
+
 
 
 

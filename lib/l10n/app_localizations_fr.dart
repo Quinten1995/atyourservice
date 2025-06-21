@@ -783,4 +783,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get weekday_sunday => 'Dimanche';
+
+  @override
+  String get kundenInfoBanner => 'Vous êtes connecté en tant que client. Veuillez décrire ici le service dont vous avez besoin. Les prestataires de services vous feront ensuite des offres.';
+
+  @override
+  String get titelHint => 'par ex. faire nettoyer mon appartement';
+
+  @override
+  String get beschreibungHint => 'Décrivez ce qui doit être fait – par ex. nettoyer 3 pièces, cuisine, salle de bain ...';
 }

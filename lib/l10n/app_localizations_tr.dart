@@ -783,4 +783,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get weekday_sunday => 'Pazar';
+
+  @override
+  String get kundenInfoBanner => 'Müşteri olarak giriş yaptınız. Lütfen burada ihtiyacınız olan hizmeti açıklayın. Hizmet sağlayıcıları size teklif gönderecektir.';
+
+  @override
+  String get titelHint => 'ör. dairem temizlensin';
+
+  @override
+  String get beschreibungHint => 'Ne yapılması gerektiğini açıklayın – ör. 3 oda, mutfak ve banyo temizliği ...';
 }

@@ -249,7 +249,11 @@
   "weekday_thursday": "Jueves",
   "weekday_friday": "Viernes",
   "weekday_saturday": "Sábado",
-  "weekday_sunday": "Domingo"
+  "weekday_sunday": "Domingo",
+  "kundenInfoBanner": "Has iniciado sesión como cliente. Describe aquí el servicio que necesitas. Los proveedores de servicios te enviarán ofertas.",
+  "titelHint": "p. ej. limpiar mi apartamento",
+  "beschreibungHint": "Describe lo que se debe hacer – p. ej. limpiar 3 habitaciones, cocina y baño ..."
+
 
 
 }

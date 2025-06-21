@@ -247,7 +247,11 @@
   "weekday_thursday": "Donnerstag",
   "weekday_friday": "Freitag",
   "weekday_saturday": "Samstag",
-  "weekday_sunday": "Sonntag"
+  "weekday_sunday": "Sonntag",
+  "kundenInfoBanner": "Sie sind als Kunde angemeldet. Bitte beschreiben Sie hier, welche Dienstleistung Sie benötigen. Dienstleister werden Ihnen daraufhin Angebote machen.",
+  "titelHint": "z. B. Wohnung reinigen lassen",
+  "beschreibungHint": "Beschreiben Sie, was gemacht werden soll – z. B. 3 Zimmer, Küche, Bad reinigen ..."
+
 
 
 

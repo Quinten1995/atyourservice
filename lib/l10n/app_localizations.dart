@@ -1564,6 +1564,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunday'**
   String get weekday_sunday;
+
+  /// No description provided for @kundenInfoBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are logged in as a customer. Please describe the service you need here. Service providers will then send you offers.'**
+  String get kundenInfoBanner;
+
+  /// No description provided for @titelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Have my apartment cleaned'**
+  String get titelHint;
+
+  /// No description provided for @beschreibungHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ...'**
+  String get beschreibungHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

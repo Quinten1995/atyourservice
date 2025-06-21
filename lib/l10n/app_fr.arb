@@ -276,7 +276,11 @@
   "weekday_thursday": "Jeudi",
   "weekday_friday": "Vendredi",
   "weekday_saturday": "Samedi",
-  "weekday_sunday": "Dimanche"
+  "weekday_sunday": "Dimanche",
+  "kundenInfoBanner": "Vous êtes connecté en tant que client. Veuillez décrire ici le service dont vous avez besoin. Les prestataires de services vous feront ensuite des offres.",
+  "titelHint": "par ex. faire nettoyer mon appartement",
+  "beschreibungHint": "Décrivez ce qui doit être fait – par ex. nettoyer 3 pièces, cuisine, salle de bain ..."
+
 
 
 

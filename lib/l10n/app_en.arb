@@ -249,7 +249,11 @@
   "weekday_thursday": "Thursday",
   "weekday_friday": "Friday",
   "weekday_saturday": "Saturday",
-  "weekday_sunday": "Sunday"
+  "weekday_sunday": "Sunday",
+  "kundenInfoBanner": "You are logged in as a customer. Please describe the service you need here. Service providers will then send you offers.",
+  "titelHint": "e.g. Have my apartment cleaned",
+  "beschreibungHint": "Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ..."
+
 
 
 
