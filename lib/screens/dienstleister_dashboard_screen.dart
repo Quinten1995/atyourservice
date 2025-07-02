@@ -151,6 +151,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
 
   Widget _buildAuftragsListe(List<Map<String, dynamic>> auftraegeRaw, String titel, {bool isCompleted = false}) {
     final l10n = AppLocalizations.of(context)!;
+    final bool isGold = (_aboTyp == 'gold');
 
     if (auftraegeRaw.isEmpty) {
       return Padding(
@@ -191,7 +192,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                     ).then((_) => _ladeProfilUndAuftraege());
                   },
                   child: Container(
-                    width: 300,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,60 +241,63 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // --- Generate Invoice Button ---
                             ElevatedButton.icon(
                               icon: const Icon(Icons.picture_as_pdf, size: 17),
                               label: Text(
                                 l10n.rechnungGenerierenButtonLabel,
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isGold ? Colors.white : Colors.grey[700],
+                                ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.indigo,
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                minimumSize: const Size.fromHeight(34),
+                                backgroundColor: isGold ? Colors.indigo : Colors.grey[300],
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                minimumSize: const Size.fromHeight(44),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                elevation: 2,
+                                elevation: 3,
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PdfRechnungScreen(
-                                      auftragId: auftrag.id,
-                                      dienstleisterId: auftrag.dienstleisterId!,
-                                      kundeId: auftrag.kundeId,
-                                      beschreibung: auftrag.beschreibung,
-                                      adresse: auftrag.adresse,
-                                      datum: auftrag.aktualisiertAm,
-                                      // KEIN preis PARAMETER MEHR!
+                                if (!isGold) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.onlyForGoldTooltip),
+                                      backgroundColor: Colors.redAccent,
                                     ),
-                                  ),
-                                );
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PdfRechnungScreen(
+                                        auftragId: auftrag.id,
+                                        dienstleisterId: auftrag.dienstleisterId!,
+                                        kundeId: auftrag.kundeId,
+                                        beschreibung: auftrag.beschreibung,
+                                        adresse: auftrag.adresse,
+                                        datum: auftrag.aktualisiertAm,
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                             ),
                             if (isCompleted) ...[
-                              const SizedBox(height: 6),
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.hide_source, size: 17),
-                                label: Text(
-                                  l10n.verbergenButtonLabel,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              const SizedBox(height: 10),
+                              Center(
+                                child: IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.redAccent, size: 28),
+                                  tooltip: l10n.deleteJobTooltip, // Key ggf. ergänzen
+                                  onPressed: () {
+                                    setState(() {
+                                      _alleAbgeschlosseneAuftraegeRaw.removeWhere((element) => element['id'] == auftrag.id);
+                                    });
+                                  },
                                 ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.redAccent,
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
-                                  minimumSize: const Size.fromHeight(34),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: 2,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _alleAbgeschlosseneAuftraegeRaw.removeWhere((element) => element['id'] == auftrag.id);
-                                  });
-                                },
                               ),
                             ],
                           ],

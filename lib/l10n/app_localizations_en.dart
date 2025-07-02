@@ -861,4 +861,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumGoldInvoiceFeature => 'Invoice generation as PDF';
+
+  @override
+  String get onlyForGoldTooltip => 'This feature is available only for Gold subscribers.';
+
+  @override
+  String get deleteJobTooltip => 'Remove job from the list';
+
+  @override
+  String get invoiceNumberLabel => 'Invoice Number';
+
+  @override
+  String get invoiceProfileHint => 'Please enter your invoice details in your profile. These will automatically be included in the PDF invoice.';
 }

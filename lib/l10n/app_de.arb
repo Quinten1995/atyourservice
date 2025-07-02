@@ -275,7 +275,12 @@
   "generatedByText": "Diese Rechnung wurde automatisch über AtYourService generiert.",
   "currencyLabel": "Währung",
   "amountRequired": "Bitte einen gültigen Betrag eingeben.",
-  "premiumGoldInvoiceFeature": "Rechnungsstellung als PDF"
+  "premiumGoldInvoiceFeature": "Rechnungsstellung als PDF",
+  "onlyForGoldTooltip": "Diese Funktion ist nur für Gold-Abonnenten verfügbar.",
+  "deleteJobTooltip": "Auftrag von der Liste entfernen",
+  "invoiceNumberLabel": "Rechnungsnummer",
+  "invoiceProfileHint": "Bitte trage deine Rechnungsdaten im Profil ein. Diese werden automatisch in die PDF-Rechnung übernommen."
+
 
 
 

@@ -861,4 +861,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumGoldInvoiceFeature => 'PDF olarak fatura oluşturma';
+
+  @override
+  String get onlyForGoldTooltip => 'Bu özellik yalnızca Gold aboneleri için geçerlidir.';
+
+  @override
+  String get deleteJobTooltip => 'Görevi listeden kaldır';
+
+  @override
+  String get invoiceNumberLabel => 'Fatura Numarası';
+
+  @override
+  String get invoiceProfileHint => 'Lütfen fatura bilgilerinizi profilinizde doldurun. Bu bilgiler PDF faturasında otomatik olarak yer alacaktır.';
 }

@@ -304,7 +304,11 @@
   "generatedByText": "Cette facture a été générée automatiquement via AtYourService.",
   "currencyLabel": "Devise",
   "amountRequired": "Veuillez saisir un montant valide.",
-  "premiumGoldInvoiceFeature": "Invoice generation as PDF"
+  "premiumGoldInvoiceFeature": "Invoice generation as PDF",
+  "onlyForGoldTooltip": "Cette fonctionnalité est disponible uniquement pour les abonnés Gold.",
+  "deleteJobTooltip": "Supprimer la mission de la liste",
+  "invoiceNumberLabel": "Numéro de facture",
+  "invoiceProfileHint": "Veuillez saisir vos coordonnées de facturation dans votre profil. Elles seront automatiquement reprises sur la facture PDF."
 
 
 

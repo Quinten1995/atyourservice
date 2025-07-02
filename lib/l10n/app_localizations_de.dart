@@ -861,4 +861,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumGoldInvoiceFeature => 'Rechnungsstellung als PDF';
+
+  @override
+  String get onlyForGoldTooltip => 'Diese Funktion ist nur für Gold-Abonnenten verfügbar.';
+
+  @override
+  String get deleteJobTooltip => 'Auftrag von der Liste entfernen';
+
+  @override
+  String get invoiceNumberLabel => 'Rechnungsnummer';
+
+  @override
+  String get invoiceProfileHint => 'Bitte trage deine Rechnungsdaten im Profil ein. Diese werden automatisch in die PDF-Rechnung übernommen.';
 }

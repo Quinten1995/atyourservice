@@ -250,7 +250,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
         final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        final storageResponse = await _supabase.storage
+        await _supabase.storage
             .from('profile-pics')
             .upload(
               fileName,
@@ -493,6 +493,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       }
     }
 
+    // ----------- NEU: Sortierte Kategorie-Dropdown-Liste -----------
+    final sortedKategorieEntries = (kategorieKeys
+        .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
+        .toList()
+      ..sort((a, b) => a.value.compareTo(b.value)));
+    // ---------------------------------------------------------------
+
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
@@ -582,13 +589,14 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 maxLines: 3,
                               ),
                               const SizedBox(height: 18),
+                              // ------------- Alphabetisch sortiertes Dropdown ---------------
                               DropdownButtonFormField<String>(
                                 value: _selectedKategorie,
                                 decoration: _inputDecoration(l10n.categoryLabel),
-                                items: kategorieKeys.map((kategorie) {
+                                items: sortedKategorieEntries.map((entry) {
                                   return DropdownMenuItem(
-                                    value: kategorie,
-                                    child: Text(getKategorieLabel(kategorie, l10n)),
+                                    value: entry.key,
+                                    child: Text(entry.value),
                                   );
                                 }).toList(),
                                 onChanged: (wert) {
@@ -602,6 +610,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     ? l10n.categoryValidator
                                     : null,
                               ),
+                              // ---------------------------------------------------------------
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _adresseController,

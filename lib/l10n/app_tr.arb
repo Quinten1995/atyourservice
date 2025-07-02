@@ -277,7 +277,11 @@
   "generatedByText": "Bu fatura AtYourService tarafından otomatik olarak oluşturulmuştur.",
   "currencyLabel": "Para birimi",
   "amountRequired": "Lütfen geçerli bir tutar girin.",
-  "premiumGoldInvoiceFeature": "PDF olarak fatura oluşturma"
+  "premiumGoldInvoiceFeature": "PDF olarak fatura oluşturma",
+  "onlyForGoldTooltip": "Bu özellik yalnızca Gold aboneleri için geçerlidir.",
+  "deleteJobTooltip": "Görevi listeden kaldır",
+  "invoiceNumberLabel": "Fatura Numarası",
+  "invoiceProfileHint": "Lütfen fatura bilgilerinizi profilinizde doldurun. Bu bilgiler PDF faturasında otomatik olarak yer alacaktır."
 
 
 

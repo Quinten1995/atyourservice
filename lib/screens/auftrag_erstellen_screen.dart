@@ -255,6 +255,14 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // ----------- Sortiertes Kategorie-Dropdown -----------
+    final sortedKategorieEntries = (kategorieKeys
+        .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
+        .toList()
+      ..sort((a, b) => a.value.compareTo(b.value)));
+    // -----------------------------------------------------
+
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
@@ -358,6 +366,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           maxLines: 3,
                         ),
                         const SizedBox(height: 16),
+                        // ------------- Alphabetisch sortiertes Dropdown ---------------
                         DropdownButtonFormField<String>(
                           value: _selectedKategorie,
                           decoration: InputDecoration(
@@ -374,10 +383,10 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               borderSide: BorderSide(color: primaryColor, width: 2),
                             ),
                           ),
-                          items: kategorieKeys.map((key) {
+                          items: sortedKategorieEntries.map((entry) {
                             return DropdownMenuItem(
-                              value: key,
-                              child: Text(getKategorieLabel(key, l10n)),
+                              value: entry.key,
+                              child: Text(entry.value),
                             );
                           }).toList(),
                           onChanged: (wert) {
@@ -388,6 +397,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                             }
                           },
                         ),
+                        // ---------------------------------------------------------------
                         const SizedBox(height: 16),
                         if (_heimatAdresse != null && _heimatAdresse!.isNotEmpty)
                           Padding(

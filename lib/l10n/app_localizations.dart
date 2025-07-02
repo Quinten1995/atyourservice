@@ -1720,6 +1720,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invoice generation as PDF'**
   String get premiumGoldInvoiceFeature;
+
+  /// No description provided for @onlyForGoldTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is available only for Gold subscribers.'**
+  String get onlyForGoldTooltip;
+
+  /// No description provided for @deleteJobTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove job from the list'**
+  String get deleteJobTooltip;
+
+  /// No description provided for @invoiceNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice Number'**
+  String get invoiceNumberLabel;
+
+  /// No description provided for @invoiceProfileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your invoice details in your profile. These will automatically be included in the PDF invoice.'**
+  String get invoiceProfileHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

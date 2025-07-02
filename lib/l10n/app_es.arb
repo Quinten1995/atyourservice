@@ -277,7 +277,11 @@
   "generatedByText": "Esta factura fue generada automáticamente a través de AtYourService.",
   "currencyLabel": "Moneda",
   "amountRequired": "Por favor, introduce una cantidad válida.",
-  "premiumGoldInvoiceFeature": "Generación de factura en PDF"
+  "premiumGoldInvoiceFeature": "Generación de factura en PDF",
+  "onlyForGoldTooltip": "Esta función está disponible solo para suscriptores Gold.",
+  "deleteJobTooltip": "Eliminar trabajo de la lista",
+  "invoiceNumberLabel": "Número de factura",
+  "invoiceProfileHint": "Por favor, introduce tus datos de facturación en tu perfil. Estos se incluirán automáticamente en la factura PDF."
 
 
 
