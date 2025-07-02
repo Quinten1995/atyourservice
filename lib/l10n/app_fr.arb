@@ -279,7 +279,34 @@
   "weekday_sunday": "Dimanche",
   "kundenInfoBanner": "Vous êtes connecté en tant que client. Veuillez décrire ici le service dont vous avez besoin. Les prestataires de services vous feront ensuite des offres.",
   "titelHint": "par ex. faire nettoyer mon appartement",
-  "beschreibungHint": "Décrivez ce qui doit être fait – par ex. nettoyer 3 pièces, cuisine, salle de bain ..."
+  "beschreibungHint": "Décrivez ce qui doit être fait – par ex. nettoyer 3 pièces, cuisine, salle de bain ...",
+  "invoiceSectionTitle": "Données de facturation (réservé aux membres Gold)",
+  "invoiceNameLabel": "Nom de la facture (ex : nom de l'entreprise)",
+  "invoiceAddressLabel": "Adresse de facturation",
+  "invoiceTaxNumberLabel": "Numéro fiscal (optionnel)",
+  "invoiceIbanLabel": "IBAN (optionnel)",
+  "invoiceLogoUrlLabel": "URL du logo (optionnel)",
+  "invoiceGoldInfo": "Ces informations apparaîtront sur votre facture PDF (fonctionnalité Gold).",
+   "rechnungGenerierenButtonLabel": "Générer la facture",
+  "meineAbgeschlossenenAuftraege": "Mes commandes terminées",
+  "verbergenButtonLabel": "Masquer",
+  "rechnungGenerierenAppBar": "Générer la facture",
+  "rechnungAlsPdfAnzeigenLabel": "Afficher la facture au format PDF",
+  "invoiceLabel": "Facture",
+  "fromLabel": "De :",
+  "invoiceAddressLabel": "Adresse de facturation :",
+  "taxNumberLabel": "Numéro fiscal :",
+  "ibanLabel": "IBAN :",
+  "toLabel": "À :",
+  "descriptionLabel": "Description du service :",
+  "amountLabel": "Montant :",
+  "dateLabel": "Date :",
+  "generatedByText": "Cette facture a été générée automatiquement via AtYourService.",
+  "currencyLabel": "Devise",
+  "amountRequired": "Veuillez saisir un montant valide.",
+  "premiumGoldInvoiceFeature": "Invoice generation as PDF"
+
+
 
 
 

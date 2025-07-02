@@ -34,7 +34,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         });
       }
     } catch (e) {
-      // Ignore, bleibt auf null
+      // Ignore
     } finally {
       setState(() => _isLoading = false);
     }
@@ -104,7 +104,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumFreeFeature4,
                     ],
                     highlighted: _aboTyp == 'free',
-                    showButton: false, // Kein Button!
+                    showButton: false,
                     onTap: () {},
                   ),
                   const SizedBox(height: 14),
@@ -139,6 +139,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumGoldFeature2,
                       l10n.premiumGoldFeature3,
                       l10n.premiumGoldFeature4,
+                      l10n.premiumGoldInvoiceFeature, // <--- Hier die Rechnungsfunktion als Feature!
                     ],
                     highlighted: _aboTyp == 'gold',
                     showButton: true,

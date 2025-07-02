@@ -252,7 +252,34 @@
   "weekday_sunday": "Sunday",
   "kundenInfoBanner": "You are logged in as a customer. Please describe the service you need here. Service providers will then send you offers.",
   "titelHint": "e.g. Have my apartment cleaned",
-  "beschreibungHint": "Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ..."
+  "beschreibungHint": "Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ...",
+  "invoiceSectionTitle": "Invoice data (Gold only)",
+  "invoiceNameLabel": "Invoice name (e.g. company name)",
+  "invoiceAddressLabel": "Invoice address",
+  "invoiceTaxNumberLabel": "Tax number (optional)",
+  "invoiceIbanLabel": "IBAN (optional)",
+  "invoiceLogoUrlLabel": "Logo URL (optional)",
+  "invoiceGoldInfo": "These details will appear on your PDF invoice (Gold feature).",
+  "rechnungGenerierenButtonLabel": "Generate Invoice",
+  "meineAbgeschlossenenAuftraege": "My Completed Orders",
+  "verbergenButtonLabel": "Hide",
+  "rechnungGenerierenAppBar": "Generate Invoice",
+  "rechnungAlsPdfAnzeigenLabel": "Show invoice as PDF",
+  "invoiceLabel": "Invoice",
+  "fromLabel": "From:",
+  "invoiceAddressLabel": "Invoice address:",
+  "taxNumberLabel": "Tax number:",
+  "ibanLabel": "IBAN:",
+  "toLabel": "To:",
+  "descriptionLabel": "Service description:",
+  "amountLabel": "Amount:",
+  "dateLabel": "Date:",
+  "generatedByText": "This invoice was automatically generated via AtYourService.",
+  "currencyLabel": "Currency",
+  "amountRequired": "Please enter a valid amount.",
+  "premiumGoldInvoiceFeature": "Invoice generation as PDF"
+
+
 
 
 

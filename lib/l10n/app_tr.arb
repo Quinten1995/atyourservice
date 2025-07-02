@@ -252,7 +252,35 @@
   "weekday_sunday": "Pazar",
   "kundenInfoBanner": "Müşteri olarak giriş yaptınız. Lütfen burada ihtiyacınız olan hizmeti açıklayın. Hizmet sağlayıcıları size teklif gönderecektir.",
   "titelHint": "ör. dairem temizlensin",
-  "beschreibungHint": "Ne yapılması gerektiğini açıklayın – ör. 3 oda, mutfak ve banyo temizliği ..."
+  "beschreibungHint": "Ne yapılması gerektiğini açıklayın – ör. 3 oda, mutfak ve banyo temizliği ...",
+  "invoiceSectionTitle": "Fatura bilgileri (sadece Gold için)",
+  "invoiceNameLabel": "Fatura adı (ör. şirket adı)",
+  "invoiceAddressLabel": "Fatura adresi",
+  "invoiceTaxNumberLabel": "Vergi numarası (isteğe bağlı)",
+  "invoiceIbanLabel": "IBAN (isteğe bağlı)",
+  "invoiceLogoUrlLabel": "Logo URL'si (isteğe bağlı)",
+  "invoiceGoldInfo": "Bu bilgiler PDF faturanızda görünecektir (Gold özelliği).",
+  "rechnungGenerierenButtonLabel": "Fatura oluştur",
+  "meineAbgeschlossenenAuftraege": "Tamamlanan siparişlerim",
+  "verbergenButtonLabel": "Gizle",
+  "rechnungGenerierenAppBar": "Fatura oluştur",
+  "rechnungAlsPdfAnzeigenLabel": "PDF olarak faturayı göster",
+  "invoiceLabel": "Fatura",
+  "fromLabel": "Kimden:",
+  "invoiceAddressLabel": "Fatura adresi:",
+  "taxNumberLabel": "Vergi numarası:",
+  "ibanLabel": "IBAN:",
+  "toLabel": "Kime:",
+  "descriptionLabel": "Hizmet açıklaması:",
+  "amountLabel": "Tutar:",
+  "dateLabel": "Tarih:",
+  "generatedByText": "Bu fatura AtYourService tarafından otomatik olarak oluşturulmuştur.",
+  "currencyLabel": "Para birimi",
+  "amountRequired": "Lütfen geçerli bir tutar girin.",
+  "premiumGoldInvoiceFeature": "PDF olarak fatura oluşturma"
+
+
+
 
 
 

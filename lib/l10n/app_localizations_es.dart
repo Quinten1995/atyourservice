@@ -133,7 +133,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get nameValidator => 'Por favor ingresa el nombre';
 
   @override
-  String get descriptionLabel => 'Descripción';
+  String get descriptionLabel => 'Descripción del servicio:';
 
   @override
   String get addressLabel => 'Dirección (ej. calle, código postal, ciudad)';
@@ -792,4 +792,73 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get beschreibungHint => 'Describe lo que se debe hacer – p. ej. limpiar 3 habitaciones, cocina y baño ...';
+
+  @override
+  String get invoiceSectionTitle => 'Datos de facturación (solo Gold)';
+
+  @override
+  String get invoiceNameLabel => 'Nombre en la factura (por ejemplo, nombre de empresa)';
+
+  @override
+  String get invoiceAddressLabel => 'Dirección de facturación:';
+
+  @override
+  String get invoiceTaxNumberLabel => 'Número fiscal (opcional)';
+
+  @override
+  String get invoiceIbanLabel => 'IBAN (opcional)';
+
+  @override
+  String get invoiceLogoUrlLabel => 'URL del logotipo (opcional)';
+
+  @override
+  String get invoiceGoldInfo => 'Estos datos aparecerán en tu factura PDF (función Gold).';
+
+  @override
+  String get rechnungGenerierenButtonLabel => 'Generar factura';
+
+  @override
+  String get meineAbgeschlossenenAuftraege => 'Mis pedidos completados';
+
+  @override
+  String get verbergenButtonLabel => 'Ocultar';
+
+  @override
+  String get rechnungGenerierenAppBar => 'Generar factura';
+
+  @override
+  String get rechnungAlsPdfAnzeigenLabel => 'Mostrar factura en PDF';
+
+  @override
+  String get invoiceLabel => 'Factura';
+
+  @override
+  String get fromLabel => 'De:';
+
+  @override
+  String get taxNumberLabel => 'Número fiscal:';
+
+  @override
+  String get ibanLabel => 'IBAN:';
+
+  @override
+  String get toLabel => 'Para:';
+
+  @override
+  String get amountLabel => 'Importe:';
+
+  @override
+  String get dateLabel => 'Fecha:';
+
+  @override
+  String get generatedByText => 'Esta factura fue generada automáticamente a través de AtYourService.';
+
+  @override
+  String get currencyLabel => 'Moneda';
+
+  @override
+  String get amountRequired => 'Por favor, introduce una cantidad válida.';
+
+  @override
+  String get premiumGoldInvoiceFeature => 'Generación de factura en PDF';
 }

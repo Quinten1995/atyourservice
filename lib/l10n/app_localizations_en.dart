@@ -133,7 +133,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nameValidator => 'Please enter name';
 
   @override
-  String get descriptionLabel => 'Description';
+  String get descriptionLabel => 'Service description:';
 
   @override
   String get addressLabel => 'Address (e.g. street, zip code, city)';
@@ -792,4 +792,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get beschreibungHint => 'Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ...';
+
+  @override
+  String get invoiceSectionTitle => 'Invoice data (Gold only)';
+
+  @override
+  String get invoiceNameLabel => 'Invoice name (e.g. company name)';
+
+  @override
+  String get invoiceAddressLabel => 'Invoice address:';
+
+  @override
+  String get invoiceTaxNumberLabel => 'Tax number (optional)';
+
+  @override
+  String get invoiceIbanLabel => 'IBAN (optional)';
+
+  @override
+  String get invoiceLogoUrlLabel => 'Logo URL (optional)';
+
+  @override
+  String get invoiceGoldInfo => 'These details will appear on your PDF invoice (Gold feature).';
+
+  @override
+  String get rechnungGenerierenButtonLabel => 'Generate Invoice';
+
+  @override
+  String get meineAbgeschlossenenAuftraege => 'My Completed Orders';
+
+  @override
+  String get verbergenButtonLabel => 'Hide';
+
+  @override
+  String get rechnungGenerierenAppBar => 'Generate Invoice';
+
+  @override
+  String get rechnungAlsPdfAnzeigenLabel => 'Show invoice as PDF';
+
+  @override
+  String get invoiceLabel => 'Invoice';
+
+  @override
+  String get fromLabel => 'From:';
+
+  @override
+  String get taxNumberLabel => 'Tax number:';
+
+  @override
+  String get ibanLabel => 'IBAN:';
+
+  @override
+  String get toLabel => 'To:';
+
+  @override
+  String get amountLabel => 'Amount:';
+
+  @override
+  String get dateLabel => 'Date:';
+
+  @override
+  String get generatedByText => 'This invoice was automatically generated via AtYourService.';
+
+  @override
+  String get currencyLabel => 'Currency';
+
+  @override
+  String get amountRequired => 'Please enter a valid amount.';
+
+  @override
+  String get premiumGoldInvoiceFeature => 'Invoice generation as PDF';
 }

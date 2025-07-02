@@ -133,7 +133,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nameValidator => 'Bitte Name eingeben';
 
   @override
-  String get descriptionLabel => 'Beschreibung';
+  String get descriptionLabel => 'Leistungsbeschreibung:';
 
   @override
   String get addressLabel => 'Adresse (z.B. Straße, PLZ, Stadt)';
@@ -792,4 +792,73 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get beschreibungHint => 'Beschreiben Sie, was gemacht werden soll – z. B. 3 Zimmer, Küche, Bad reinigen ...';
+
+  @override
+  String get invoiceSectionTitle => 'Rechnungsdaten (nur für Gold)';
+
+  @override
+  String get invoiceNameLabel => 'Rechnungsname (z.B. Firmenname)';
+
+  @override
+  String get invoiceAddressLabel => 'Rechnungsadresse:';
+
+  @override
+  String get invoiceTaxNumberLabel => 'Steuernummer (optional)';
+
+  @override
+  String get invoiceIbanLabel => 'IBAN (optional)';
+
+  @override
+  String get invoiceLogoUrlLabel => 'Logo-URL (optional)';
+
+  @override
+  String get invoiceGoldInfo => 'Diese Angaben werden auf deiner PDF-Rechnung erscheinen (Gold-Feature).';
+
+  @override
+  String get rechnungGenerierenButtonLabel => 'Rechnung generieren';
+
+  @override
+  String get meineAbgeschlossenenAuftraege => 'Meine abgeschlossenen Aufträge';
+
+  @override
+  String get verbergenButtonLabel => 'Verbergen';
+
+  @override
+  String get rechnungGenerierenAppBar => 'Rechnung generieren';
+
+  @override
+  String get rechnungAlsPdfAnzeigenLabel => 'Rechnung als PDF anzeigen';
+
+  @override
+  String get invoiceLabel => 'Rechnung';
+
+  @override
+  String get fromLabel => 'Von:';
+
+  @override
+  String get taxNumberLabel => 'Steuernummer:';
+
+  @override
+  String get ibanLabel => 'IBAN:';
+
+  @override
+  String get toLabel => 'Für:';
+
+  @override
+  String get amountLabel => 'Betrag:';
+
+  @override
+  String get dateLabel => 'Datum:';
+
+  @override
+  String get generatedByText => 'Diese Rechnung wurde automatisch über AtYourService generiert.';
+
+  @override
+  String get currencyLabel => 'Währung';
+
+  @override
+  String get amountRequired => 'Bitte einen gültigen Betrag eingeben.';
+
+  @override
+  String get premiumGoldInvoiceFeature => 'Rechnungsstellung als PDF';
 }

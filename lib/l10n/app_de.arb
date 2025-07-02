@@ -250,7 +250,37 @@
   "weekday_sunday": "Sonntag",
   "kundenInfoBanner": "Sie sind als Kunde angemeldet. Bitte beschreiben Sie hier, welche Dienstleistung Sie benötigen. Dienstleister werden Ihnen daraufhin Angebote machen.",
   "titelHint": "z. B. Wohnung reinigen lassen",
-  "beschreibungHint": "Beschreiben Sie, was gemacht werden soll – z. B. 3 Zimmer, Küche, Bad reinigen ..."
+  "beschreibungHint": "Beschreiben Sie, was gemacht werden soll – z. B. 3 Zimmer, Küche, Bad reinigen ...",
+  "invoiceSectionTitle": "Rechnungsdaten (nur für Gold)",
+  "invoiceNameLabel": "Rechnungsname (z.B. Firmenname)",
+  "invoiceAddressLabel": "Rechnungsadresse",
+  "invoiceTaxNumberLabel": "Steuernummer (optional)",
+  "invoiceIbanLabel": "IBAN (optional)",
+  "invoiceLogoUrlLabel": "Logo-URL (optional)",
+  "invoiceGoldInfo": "Diese Angaben werden auf deiner PDF-Rechnung erscheinen (Gold-Feature).",
+  "rechnungGenerierenButtonLabel": "Rechnung generieren",
+  "meineAbgeschlossenenAuftraege": "Meine abgeschlossenen Aufträge",
+  "verbergenButtonLabel": "Verbergen",
+  "rechnungGenerierenAppBar": "Rechnung generieren",
+  "rechnungAlsPdfAnzeigenLabel": "Rechnung als PDF anzeigen",
+  "invoiceLabel": "Rechnung",
+  "fromLabel": "Von:",
+  "invoiceAddressLabel": "Rechnungsadresse:",
+  "taxNumberLabel": "Steuernummer:",
+  "ibanLabel": "IBAN:",
+  "toLabel": "Für:",
+  "descriptionLabel": "Leistungsbeschreibung:",
+  "amountLabel": "Betrag:",
+  "dateLabel": "Datum:",
+  "generatedByText": "Diese Rechnung wurde automatisch über AtYourService generiert.",
+  "currencyLabel": "Währung",
+  "amountRequired": "Bitte einen gültigen Betrag eingeben.",
+  "premiumGoldInvoiceFeature": "Rechnungsstellung als PDF"
+
+
+
+
+
 
 
 

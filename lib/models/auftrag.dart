@@ -15,6 +15,9 @@ class Auftrag {
   final DateTime aktualisiertAm;
   final String? telefon;
 
+  // Preisfeld NEU
+  final double? preis; // <----- NEU
+
   // Planung und Zeitfenster
   final bool soSchnellWieMoeglich;
   final DateTime? terminDatum;
@@ -42,6 +45,7 @@ class Auftrag {
     required this.erstelltAm,
     required this.aktualisiertAm,
     this.telefon,
+    this.preis, // <----- NEU
     this.soSchnellWieMoeglich = true,
     this.terminDatum,
     this.zeitVon,
@@ -68,6 +72,7 @@ class Auftrag {
         erstelltAm: DateTime.parse(json['erstellt_am'] as String),
         aktualisiertAm: DateTime.parse(json['aktualisiert_am'] as String),
         telefon: json['telefon'] as String?,
+        preis: (json['preis'] as num?)?.toDouble(), // <----- NEU
         soSchnellWieMoeglich: json['so_schnell_wie_moeglich'] as bool? ?? true,
         terminDatum: json['termin_datum'] != null
             ? DateTime.tryParse(json['termin_datum'])
@@ -111,6 +116,7 @@ class Auftrag {
       if (wochentag != null) 'wochentag': wochentag,
       if (anzahlWiederholungen != null) 'anzahl_wiederholungen': anzahlWiederholungen,
       if (wiederholenBis != null) 'wiederholen_bis': wiederholenBis!.toIso8601String().substring(0, 10),
+      if (preis != null) 'preis': preis, // <----- NEU
     };
     if (dienstleisterId != null) {
       map['dienstleister_id'] = dienstleisterId;
@@ -132,6 +138,7 @@ class Auftrag {
     String? dienstleisterId,
     DateTime? aktualisiertAm,
     String? telefon,
+    double? preis, // <----- NEU
     bool? soSchnellWieMoeglich,
     DateTime? terminDatum,
     TimeOfDay? zeitVon,
@@ -157,6 +164,7 @@ class Auftrag {
       erstelltAm: erstelltAm,
       aktualisiertAm: aktualisiertAm ?? this.aktualisiertAm,
       telefon: telefon ?? this.telefon,
+      preis: preis ?? this.preis, // <----- NEU
       soSchnellWieMoeglich: soSchnellWieMoeglich ?? this.soSchnellWieMoeglich,
       terminDatum: terminDatum ?? this.terminDatum,
       zeitVon: zeitVon ?? this.zeitVon,

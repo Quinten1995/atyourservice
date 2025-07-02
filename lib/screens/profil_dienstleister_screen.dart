@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,113 +7,61 @@ import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
 import 'premium_screen.dart';
 
-// ---- Helper für Kategorien (mit Unterstrich) ----
+// ---- Helper für Kategorien ----
 String getKategorieLabel(String key, AppLocalizations l10n) {
   switch (key) {
-    case 'category_babysitter':
-      return l10n.category_babysitter;
-    case 'category_catering':
-      return l10n.category_catering;
-    case 'category_dachdecker':
-      return l10n.category_dachdecker;
-    case 'category_elektriker':
-      return l10n.category_elektriker;
-    case 'category_ernaehrungsberatung':
-      return l10n.category_ernaehrungsberatung;
-    case 'category_eventplanung':
-      return l10n.category_eventplanung;
-    case 'category_fahrdienste':
-      return l10n.category_fahrdienste;
-    case 'category_fahrlehrer':
-      return l10n.category_fahrlehrer;
-    case 'category_fensterputzer':
-      return l10n.category_fensterputzer;
-    case 'category_fliesenleger':
-      return l10n.category_fliesenleger;
-    case 'category_fotografie':
-      return l10n.category_fotografie;
-    case 'category_friseur':
-      return l10n.category_friseur;
-    case 'category_gartenpflege':
-      return l10n.category_gartenpflege;
-    case 'category_grafikdesign':
-      return l10n.category_grafikdesign;
-    case 'category_handy_reparatur':
-      return l10n.category_handy_reparatur;
-    case 'category_haushaltsreinigung':
-      return l10n.category_haushaltsreinigung;
-    case 'category_hausmeisterservice':
-      return l10n.category_hausmeisterservice;
-    case 'category_heizungsbauer':
-      return l10n.category_heizungsbauer;
-    case 'category_hundesitter':
-      return l10n.category_hundesitter;
-    case 'category_it_support':
-      return l10n.category_it_support;
-    case 'category_klempner':
-      return l10n.category_klempner;
-    case 'category_kosmetik':
-      return l10n.category_kosmetik;
-    case 'category_kuenstler':
-      return l10n.category_kuenstler;
-    case 'category_kurierdienst':
-      return l10n.category_kurierdienst;
-    case 'category_maler':
-      return l10n.category_maler;
-    case 'category_massagen':
-      return l10n.category_massagen;
-    case 'category_maurer':
-      return l10n.category_maurer;
-    case 'category_moebelaufbau':
-      return l10n.category_moebelaufbau;
-    case 'category_musikunterricht':
-      return l10n.category_musikunterricht;
-    case 'category_nachhilfe':
-      return l10n.category_nachhilfe;
-    case 'category_nagelstudio':
-      return l10n.category_nagelstudio;
-    case 'category_pc_reparatur':
-      return l10n.category_pc_reparatur;
-    case 'category_partyservice':
-      return l10n.category_partyservice;
-    case 'category_personal_trainer':
-      return l10n.category_personal_trainer;
-    case 'category_rasenmaeher_service':
-      return l10n.category_rasenmaeher_service;
-    case 'category_rechtsberatung':
-      return l10n.category_rechtsberatung;
-    case 'category_reparaturdienste':
-      return l10n.category_reparaturdienste;
-    case 'category_seniorenbetreuung':
-      return l10n.category_seniorenbetreuung;
-    case 'category_social_media':
-      return l10n.category_social_media;
-    case 'category_sonstige':
-      return l10n.category_sonstige;
-    case 'category_sprachunterricht':
-      return l10n.category_sprachunterricht;
-    case 'category_steuerberatung':
-      return l10n.category_steuerberatung;
-    case 'category_tischler':
-      return l10n.category_tischler;
-    case 'category_transport':
-      return l10n.category_transport;
-    case 'category_umzugstransporte':
-      return l10n.category_umzugstransporte;
-    case 'category_umzugshelfer':
-      return l10n.category_umzugshelfer;
-    case 'category_uebersetzungen':
-      return l10n.category_uebersetzungen;
-    case 'category_waescheservice':
-      return l10n.category_waescheservice;
-    case 'category_webdesign':
-      return l10n.category_webdesign;
-    case 'category_einkaufsservice':
-      return l10n.category_einkaufsservice;
-    case 'category_haustierbetreuung':
-      return l10n.category_haustierbetreuung;
-    default:
-      return key;
+    case 'category_babysitter': return l10n.category_babysitter;
+    case 'category_catering': return l10n.category_catering;
+    case 'category_dachdecker': return l10n.category_dachdecker;
+    case 'category_elektriker': return l10n.category_elektriker;
+    case 'category_ernaehrungsberatung': return l10n.category_ernaehrungsberatung;
+    case 'category_eventplanung': return l10n.category_eventplanung;
+    case 'category_fahrdienste': return l10n.category_fahrdienste;
+    case 'category_fahrlehrer': return l10n.category_fahrlehrer;
+    case 'category_fensterputzer': return l10n.category_fensterputzer;
+    case 'category_fliesenleger': return l10n.category_fliesenleger;
+    case 'category_fotografie': return l10n.category_fotografie;
+    case 'category_friseur': return l10n.category_friseur;
+    case 'category_gartenpflege': return l10n.category_gartenpflege;
+    case 'category_grafikdesign': return l10n.category_grafikdesign;
+    case 'category_handy_reparatur': return l10n.category_handy_reparatur;
+    case 'category_haushaltsreinigung': return l10n.category_haushaltsreinigung;
+    case 'category_hausmeisterservice': return l10n.category_hausmeisterservice;
+    case 'category_heizungsbauer': return l10n.category_heizungsbauer;
+    case 'category_hundesitter': return l10n.category_hundesitter;
+    case 'category_it_support': return l10n.category_it_support;
+    case 'category_klempner': return l10n.category_klempner;
+    case 'category_kosmetik': return l10n.category_kosmetik;
+    case 'category_kuenstler': return l10n.category_kuenstler;
+    case 'category_kurierdienst': return l10n.category_kurierdienst;
+    case 'category_maler': return l10n.category_maler;
+    case 'category_massagen': return l10n.category_massagen;
+    case 'category_maurer': return l10n.category_maurer;
+    case 'category_moebelaufbau': return l10n.category_moebelaufbau;
+    case 'category_musikunterricht': return l10n.category_musikunterricht;
+    case 'category_nachhilfe': return l10n.category_nachhilfe;
+    case 'category_nagelstudio': return l10n.category_nagelstudio;
+    case 'category_pc_reparatur': return l10n.category_pc_reparatur;
+    case 'category_partyservice': return l10n.category_partyservice;
+    case 'category_personal_trainer': return l10n.category_personal_trainer;
+    case 'category_rasenmaeher_service': return l10n.category_rasenmaeher_service;
+    case 'category_rechtsberatung': return l10n.category_rechtsberatung;
+    case 'category_reparaturdienste': return l10n.category_reparaturdienste;
+    case 'category_seniorenbetreuung': return l10n.category_seniorenbetreuung;
+    case 'category_social_media': return l10n.category_social_media;
+    case 'category_sonstige': return l10n.category_sonstige;
+    case 'category_sprachunterricht': return l10n.category_sprachunterricht;
+    case 'category_steuerberatung': return l10n.category_steuerberatung;
+    case 'category_tischler': return l10n.category_tischler;
+    case 'category_transport': return l10n.category_transport;
+    case 'category_umzugstransporte': return l10n.category_umzugstransporte;
+    case 'category_umzugshelfer': return l10n.category_umzugshelfer;
+    case 'category_uebersetzungen': return l10n.category_uebersetzungen;
+    case 'category_waescheservice': return l10n.category_waescheservice;
+    case 'category_webdesign': return l10n.category_webdesign;
+    case 'category_einkaufsservice': return l10n.category_einkaufsservice;
+    case 'category_haustierbetreuung': return l10n.category_haustierbetreuung;
+    default: return key;
   }
 }
 // ---- Ende Helper ----
@@ -136,6 +83,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _emailController = TextEditingController();
   String _selectedKategorie = kategorieKeys.first;
   final _adresseController = TextEditingController();
+
+  // NEU: Rechnungsdaten-Controller
+  final _invoiceNameController = TextEditingController();
+  final _invoiceAddressController = TextEditingController();
+  final _invoiceTaxNumberController = TextEditingController();
+  final _invoiceIbanController = TextEditingController();
+  final _invoiceLogoUrlController = TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -190,6 +144,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _lastProfileChange = data['last_profile_change'] != null
             ? DateTime.parse(data['last_profile_change'])
             : null;
+
+        // Rechnungsdaten (NEU)
+        _invoiceNameController.text = data['invoice_name'] as String? ?? '';
+        _invoiceAddressController.text = data['invoice_address'] as String? ?? '';
+        _invoiceTaxNumberController.text = data['invoice_tax_number'] as String? ?? '';
+        _invoiceIbanController.text = data['invoice_iban'] as String? ?? '';
+        _invoiceLogoUrlController.text = data['invoice_logo_url'] as String? ?? '';
       }
 
       final userData = await _supabase
@@ -288,7 +249,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
-        // ---- FIX: Nur den Dateinamen/Key an getPublicUrl() übergeben ----
         final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         final storageResponse = await _supabase.storage
             .from('profile-pics')
@@ -297,12 +257,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
               _neuesProfilbild!,
               fileOptions: const FileOptions(upsert: true),
             );
-        // Der Key ist jetzt einfach fileName, KEIN ganzer Pfad mehr!
         final String publicUrl = _supabase.storage
             .from('profile-pics')
-            .getPublicUrl(fileName); // <<< FIX HIER!
+            .getPublicUrl(fileName);
         profilbildUrl = publicUrl;
       }
+
+      // Rechnungsdaten (NEU)
+      final invoiceName = _invoiceNameController.text.trim();
+      final invoiceAddress = _invoiceAddressController.text.trim();
+      final invoiceTaxNumber = _invoiceTaxNumberController.text.trim();
+      final invoiceIban = _invoiceIbanController.text.trim();
+      final invoiceLogoUrl = _invoiceLogoUrlController.text.trim();
 
       await _supabase
           .from('dienstleister_details')
@@ -319,6 +285,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             'profilbild_url': profilbildUrl,
             'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
             if (isFree) 'last_profile_change': DateTime.now().toUtc().toIso8601String(),
+            // NEU: Rechnungsdaten
+            'invoice_name': invoiceName,
+            'invoice_address': invoiceAddress,
+            'invoice_tax_number': invoiceTaxNumber,
+            'invoice_iban': invoiceIban,
+            'invoice_logo_url': invoiceLogoUrl,
           }, onConflict: 'user_id')
           .select();
 
@@ -362,22 +334,26 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     _adresseController.dispose();
     _telefonController.dispose();
     _emailController.dispose();
+    _invoiceNameController.dispose();
+    _invoiceAddressController.dispose();
+    _invoiceTaxNumberController.dispose();
+    _invoiceIbanController.dispose();
+    _invoiceLogoUrlController.dispose();
     super.dispose();
   }
 
   InputDecoration _inputDecoration(String label) => InputDecoration(
-  labelText: label,
-  filled: true,
-  fillColor: Colors.white,
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(14),
-  ),
-  focusedBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(14),
-    borderSide: const BorderSide(color: primaryColor, width: 2),
-  ),
-);
-
+    labelText: label,
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: const BorderSide(color: primaryColor, width: 2),
+    ),
+  );
 
   Widget _profilbildWidget() {
     final double avatarSize = 96;
@@ -443,6 +419,58 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       ),
     );
   }
+
+  // ---------- NEU: Rechnungsdaten-Widget ----------
+  Widget _rechnungsdatenWidget(BuildContext context) {
+    if ((_aboTyp ?? 'free') != 'gold') return const SizedBox.shrink(); // Nur Gold-User
+
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+        Text(
+          l10n.invoiceSectionTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            color: primaryColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: _invoiceNameController,
+          decoration: _inputDecoration(l10n.invoiceNameLabel),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _invoiceAddressController,
+          decoration: _inputDecoration(l10n.invoiceAddressLabel),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _invoiceTaxNumberController,
+          decoration: _inputDecoration(l10n.invoiceTaxNumberLabel),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _invoiceIbanController,
+          decoration: _inputDecoration(l10n.invoiceIbanLabel),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _invoiceLogoUrlController,
+          decoration: _inputDecoration(l10n.invoiceLogoUrlLabel),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          l10n.invoiceGoldInfo,
+          style: const TextStyle(fontSize: 13, color: Colors.grey),
+        ),
+      ],
+    );
+  }
+  // -----------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -605,6 +633,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   return null;
                                 },
                               ),
+                              // -------- NEU: Rechnungsdaten für Gold --------
+                              _rechnungsdatenWidget(context),
+                              // ----------------------------------------------
                               const SizedBox(height: 24),
                               if (_errorMessage != null)
                                 Padding(

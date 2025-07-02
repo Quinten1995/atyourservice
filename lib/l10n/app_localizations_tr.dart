@@ -133,7 +133,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get nameValidator => 'Lütfen isim girin';
 
   @override
-  String get descriptionLabel => 'Açıklama';
+  String get descriptionLabel => 'Hizmet açıklaması:';
 
   @override
   String get addressLabel => 'Adres (örn. sokak, posta kodu, şehir)';
@@ -792,4 +792,73 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get beschreibungHint => 'Ne yapılması gerektiğini açıklayın – ör. 3 oda, mutfak ve banyo temizliği ...';
+
+  @override
+  String get invoiceSectionTitle => 'Fatura bilgileri (sadece Gold için)';
+
+  @override
+  String get invoiceNameLabel => 'Fatura adı (ör. şirket adı)';
+
+  @override
+  String get invoiceAddressLabel => 'Fatura adresi:';
+
+  @override
+  String get invoiceTaxNumberLabel => 'Vergi numarası (isteğe bağlı)';
+
+  @override
+  String get invoiceIbanLabel => 'IBAN (isteğe bağlı)';
+
+  @override
+  String get invoiceLogoUrlLabel => 'Logo URL\'si (isteğe bağlı)';
+
+  @override
+  String get invoiceGoldInfo => 'Bu bilgiler PDF faturanızda görünecektir (Gold özelliği).';
+
+  @override
+  String get rechnungGenerierenButtonLabel => 'Fatura oluştur';
+
+  @override
+  String get meineAbgeschlossenenAuftraege => 'Tamamlanan siparişlerim';
+
+  @override
+  String get verbergenButtonLabel => 'Gizle';
+
+  @override
+  String get rechnungGenerierenAppBar => 'Fatura oluştur';
+
+  @override
+  String get rechnungAlsPdfAnzeigenLabel => 'PDF olarak faturayı göster';
+
+  @override
+  String get invoiceLabel => 'Fatura';
+
+  @override
+  String get fromLabel => 'Kimden:';
+
+  @override
+  String get taxNumberLabel => 'Vergi numarası:';
+
+  @override
+  String get ibanLabel => 'IBAN:';
+
+  @override
+  String get toLabel => 'Kime:';
+
+  @override
+  String get amountLabel => 'Tutar:';
+
+  @override
+  String get dateLabel => 'Tarih:';
+
+  @override
+  String get generatedByText => 'Bu fatura AtYourService tarafından otomatik olarak oluşturulmuştur.';
+
+  @override
+  String get currencyLabel => 'Para birimi';
+
+  @override
+  String get amountRequired => 'Lütfen geçerli bir tutar girin.';
+
+  @override
+  String get premiumGoldInvoiceFeature => 'PDF olarak fatura oluşturma';
 }

@@ -133,7 +133,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nameValidator => 'Veuillez saisir le nom';
 
   @override
-  String get descriptionLabel => 'Description';
+  String get descriptionLabel => 'Description du service :';
 
   @override
   String get addressLabel => 'Adresse (ex : rue, code postal, ville)';
@@ -792,4 +792,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get beschreibungHint => 'Décrivez ce qui doit être fait – par ex. nettoyer 3 pièces, cuisine, salle de bain ...';
+
+  @override
+  String get invoiceSectionTitle => 'Données de facturation (réservé aux membres Gold)';
+
+  @override
+  String get invoiceNameLabel => 'Nom de la facture (ex : nom de l\'entreprise)';
+
+  @override
+  String get invoiceAddressLabel => 'Adresse de facturation :';
+
+  @override
+  String get invoiceTaxNumberLabel => 'Numéro fiscal (optionnel)';
+
+  @override
+  String get invoiceIbanLabel => 'IBAN (optionnel)';
+
+  @override
+  String get invoiceLogoUrlLabel => 'URL du logo (optionnel)';
+
+  @override
+  String get invoiceGoldInfo => 'Ces informations apparaîtront sur votre facture PDF (fonctionnalité Gold).';
+
+  @override
+  String get rechnungGenerierenButtonLabel => 'Générer la facture';
+
+  @override
+  String get meineAbgeschlossenenAuftraege => 'Mes commandes terminées';
+
+  @override
+  String get verbergenButtonLabel => 'Masquer';
+
+  @override
+  String get rechnungGenerierenAppBar => 'Générer la facture';
+
+  @override
+  String get rechnungAlsPdfAnzeigenLabel => 'Afficher la facture au format PDF';
+
+  @override
+  String get invoiceLabel => 'Facture';
+
+  @override
+  String get fromLabel => 'De :';
+
+  @override
+  String get taxNumberLabel => 'Numéro fiscal :';
+
+  @override
+  String get ibanLabel => 'IBAN :';
+
+  @override
+  String get toLabel => 'À :';
+
+  @override
+  String get amountLabel => 'Montant :';
+
+  @override
+  String get dateLabel => 'Date :';
+
+  @override
+  String get generatedByText => 'Cette facture a été générée automatiquement via AtYourService.';
+
+  @override
+  String get currencyLabel => 'Devise';
+
+  @override
+  String get amountRequired => 'Veuillez saisir un montant valide.';
+
+  @override
+  String get premiumGoldInvoiceFeature => 'Invoice generation as PDF';
 }

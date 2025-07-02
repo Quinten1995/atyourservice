@@ -332,7 +332,7 @@ abstract class AppLocalizations {
   /// No description provided for @descriptionLabel.
   ///
   /// In en, this message translates to:
-  /// **'Description'**
+  /// **'Service description:'**
   String get descriptionLabel;
 
   /// No description provided for @addressLabel.
@@ -1582,6 +1582,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Describe what needs to be done – e.g. clean 3 rooms, kitchen, and bathroom ...'**
   String get beschreibungHint;
+
+  /// No description provided for @invoiceSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice data (Gold only)'**
+  String get invoiceSectionTitle;
+
+  /// No description provided for @invoiceNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice name (e.g. company name)'**
+  String get invoiceNameLabel;
+
+  /// No description provided for @invoiceAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice address:'**
+  String get invoiceAddressLabel;
+
+  /// No description provided for @invoiceTaxNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax number (optional)'**
+  String get invoiceTaxNumberLabel;
+
+  /// No description provided for @invoiceIbanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'IBAN (optional)'**
+  String get invoiceIbanLabel;
+
+  /// No description provided for @invoiceLogoUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Logo URL (optional)'**
+  String get invoiceLogoUrlLabel;
+
+  /// No description provided for @invoiceGoldInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'These details will appear on your PDF invoice (Gold feature).'**
+  String get invoiceGoldInfo;
+
+  /// No description provided for @rechnungGenerierenButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Invoice'**
+  String get rechnungGenerierenButtonLabel;
+
+  /// No description provided for @meineAbgeschlossenenAuftraege.
+  ///
+  /// In en, this message translates to:
+  /// **'My Completed Orders'**
+  String get meineAbgeschlossenenAuftraege;
+
+  /// No description provided for @verbergenButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get verbergenButtonLabel;
+
+  /// No description provided for @rechnungGenerierenAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Invoice'**
+  String get rechnungGenerierenAppBar;
+
+  /// No description provided for @rechnungAlsPdfAnzeigenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show invoice as PDF'**
+  String get rechnungAlsPdfAnzeigenLabel;
+
+  /// No description provided for @invoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get invoiceLabel;
+
+  /// No description provided for @fromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From:'**
+  String get fromLabel;
+
+  /// No description provided for @taxNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax number:'**
+  String get taxNumberLabel;
+
+  /// No description provided for @ibanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'IBAN:'**
+  String get ibanLabel;
+
+  /// No description provided for @toLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To:'**
+  String get toLabel;
+
+  /// No description provided for @amountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount:'**
+  String get amountLabel;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date:'**
+  String get dateLabel;
+
+  /// No description provided for @generatedByText.
+  ///
+  /// In en, this message translates to:
+  /// **'This invoice was automatically generated via AtYourService.'**
+  String get generatedByText;
+
+  /// No description provided for @currencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currencyLabel;
+
+  /// No description provided for @amountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid amount.'**
+  String get amountRequired;
+
+  /// No description provided for @premiumGoldInvoiceFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice generation as PDF'**
+  String get premiumGoldInvoiceFeature;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

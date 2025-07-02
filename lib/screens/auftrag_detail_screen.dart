@@ -5,6 +5,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'bewertung_dialog.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/pdf_invoice_service.dart'; // Pfad ggf. anpassen!
+import 'pdf_rechnung_screen.dart';
+
+
 
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
