@@ -9,6 +9,7 @@ import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
 import 'app_localizations_tr.dart';
 
 // ignore_for_file: type=lint
@@ -98,6 +99,7 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('es'),
     Locale('fr'),
+    Locale('it'),
     Locale('tr')
   ];
 
@@ -452,7 +454,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumSilverFeature1.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited job acceptance'**
+  /// **'Accept 3 jobs per week'**
   String get premiumSilverFeature1;
 
   /// No description provided for @premiumSilverFeature2.
@@ -1755,7 +1757,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['de', 'en', 'es', 'fr', 'tr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['de', 'en', 'es', 'fr', 'it', 'tr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1770,6 +1772,7 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     case 'en': return AppLocalizationsEn();
     case 'es': return AppLocalizationsEs();
     case 'fr': return AppLocalizationsFr();
+    case 'it': return AppLocalizationsIt();
     case 'tr': return AppLocalizationsTr();
   }
 

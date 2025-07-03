@@ -245,7 +245,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
     try {
       int wochenLimit = 1; // Default: free
-      if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 5;
+      if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 3;
       if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999; // "unbegrenzt"
 
       if ((_aboTyp ?? 'free') != 'gold') {

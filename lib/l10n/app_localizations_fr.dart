@@ -199,7 +199,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get premiumFreeFeature4 => 'Changement de catégorie seulement tous les 20 jours';
 
   @override
-  String get premiumSilverFeature1 => 'Missions illimitées';
+  String get premiumSilverFeature1 => 'Accepter 3 missions par semaine';
 
   @override
   String get premiumSilverFeature2 => 'Missions dans un rayon de 15 km';

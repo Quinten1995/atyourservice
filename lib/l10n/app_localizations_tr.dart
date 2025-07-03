@@ -199,7 +199,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumFreeFeature4 => 'Kategori değişimi sadece 20 günde bir';
 
   @override
-  String get premiumSilverFeature1 => 'Sınırsız iş kabul et';
+  String get premiumSilverFeature1 => 'Haftada 3 iş kabul et';
 
   @override
   String get premiumSilverFeature2 => '15 km çapında işler';

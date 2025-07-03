@@ -199,7 +199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumFreeFeature4 => 'Category change only every 20 days';
 
   @override
-  String get premiumSilverFeature1 => 'Unlimited job acceptance';
+  String get premiumSilverFeature1 => 'Accept 3 jobs per week';
 
   @override
   String get premiumSilverFeature2 => 'Jobs within a 15 km radius';

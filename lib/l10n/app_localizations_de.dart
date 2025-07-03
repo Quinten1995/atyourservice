@@ -199,7 +199,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get premiumFreeFeature4 => 'Kategorie-Wechsel nur alle 20 Tage';
 
   @override
-  String get premiumSilverFeature1 => 'Unbegrenzte Aufträge annehmen';
+  String get premiumSilverFeature1 => '3 Aufträge pro Woche annehmen';
 
   @override
   String get premiumSilverFeature2 => 'Aufträge im Umkreis von 15 km';
