@@ -78,6 +78,7 @@ class MyApp extends StatelessWidget {
         Locale('es'), // Spanisch
         Locale('tr'), // Türkisch
         Locale('it'),
+        Locale('nl'),
       ],
 
       home: const StartScreen(),
