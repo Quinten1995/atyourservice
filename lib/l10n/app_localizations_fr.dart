@@ -873,4 +873,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Veuillez saisir vos coordonnées de facturation dans votre profil. Elles seront automatiquement reprises sur la facture PDF.';
+
+  @override
+  String get auftragErneutPosten => 'Republier la mission';
+
+  @override
+  String get auftragErneutPostenTitle => 'Republier cette mission ?';
+
+  @override
+  String get auftragErneutPostenText => 'Le prestataire actuel sera retiré. La mission sera à nouveau visible pour d’autres. Voulez-vous continuer ?';
+
+  @override
+  String get auftragErneutGepostet => 'La mission a été republiée.';
 }

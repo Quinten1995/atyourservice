@@ -873,4 +873,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Please enter your invoice details in your profile. These will automatically be included in the PDF invoice.';
+
+  @override
+  String get auftragErneutPosten => 'Repost job';
+
+  @override
+  String get auftragErneutPostenTitle => 'Repost this job?';
+
+  @override
+  String get auftragErneutPostenText => 'The current provider will be removed. The job will become visible to others again. Do you want to continue?';
+
+  @override
+  String get auftragErneutGepostet => 'The job has been reposted.';
 }

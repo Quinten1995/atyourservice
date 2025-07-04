@@ -1748,6 +1748,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter your invoice details in your profile. These will automatically be included in the PDF invoice.'**
   String get invoiceProfileHint;
+
+  /// No description provided for @auftragErneutPosten.
+  ///
+  /// In en, this message translates to:
+  /// **'Repost job'**
+  String get auftragErneutPosten;
+
+  /// No description provided for @auftragErneutPostenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repost this job?'**
+  String get auftragErneutPostenTitle;
+
+  /// No description provided for @auftragErneutPostenText.
+  ///
+  /// In en, this message translates to:
+  /// **'The current provider will be removed. The job will become visible to others again. Do you want to continue?'**
+  String get auftragErneutPostenText;
+
+  /// No description provided for @auftragErneutGepostet.
+  ///
+  /// In en, this message translates to:
+  /// **'The job has been reposted.'**
+  String get auftragErneutGepostet;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

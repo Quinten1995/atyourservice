@@ -873,4 +873,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Vul je factuurgegevens in bij je profiel. Deze worden automatisch overgenomen in de PDF-factuur.';
+
+  @override
+  String get auftragErneutPosten => 'Opdracht opnieuw plaatsen';
+
+  @override
+  String get auftragErneutPostenTitle => 'Opdracht opnieuw plaatsen?';
+
+  @override
+  String get auftragErneutPostenText => 'De huidige dienstverlener wordt verwijderd. De opdracht wordt weer zichtbaar voor anderen. Wil je doorgaan?';
+
+  @override
+  String get auftragErneutGepostet => 'De opdracht is opnieuw geplaatst.';
 }

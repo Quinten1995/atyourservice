@@ -281,7 +281,13 @@
   "onlyForGoldTooltip": "Bu özellik yalnızca Gold aboneleri için geçerlidir.",
   "deleteJobTooltip": "Görevi listeden kaldır",
   "invoiceNumberLabel": "Fatura Numarası",
-  "invoiceProfileHint": "Lütfen fatura bilgilerinizi profilinizde doldurun. Bu bilgiler PDF faturasında otomatik olarak yer alacaktır."
+  "invoiceProfileHint": "Lütfen fatura bilgilerinizi profilinizde doldurun. Bu bilgiler PDF faturasında otomatik olarak yer alacaktır.",
+  "auftragErneutPosten": "İşi tekrar yayımla",
+  "auftragErneutPostenTitle": "Bu işi tekrar yayımlamak istiyor musun?",
+  "auftragErneutPostenText": "Mevcut hizmet sağlayıcı kaldırılacak. İş tekrar diğerlerine görünür olacak. Devam etmek istiyor musun?",
+  "auftragErneutGepostet": "İş yeniden yayımlandı."
+  
+
 
 
 

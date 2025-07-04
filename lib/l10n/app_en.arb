@@ -281,7 +281,12 @@
   "onlyForGoldTooltip": "This feature is available only for Gold subscribers.",
   "deleteJobTooltip": "Remove job from the list",
   "invoiceNumberLabel": "Invoice Number",
-  "invoiceProfileHint": "Please enter your invoice details in your profile. These will automatically be included in the PDF invoice."
+  "invoiceProfileHint": "Please enter your invoice details in your profile. These will automatically be included in the PDF invoice.",
+  "auftragErneutPosten": "Repost job",
+  "auftragErneutPostenTitle": "Repost this job?",
+  "auftragErneutPostenText": "The current provider will be removed. The job will become visible to others again. Do you want to continue?",
+  "auftragErneutGepostet": "The job has been reposted."
+
 
 
 

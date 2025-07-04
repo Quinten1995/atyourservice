@@ -281,7 +281,12 @@
   "onlyForGoldTooltip": "Esta función está disponible solo para suscriptores Gold.",
   "deleteJobTooltip": "Eliminar trabajo de la lista",
   "invoiceNumberLabel": "Número de factura",
-  "invoiceProfileHint": "Por favor, introduce tus datos de facturación en tu perfil. Estos se incluirán automáticamente en la factura PDF."
+  "invoiceProfileHint": "Por favor, introduce tus datos de facturación en tu perfil. Estos se incluirán automáticamente en la factura PDF.",
+  "auftragErneutPosten": "Volver a publicar el encargo",
+  "auftragErneutPostenTitle": "¿Volver a publicar este encargo?",
+  "auftragErneutPostenText": "El proveedor actual será eliminado. El encargo volverá a estar visible para otros. ¿Deseas continuar?",
+  "auftragErneutGepostet": "El encargo se ha vuelto a publicar."
+
 
 
 

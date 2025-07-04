@@ -873,4 +873,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Lütfen fatura bilgilerinizi profilinizde doldurun. Bu bilgiler PDF faturasında otomatik olarak yer alacaktır.';
+
+  @override
+  String get auftragErneutPosten => 'İşi tekrar yayımla';
+
+  @override
+  String get auftragErneutPostenTitle => 'Bu işi tekrar yayımlamak istiyor musun?';
+
+  @override
+  String get auftragErneutPostenText => 'Mevcut hizmet sağlayıcı kaldırılacak. İş tekrar diğerlerine görünür olacak. Devam etmek istiyor musun?';
+
+  @override
+  String get auftragErneutGepostet => 'İş yeniden yayımlandı.';
 }

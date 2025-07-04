@@ -308,7 +308,12 @@
   "onlyForGoldTooltip": "Cette fonctionnalité est disponible uniquement pour les abonnés Gold.",
   "deleteJobTooltip": "Supprimer la mission de la liste",
   "invoiceNumberLabel": "Numéro de facture",
-  "invoiceProfileHint": "Veuillez saisir vos coordonnées de facturation dans votre profil. Elles seront automatiquement reprises sur la facture PDF."
+  "invoiceProfileHint": "Veuillez saisir vos coordonnées de facturation dans votre profil. Elles seront automatiquement reprises sur la facture PDF.",
+  "auftragErneutPosten": "Republier la mission",
+  "auftragErneutPostenTitle": "Republier cette mission ?",
+  "auftragErneutPostenText": "Le prestataire actuel sera retiré. La mission sera à nouveau visible pour d’autres. Voulez-vous continuer ?",
+  "auftragErneutGepostet": "La mission a été republiée."
+
 
 
 

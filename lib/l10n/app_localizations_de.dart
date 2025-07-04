@@ -873,4 +873,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Bitte trage deine Rechnungsdaten im Profil ein. Diese werden automatisch in die PDF-Rechnung übernommen.';
+
+  @override
+  String get auftragErneutPosten => 'Auftrag erneut posten';
+
+  @override
+  String get auftragErneutPostenTitle => 'Auftrag erneut veröffentlichen?';
+
+  @override
+  String get auftragErneutPostenText => 'Der aktuelle Dienstleister wird entfernt. Der Auftrag ist wieder für andere sichtbar. Möchtest du fortfahren?';
+
+  @override
+  String get auftragErneutGepostet => 'Der Auftrag wurde erneut veröffentlicht.';
 }

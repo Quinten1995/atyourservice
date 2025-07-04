@@ -873,4 +873,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get invoiceProfileHint => 'Por favor, introduce tus datos de facturación en tu perfil. Estos se incluirán automáticamente en la factura PDF.';
+
+  @override
+  String get auftragErneutPosten => 'Volver a publicar el encargo';
+
+  @override
+  String get auftragErneutPostenTitle => '¿Volver a publicar este encargo?';
+
+  @override
+  String get auftragErneutPostenText => 'El proveedor actual será eliminado. El encargo volverá a estar visible para otros. ¿Deseas continuar?';
+
+  @override
+  String get auftragErneutGepostet => 'El encargo se ha vuelto a publicar.';
 }

@@ -279,5 +279,10 @@
   "onlyForGoldTooltip": "Questa funzione è disponibile solo per abbonati Gold.",
   "deleteJobTooltip": "Rimuovi incarico dall'elenco",
   "invoiceNumberLabel": "Numero fattura",
-  "invoiceProfileHint": "Inserisci i tuoi dati per la fatturazione nel profilo. Verranno riportati automaticamente nella fattura PDF."
+  "invoiceProfileHint": "Inserisci i tuoi dati per la fatturazione nel profilo. Verranno riportati automaticamente nella fattura PDF.",
+  "auftragErneutPosten": "Ripubblica l’incarico",
+  "auftragErneutPostenTitle": "Ripubblicare questo incarico?",
+  "auftragErneutPostenText": "L’attuale fornitore verrà rimosso. L’incarico sarà di nuovo visibile agli altri. Vuoi continuare?",
+  "auftragErneutGepostet": "L’incarico è stato ripubblicato."
+
 }

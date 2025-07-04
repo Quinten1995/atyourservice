@@ -271,5 +271,10 @@
   "onlyForGoldTooltip": "Deze functie is alleen beschikbaar voor Gold-abonnees.",
   "deleteJobTooltip": "Opdracht uit de lijst verwijderen",
   "invoiceNumberLabel": "Factuurnummer",
-  "invoiceProfileHint": "Vul je factuurgegevens in bij je profiel. Deze worden automatisch overgenomen in de PDF-factuur."
+  "invoiceProfileHint": "Vul je factuurgegevens in bij je profiel. Deze worden automatisch overgenomen in de PDF-factuur.",
+  "auftragErneutPosten": "Opdracht opnieuw plaatsen",
+  "auftragErneutPostenTitle": "Opdracht opnieuw plaatsen?",
+  "auftragErneutPostenText": "De huidige dienstverlener wordt verwijderd. De opdracht wordt weer zichtbaar voor anderen. Wil je doorgaan?",
+  "auftragErneutGepostet": "De opdracht is opnieuw geplaatst."
+
 }

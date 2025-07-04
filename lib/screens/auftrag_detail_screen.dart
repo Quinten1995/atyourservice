@@ -8,8 +8,6 @@ import '../l10n/app_localizations.dart';
 import '../utils/pdf_invoice_service.dart'; // Pfad ggf. anpassen!
 import 'pdf_rechnung_screen.dart';
 
-
-
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
   const AuftragDetailScreen({Key? key, required this.initialAuftrag}) : super(key: key);
@@ -371,6 +369,53 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _errorMessage = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  // NEU: Auftrag erneut posten
+  Future<void> _auftragErneutPosten() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.auftragErneutPostenTitle),
+        content: Text(l10n.auftragErneutPostenText),
+        actions: [
+          TextButton(
+            child: Text(l10n.abbrechen),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          TextButton(
+            child: Text(l10n.ok),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _supabase.from('auftraege').update({
+        'status': 'offen',
+        'dienstleister_id': null,
+        'angenommen_am': null,
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', _auftragDetails!.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.auftragErneutGepostet)),
+      );
+
+      // Optional: Auftrag neu laden
+      await _ladeRolleUndAktuellenAuftrag();
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -770,6 +815,27 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               label: Text(l10n.auftragEntfernen),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[600],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 2,
+              ),
+            ),
+          ),
+        // NEU: Abstand einfügen
+        if (!_isDienstleister && ad.status == 'in bearbeitung')
+          const SizedBox(height: 18),
+        // NEU: Auftrag erneut posten (nur für Kunden und wenn in Bearbeitung)
+        if (!_isDienstleister && ad.status == 'in bearbeitung')
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _auftragErneutPosten,
+              icon: const Icon(Icons.replay),
+              label: Text(l10n.auftragErneutPosten),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
