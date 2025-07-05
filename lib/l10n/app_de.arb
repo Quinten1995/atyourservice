@@ -283,7 +283,14 @@
   "auftragErneutPosten": "Auftrag erneut posten",
   "auftragErneutPostenTitle": "Auftrag erneut veröffentlichen?",
   "auftragErneutPostenText": "Der aktuelle Dienstleister wird entfernt. Der Auftrag ist wieder für andere sichtbar. Möchtest du fortfahren?",
-  "auftragErneutGepostet": "Der Auftrag wurde erneut veröffentlicht."
+  "auftragErneutGepostet": "Der Auftrag wurde erneut veröffentlicht.",
+  "premiumActivated": "Abo erfolgreich aktiviert!",
+  "premiumPurchaseFailed": "Fehler beim Kauf: {error}",
+  "premiumProductNotFound": "Produkt nicht gefunden!",
+  "premiumStoreNotLoaded": "Store-Produkte konnten nicht geladen werden.",
+  "premiumYearlySuffix": "Jährlich: {price}",
+  "premiumYearlyButton": "{plan} (Jährlich)"
+
 
 
 

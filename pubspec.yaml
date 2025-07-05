@@ -2,7 +2,7 @@ name: atyourservice
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0+6
+version: 1.0.0+8
 
 environment:
   sdk: ^3.8.0
@@ -36,6 +36,9 @@ dependencies:
   # === PDF-Generierung & Drucken ===
   pdf: ^3.10.8
   printing: ^5.12.0
+
+  # === In-App-Purchase ===
+  in_app_purchase: ^3.2.3
 
 dev_dependencies:
   flutter_test:

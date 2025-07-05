@@ -885,4 +885,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get auftragErneutGepostet => 'Der Auftrag wurde erneut veröffentlicht.';
+
+  @override
+  String get premiumActivated => 'Abo erfolgreich aktiviert!';
+
+  @override
+  String premiumPurchaseFailed(Object error) {
+    return 'Fehler beim Kauf: $error';
+  }
+
+  @override
+  String get premiumProductNotFound => 'Produkt nicht gefunden!';
+
+  @override
+  String get premiumStoreNotLoaded => 'Store-Produkte konnten nicht geladen werden.';
+
+  @override
+  String premiumYearlySuffix(Object price) {
+    return 'Jährlich: $price';
+  }
+
+  @override
+  String premiumYearlyButton(Object plan) {
+    return '$plan (Jährlich)';
+  }
 }

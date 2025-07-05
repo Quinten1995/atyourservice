@@ -283,6 +283,13 @@
   "auftragErneutPosten": "Ripubblica l’incarico",
   "auftragErneutPostenTitle": "Ripubblicare questo incarico?",
   "auftragErneutPostenText": "L’attuale fornitore verrà rimosso. L’incarico sarà di nuovo visibile agli altri. Vuoi continuare?",
-  "auftragErneutGepostet": "L’incarico è stato ripubblicato."
+  "auftragErneutGepostet": "L’incarico è stato ripubblicato.",
+  "premiumActivated": "Abbonamento attivato con successo!",
+  "premiumPurchaseFailed": "Acquisto non riuscito: {error}",
+  "premiumProductNotFound": "Prodotto non trovato!",
+  "premiumStoreNotLoaded": "Impossibile caricare i prodotti del negozio.",
+  "premiumYearlySuffix": "Annuale: {price}",
+  "premiumYearlyButton": "{plan} (Annuale)"
+
 
 }

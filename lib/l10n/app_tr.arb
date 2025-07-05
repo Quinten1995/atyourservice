@@ -285,7 +285,14 @@
   "auftragErneutPosten": "İşi tekrar yayımla",
   "auftragErneutPostenTitle": "Bu işi tekrar yayımlamak istiyor musun?",
   "auftragErneutPostenText": "Mevcut hizmet sağlayıcı kaldırılacak. İş tekrar diğerlerine görünür olacak. Devam etmek istiyor musun?",
-  "auftragErneutGepostet": "İş yeniden yayımlandı."
+  "auftragErneutGepostet": "İş yeniden yayımlandı.",
+  "premiumActivated": "Abonelik başarıyla etkinleştirildi!",
+  "premiumPurchaseFailed": "Satın alma başarısız: {error}",
+  "premiumProductNotFound": "Ürün bulunamadı!",
+  "premiumStoreNotLoaded": "Mağaza ürünleri yüklenemedi.",
+  "premiumYearlySuffix": "Yıllık: {price}",
+  "premiumYearlyButton": "{plan} (Yıllık)"
+
   
 
 

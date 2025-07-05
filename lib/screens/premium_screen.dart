@@ -1,6 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/in_app_purchase_service.dart';
+
+// IDs wie im Play Store/App Store angelegt!
+const Set<String> _kProductIds = {
+  'atyourservice_silver_monthly',
+  'atyourservice_silver_yearly',
+  'atyourservice_gold_monthly',
+  'atyourservice_gold_yearly',
+};
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -12,13 +23,27 @@ class PremiumScreen extends StatefulWidget {
 class _PremiumScreenState extends State<PremiumScreen> {
   String? _aboTyp;
   bool _isLoading = true;
+  bool _storeAvailable = false;
+  List<ProductDetails> _products = [];
+  StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
   @override
   void initState() {
     super.initState();
     _ladeAboTyp();
+    _ladeStoreProdukte();
+    _purchaseSubscription = InAppPurchaseService()
+        .listenToPurchases()
+        .listen(_handlePurchases);
   }
 
+  @override
+  void dispose() {
+    _purchaseSubscription?.cancel();
+    super.dispose();
+  }
+
+  // Holt aktuellen Abo-Typ aus Supabase
   Future<void> _ladeAboTyp() async {
     setState(() => _isLoading = true);
     try {
@@ -33,11 +58,75 @@ class _PremiumScreenState extends State<PremiumScreen> {
           _aboTyp = res?['abo_typ'] ?? 'free';
         });
       }
-    } catch (e) {
-      // Ignore
+    } catch (_) {
+      // Fehler ignorieren
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  // Lädt Store-Produkte (Abos)
+  Future<void> _ladeStoreProdukte() async {
+    final available = await InAppPurchaseService().isAvailable();
+    if (!available) {
+      setState(() {
+        _storeAvailable = false;
+      });
+      return;
+    }
+    final resp = await InAppPurchaseService().getProducts();
+    setState(() {
+      _storeAvailable = true;
+      _products = resp.productDetails.toList();
+    });
+  }
+
+  // Helper, um Produkt anhand der ID zu finden
+  ProductDetails? _getProduct(String id) {
+    try {
+      return _products.firstWhere((p) => p.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Stream-Callback für Käufe
+  void _handlePurchases(List<PurchaseDetails> purchases) async {
+    final l10n = AppLocalizations.of(context)!;
+    for (final purchase in purchases) {
+      if (purchase.status == PurchaseStatus.purchased ||
+          purchase.status == PurchaseStatus.restored) {
+        // Abo-Typ anhand der Produkt-ID bestimmen
+        final typ = _aboTypFromProductId(purchase.productID);
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null && typ != null) {
+          // In Supabase Abo-Typ speichern
+          await Supabase.instance.client
+              .from('users')
+              .update({'abo_typ': typ})
+              .eq('id', user.id);
+
+          setState(() {
+            _aboTyp = typ;
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.premiumActivated)),
+          );
+        }
+      } else if (purchase.status == PurchaseStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.premiumPurchaseFailed(purchase.error?.message ?? ''))),
+        );
+      }
+    }
+  }
+
+  // Produkt-ID → Abo-Typ
+  String? _aboTypFromProductId(String productId) {
+    if (productId.contains('gold')) return 'gold';
+    if (productId.contains('silver')) return 'silver';
+    return null;
   }
 
   @override
@@ -91,6 +180,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         ],
                       ),
                     ),
+                  // === FREE PLAN CARD ===
                   _planCard(
                     context,
                     title: 'FREE',
@@ -108,12 +198,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     onTap: () {},
                   ),
                   const SizedBox(height: 14),
+                  // === SILVER PLAN CARD ===
                   _planCard(
                     context,
                     title: 'SILVER',
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
-                    priceText: l10n.premiumSilverPrice,
+                    priceText: _storeAvailable
+                        ? (_getProduct('atyourservice_silver_monthly')?.price ?? '...')
+                        : '...',
+                    priceTextYearly: _storeAvailable
+                        ? (_getProduct('atyourservice_silver_yearly')?.price ?? '')
+                        : '',
                     features: [
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
@@ -121,32 +217,70 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     ],
                     highlighted: _aboTyp == 'silver',
                     showButton: true,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.premiumSilverComingSoon)),
-                      );
+                    onTap: () async {
+                      final product = _getProduct('atyourservice_silver_monthly');
+                      if (product != null) {
+                        await InAppPurchaseService().buyProduct(product);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.premiumProductNotFound)),
+                        );
+                      }
+                    },
+                    yearly: true,
+                    onTapYearly: () async {
+                      final product = _getProduct('atyourservice_silver_yearly');
+                      if (product != null) {
+                        await InAppPurchaseService().buyProduct(product);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.premiumProductNotFound)),
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 14),
+                  // === GOLD PLAN CARD ===
                   _planCard(
                     context,
                     title: 'GOLD',
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
-                    priceText: l10n.premiumGoldPrice,
+                    priceText: _storeAvailable
+                        ? (_getProduct('atyourservice_gold_monthly')?.price ?? '...')
+                        : '...',
+                    priceTextYearly: _storeAvailable
+                        ? (_getProduct('atyourservice_gold_yearly')?.price ?? '')
+                        : '',
                     features: [
                       l10n.premiumGoldFeature1,
                       l10n.premiumGoldFeature2,
                       l10n.premiumGoldFeature3,
                       l10n.premiumGoldFeature4,
-                      l10n.premiumGoldInvoiceFeature, // <--- Hier die Rechnungsfunktion als Feature!
+                      l10n.premiumGoldInvoiceFeature,
                     ],
                     highlighted: _aboTyp == 'gold',
                     showButton: true,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.premiumGoldComingSoon)),
-                      );
+                    onTap: () async {
+                      final product = _getProduct('atyourservice_gold_monthly');
+                      if (product != null) {
+                        await InAppPurchaseService().buyProduct(product);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.premiumProductNotFound)),
+                        );
+                      }
+                    },
+                    yearly: true,
+                    onTapYearly: () async {
+                      final product = _getProduct('atyourservice_gold_yearly');
+                      if (product != null) {
+                        await InAppPurchaseService().buyProduct(product);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.premiumProductNotFound)),
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: 34),
@@ -154,22 +288,34 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     l10n.premiumPaymentNote,
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
+                  if (!_storeAvailable)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(
+                        l10n.premiumStoreNotLoaded,
+                        style: TextStyle(color: Colors.red[700], fontSize: 13),
+                      ),
+                    ),
                 ],
               ),
             ),
     );
   }
 
+  // Erweiterte PlanCard mit Unterstützung für jährliche Buttons
   Widget _planCard(
     BuildContext context, {
     required String title,
     required Color color,
     required IconData badge,
     required String priceText,
+    String priceTextYearly = '',
     required List<String> features,
     required VoidCallback onTap,
+    VoidCallback? onTapYearly,
     bool highlighted = false,
     bool showButton = true,
+    bool yearly = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -211,13 +357,30 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  priceText,
-                  style: TextStyle(
-                    color: Colors.blueGrey[900],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      priceText,
+                      style: TextStyle(
+                        color: Colors.blueGrey[900],
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (yearly && priceTextYearly.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          l10n.premiumYearlySuffix(priceTextYearly),
+                          style: TextStyle(
+                            color: Colors.blueGrey[700],
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -236,15 +399,35 @@ class _PremiumScreenState extends State<PremiumScreen> {
               const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onTap,
-                  child: Text(l10n.premiumChooseButton(title)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                  ),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: onTap,
+                      child: Text(l10n.premiumChooseButton(title)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                      ),
+                    ),
+                    if (yearly && onTapYearly != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: ElevatedButton(
+                          onPressed: onTapYearly,
+                          child: Text(
+                            l10n.premiumYearlyButton(l10n.premiumChooseButton(title)),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent.withOpacity(0.8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                            padding: const EdgeInsets.symmetric(vertical: 11),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],

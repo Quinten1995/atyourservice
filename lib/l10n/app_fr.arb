@@ -312,7 +312,14 @@
   "auftragErneutPosten": "Republier la mission",
   "auftragErneutPostenTitle": "Republier cette mission ?",
   "auftragErneutPostenText": "Le prestataire actuel sera retiré. La mission sera à nouveau visible pour d’autres. Voulez-vous continuer ?",
-  "auftragErneutGepostet": "La mission a été republiée."
+  "auftragErneutGepostet": "La mission a été republiée.",
+  "premiumActivated": "Abonnement activé avec succès !",
+  "premiumPurchaseFailed": "Échec de l'achat : {error}",
+  "premiumProductNotFound": "Produit introuvable !",
+  "premiumStoreNotLoaded": "Les produits du store n'ont pas pu être chargés.",
+  "premiumYearlySuffix": "Annuel : {price}",
+  "premiumYearlyButton": "{plan} (Annuel)"
+
 
 
 

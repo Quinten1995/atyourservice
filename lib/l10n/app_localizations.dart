@@ -1772,6 +1772,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The job has been reposted.'**
   String get auftragErneutGepostet;
+
+  /// No description provided for @premiumActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription activated successfully!'**
+  String get premiumActivated;
+
+  /// No description provided for @premiumPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed: {error}'**
+  String premiumPurchaseFailed(Object error);
+
+  /// No description provided for @premiumProductNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found!'**
+  String get premiumProductNotFound;
+
+  /// No description provided for @premiumStoreNotLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Store products could not be loaded.'**
+  String get premiumStoreNotLoaded;
+
+  /// No description provided for @premiumYearlySuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly: {price}'**
+  String premiumYearlySuffix(Object price);
+
+  /// No description provided for @premiumYearlyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{plan} (Yearly)'**
+  String premiumYearlyButton(Object plan);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

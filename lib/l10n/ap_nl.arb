@@ -275,6 +275,13 @@
   "auftragErneutPosten": "Opdracht opnieuw plaatsen",
   "auftragErneutPostenTitle": "Opdracht opnieuw plaatsen?",
   "auftragErneutPostenText": "De huidige dienstverlener wordt verwijderd. De opdracht wordt weer zichtbaar voor anderen. Wil je doorgaan?",
-  "auftragErneutGepostet": "De opdracht is opnieuw geplaatst."
+  "auftragErneutGepostet": "De opdracht is opnieuw geplaatst.",
+  "premiumActivated": "Abonnement succesvol geactiveerd!",
+  "premiumPurchaseFailed": "Aankoop mislukt: {error}",
+  "premiumProductNotFound": "Product niet gevonden!",
+  "premiumStoreNotLoaded": "Winkelproducten konden niet worden geladen.",
+  "premiumYearlySuffix": "Jaarlijks: {price}",
+  "premiumYearlyButton": "{plan} (Jaarlijks)"
+
 
 }

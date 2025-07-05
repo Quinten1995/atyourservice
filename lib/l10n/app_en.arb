@@ -285,7 +285,14 @@
   "auftragErneutPosten": "Repost job",
   "auftragErneutPostenTitle": "Repost this job?",
   "auftragErneutPostenText": "The current provider will be removed. The job will become visible to others again. Do you want to continue?",
-  "auftragErneutGepostet": "The job has been reposted."
+  "auftragErneutGepostet": "The job has been reposted.",
+  "premiumActivated": "Subscription activated successfully!",
+  "premiumPurchaseFailed": "Purchase failed: {error}",
+  "premiumProductNotFound": "Product not found!",
+  "premiumStoreNotLoaded": "Store products could not be loaded.",
+  "premiumYearlySuffix": "Yearly: {price}",
+  "premiumYearlyButton": "{plan} (Yearly)"
+
 
 
 

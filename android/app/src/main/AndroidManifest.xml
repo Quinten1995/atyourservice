@@ -3,6 +3,8 @@
 
     <!-- INTERNET-Permission unbedingt erforderlich! -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Google Play Billing API (In-App-Käufe) -->
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:label="atyourservice"

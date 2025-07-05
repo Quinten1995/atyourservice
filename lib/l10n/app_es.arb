@@ -285,7 +285,14 @@
   "auftragErneutPosten": "Volver a publicar el encargo",
   "auftragErneutPostenTitle": "¿Volver a publicar este encargo?",
   "auftragErneutPostenText": "El proveedor actual será eliminado. El encargo volverá a estar visible para otros. ¿Deseas continuar?",
-  "auftragErneutGepostet": "El encargo se ha vuelto a publicar."
+  "auftragErneutGepostet": "El encargo se ha vuelto a publicar.",
+  "premiumActivated": "¡Suscripción activada correctamente!",
+  "premiumPurchaseFailed": "La compra ha fallado: {error}",
+  "premiumProductNotFound": "¡Producto no encontrado!",
+  "premiumStoreNotLoaded": "No se pudieron cargar los productos de la tienda.",
+  "premiumYearlySuffix": "Anual: {price}",
+  "premiumYearlyButton": "{plan} (Anual)"
+
 
 
 
