@@ -7,10 +7,8 @@ import '../utils/in_app_purchase_service.dart';
 
 // IDs wie im Play Store/App Store angelegt!
 const Set<String> _kProductIds = {
-  'atyourservice_silver_monthly',
-  'atyourservice_silver_yearly',
-  'atyourservice_gold_monthly',
-  'atyourservice_gold_yearly',
+  'atyourservice_silver',
+  'atyourservice_gold',
 };
 
 class PremiumScreen extends StatefulWidget {
@@ -67,14 +65,25 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   // Lädt Store-Produkte (Abos)
   Future<void> _ladeStoreProdukte() async {
+    print('IAP DEBUG: Starte _ladeStoreProdukte()');
     final available = await InAppPurchaseService().isAvailable();
+    print('IAP DEBUG: isAvailable() -> $available');
     if (!available) {
       setState(() {
         _storeAvailable = false;
       });
+      print('IAP DEBUG: Store nicht verfügbar');
       return;
     }
+    print('IAP DEBUG: Store verfügbar, hole Produkte...');
     final resp = await InAppPurchaseService().getProducts();
+
+    print('IAP DEBUG: getProducts() abgeschlossen');
+    print('======== IAP DEBUG ========');
+    print('Gefundene Produkte: ${resp.productDetails.map((e) => e.id).toList()}');
+    print('Nicht gefundene IDs: ${resp.notFoundIDs}');
+    print('===========================');
+
     setState(() {
       _storeAvailable = true;
       _products = resp.productDetails.toList();
@@ -205,11 +214,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
                     priceText: _storeAvailable
-                        ? (_getProduct('atyourservice_silver_monthly')?.price ?? '...')
+                        ? (_getProduct('atyourservice_silver')?.price ?? '...')
                         : '...',
-                    priceTextYearly: _storeAvailable
-                        ? (_getProduct('atyourservice_silver_yearly')?.price ?? '')
-                        : '',
                     features: [
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
@@ -218,18 +224,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     highlighted: _aboTyp == 'silver',
                     showButton: true,
                     onTap: () async {
-                      final product = _getProduct('atyourservice_silver_monthly');
-                      if (product != null) {
-                        await InAppPurchaseService().buyProduct(product);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.premiumProductNotFound)),
-                        );
-                      }
-                    },
-                    yearly: true,
-                    onTapYearly: () async {
-                      final product = _getProduct('atyourservice_silver_yearly');
+                      final product = _getProduct('atyourservice_silver');
                       if (product != null) {
                         await InAppPurchaseService().buyProduct(product);
                       } else {
@@ -247,11 +242,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
                     priceText: _storeAvailable
-                        ? (_getProduct('atyourservice_gold_monthly')?.price ?? '...')
+                        ? (_getProduct('atyourservice_gold')?.price ?? '...')
                         : '...',
-                    priceTextYearly: _storeAvailable
-                        ? (_getProduct('atyourservice_gold_yearly')?.price ?? '')
-                        : '',
                     features: [
                       l10n.premiumGoldFeature1,
                       l10n.premiumGoldFeature2,
@@ -262,18 +254,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     highlighted: _aboTyp == 'gold',
                     showButton: true,
                     onTap: () async {
-                      final product = _getProduct('atyourservice_gold_monthly');
-                      if (product != null) {
-                        await InAppPurchaseService().buyProduct(product);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.premiumProductNotFound)),
-                        );
-                      }
-                    },
-                    yearly: true,
-                    onTapYearly: () async {
-                      final product = _getProduct('atyourservice_gold_yearly');
+                      final product = _getProduct('atyourservice_gold');
                       if (product != null) {
                         await InAppPurchaseService().buyProduct(product);
                       } else {
@@ -302,20 +283,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  // Erweiterte PlanCard mit Unterstützung für jährliche Buttons
   Widget _planCard(
     BuildContext context, {
     required String title,
     required Color color,
     required IconData badge,
     required String priceText,
-    String priceTextYearly = '',
-    required List<String> features,
+    List<String>? features,
     required VoidCallback onTap,
-    VoidCallback? onTapYearly,
     bool highlighted = false,
     bool showButton = true,
-    bool yearly = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -357,35 +334,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                 ),
                 const Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      priceText,
-                      style: TextStyle(
-                        color: Colors.blueGrey[900],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    if (yearly && priceTextYearly.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Text(
-                          l10n.premiumYearlySuffix(priceTextYearly),
-                          style: TextStyle(
-                            color: Colors.blueGrey[700],
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                  ],
+                Text(
+                  priceText,
+                  style: TextStyle(
+                    color: Colors.blueGrey[900],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            ...features.map((f) => Padding(
+            ...?features?.map((f) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(
                     children: [
@@ -399,35 +359,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
               const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: onTap,
-                      child: Text(l10n.premiumChooseButton(title)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                      ),
-                    ),
-                    if (yearly && onTapYearly != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: ElevatedButton(
-                          onPressed: onTapYearly,
-                          child: Text(
-                            l10n.premiumYearlyButton(l10n.premiumChooseButton(title)),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent.withOpacity(0.8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                            padding: const EdgeInsets.symmetric(vertical: 11),
-                          ),
-                        ),
-                      ),
-                  ],
+                child: ElevatedButton(
+                  onPressed: onTap,
+                  child: Text(l10n.premiumChooseButton(title)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
                 ),
               ),
             ],
