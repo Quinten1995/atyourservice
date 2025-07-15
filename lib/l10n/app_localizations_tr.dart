@@ -909,4 +909,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String premiumYearlyButton(Object plan) {
     return '$plan (Yıllık)';
   }
+
+  @override
+  String get deleteAccountTitle => 'Hesabı Sil';
+
+  @override
+  String get deleteAccountWarning => 'Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Tüm verileriniz geri alınamaz şekilde silinecek.';
+
+  @override
+  String get deleteAccountButton => 'Hesabı Sil';
+
+  @override
+  String get accountDeleted => 'Hesabınız silindi.';
+
+  @override
+  String get cancel => 'İptal';
 }

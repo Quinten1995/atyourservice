@@ -909,4 +909,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String premiumYearlyButton(Object plan) {
     return '$plan (Yearly)';
   }
+
+  @override
+  String get deleteAccountTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountWarning => 'Are you sure you want to permanently delete your account? All your data will be permanently removed.';
+
+  @override
+  String get deleteAccountButton => 'Delete Account';
+
+  @override
+  String get accountDeleted => 'Your account has been deleted.';
+
+  @override
+  String get cancel => 'Cancel';
 }

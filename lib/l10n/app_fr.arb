@@ -318,7 +318,12 @@
   "premiumProductNotFound": "Produit introuvable !",
   "premiumStoreNotLoaded": "Les produits du store n'ont pas pu être chargés.",
   "premiumYearlySuffix": "Annuel : {price}",
-  "premiumYearlyButton": "{plan} (Annuel)"
+  "premiumYearlyButton": "{plan} (Annuel)",
+  "deleteAccountTitle": "Supprimer le compte",
+  "deleteAccountWarning": "Voulez-vous vraiment supprimer définitivement votre compte ? Toutes vos données seront supprimées de façon irréversible.",
+  "deleteAccountButton": "Supprimer le compte",
+  "accountDeleted": "Votre compte a été supprimé.",
+  "cancel": "Annuler"
 
 
 

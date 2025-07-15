@@ -13,7 +13,7 @@ class LoginDienstleisterScreen extends StatefulWidget {
 
 class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
   final _emailController = TextEditingController(text: 'walterlangengries@gmail.com');
-  final _passwortController = TextEditingController(text: 'password123');
+  final _passwortController = TextEditingController(text: 'password1234');
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   final supabase = Supabase.instance.client;

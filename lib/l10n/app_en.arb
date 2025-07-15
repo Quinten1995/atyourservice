@@ -291,7 +291,12 @@
   "premiumProductNotFound": "Product not found!",
   "premiumStoreNotLoaded": "Store products could not be loaded.",
   "premiumYearlySuffix": "Yearly: {price}",
-  "premiumYearlyButton": "{plan} (Yearly)"
+  "premiumYearlyButton": "{plan} (Yearly)",
+  "deleteAccountTitle": "Delete Account",
+  "deleteAccountWarning": "Are you sure you want to permanently delete your account? All your data will be permanently removed.",
+  "deleteAccountButton": "Delete Account",
+  "accountDeleted": "Your account has been deleted.",
+  "cancel": "Cancel"
 
 
 

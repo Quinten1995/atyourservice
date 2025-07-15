@@ -291,7 +291,12 @@
   "premiumProductNotFound": "Ürün bulunamadı!",
   "premiumStoreNotLoaded": "Mağaza ürünleri yüklenemedi.",
   "premiumYearlySuffix": "Yıllık: {price}",
-  "premiumYearlyButton": "{plan} (Yıllık)"
+  "premiumYearlyButton": "{plan} (Yıllık)",
+  "deleteAccountTitle": "Hesabı Sil",
+  "deleteAccountWarning": "Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Tüm verileriniz geri alınamaz şekilde silinecek.",
+  "deleteAccountButton": "Hesabı Sil",
+  "accountDeleted": "Hesabınız silindi.",
+  "cancel": "İptal"
 
   
 

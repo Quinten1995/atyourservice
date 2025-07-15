@@ -909,4 +909,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String premiumYearlyButton(Object plan) {
     return '$plan (Jährlich)';
   }
+
+  @override
+  String get deleteAccountTitle => 'Konto löschen';
+
+  @override
+  String get deleteAccountWarning => 'Möchten Sie Ihr Konto wirklich dauerhaft löschen? Alle Ihre Daten werden unwiderruflich entfernt.';
+
+  @override
+  String get deleteAccountButton => 'Konto löschen';
+
+  @override
+  String get accountDeleted => 'Ihr Konto wurde gelöscht.';
+
+  @override
+  String get cancel => 'Abbrechen';
 }

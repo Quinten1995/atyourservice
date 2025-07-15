@@ -909,4 +909,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String premiumYearlyButton(Object plan) {
     return '$plan (Jaarlijks)';
   }
+
+  @override
+  String get deleteAccountTitle => 'Account verwijderen';
+
+  @override
+  String get deleteAccountWarning => 'Weet je zeker dat je je account permanent wilt verwijderen? Al je gegevens worden onherroepelijk verwijderd.';
+
+  @override
+  String get deleteAccountButton => 'Account verwijderen';
+
+  @override
+  String get accountDeleted => 'Je account is verwijderd.';
+
+  @override
+  String get cancel => 'Annuleren';
 }

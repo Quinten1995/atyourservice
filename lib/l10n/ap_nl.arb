@@ -281,7 +281,12 @@
   "premiumProductNotFound": "Product niet gevonden!",
   "premiumStoreNotLoaded": "Winkelproducten konden niet worden geladen.",
   "premiumYearlySuffix": "Jaarlijks: {price}",
-  "premiumYearlyButton": "{plan} (Jaarlijks)"
+  "premiumYearlyButton": "{plan} (Jaarlijks)",
+  "deleteAccountTitle": "Account verwijderen",
+  "deleteAccountWarning": "Weet je zeker dat je je account permanent wilt verwijderen? Al je gegevens worden onherroepelijk verwijderd.",
+  "deleteAccountButton": "Account verwijderen",
+  "accountDeleted": "Je account is verwijderd.",
+  "cancel": "Annuleren"
 
 
 }

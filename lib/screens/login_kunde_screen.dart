@@ -13,7 +13,7 @@ class LoginKundeScreen extends StatefulWidget {
 
 class _LoginKundeScreenState extends State<LoginKundeScreen> {
   final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
-  final _passwortController = TextEditingController(text: 'password123');
+  final _passwortController = TextEditingController(text: 'password1234');
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   final supabase = Supabase.instance.client;

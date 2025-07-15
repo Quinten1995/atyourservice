@@ -289,7 +289,12 @@
   "premiumProductNotFound": "Produkt nicht gefunden!",
   "premiumStoreNotLoaded": "Store-Produkte konnten nicht geladen werden.",
   "premiumYearlySuffix": "Jährlich: {price}",
-  "premiumYearlyButton": "{plan} (Jährlich)"
+  "premiumYearlyButton": "{plan} (Jährlich)",
+  "deleteAccountTitle": "Konto löschen",
+  "deleteAccountWarning": "Möchten Sie Ihr Konto wirklich dauerhaft löschen? Alle Ihre Daten werden unwiderruflich entfernt.",
+  "deleteAccountButton": "Konto löschen",
+  "accountDeleted": "Ihr Konto wurde gelöscht.",
+  "cancel": "Abbrechen"
 
 
 

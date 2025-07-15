@@ -289,7 +289,12 @@
   "premiumProductNotFound": "Prodotto non trovato!",
   "premiumStoreNotLoaded": "Impossibile caricare i prodotti del negozio.",
   "premiumYearlySuffix": "Annuale: {price}",
-  "premiumYearlyButton": "{plan} (Annuale)"
+  "premiumYearlyButton": "{plan} (Annuale)",
+  "deleteAccountTitle": "Elimina account",
+  "deleteAccountWarning": "Sei sicuro di voler eliminare definitivamente il tuo account? Tutti i tuoi dati saranno eliminati in modo irreversibile.",
+  "deleteAccountButton": "Elimina account",
+  "accountDeleted": "Il tuo account è stato eliminato.",
+  "cancel": "Annulla"
 
 
 }
