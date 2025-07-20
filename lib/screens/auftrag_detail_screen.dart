@@ -1,12 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Für Clipboard
-import 'package:url_launcher/url_launcher.dart'; // Für Anrufen
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
 import 'bewertung_dialog.dart';
 import '../l10n/app_localizations.dart';
-import '../utils/pdf_invoice_service.dart'; // Pfad ggf. anpassen!
+import '../utils/pdf_invoice_service.dart';
 import 'pdf_rechnung_screen.dart';
+import '../utils/category_utils.dart'; // <-- für die Labels!
+
+// Hilfsfunktion für Kategorie-Icons
+IconData getKategorieIcon(String? kategorie) {
+  if (kategorie == null) return Icons.assignment_ind;
+  switch (kategorie.toLowerCase()) {
+    case 'category_elektriker':
+    case 'elektriker':
+      return Icons.electrical_services;
+    case 'category_maler':
+    case 'maler':
+      return Icons.format_paint;
+    case 'category_babysitter':
+    case 'babysitter / kinderbetreuung':
+      return Icons.child_care;
+    case 'category_klempner':
+    case 'klempner':
+      return Icons.plumbing;
+    case 'category_gartenpflege':
+    case 'gartenpflege':
+      return Icons.grass;
+    case 'category_haushaltsreinigung':
+    case 'haushaltsreinigung':
+      return Icons.cleaning_services;
+    case 'category_transport':
+    case 'transport':
+      return Icons.local_shipping;
+    // ... weitere Kategorien nach Bedarf ...
+    default:
+      return Icons.assignment_ind;
+  }
+}
 
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
@@ -25,20 +57,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   String? _kundenTelefonnummer;
   String? _dienstleisterTelefonnummer;
 
-  // Bewertungsinfos Dienstleister
   double? _dlDurchschnitt;
   int? _dlAnzahlBewertungen;
 
-  // Profilbild-URL des Dienstleisters
   String? _dienstleisterProfilbildUrl;
-
-  // Abo-Typ (eigener)
   String? _aboTyp;
-
-  // Abo-Typ des Dienstleisters (für Badge!)
   String? _dienstleisterAboTyp;
-
-  // E-Mail als Name
   String? _kundenName;
   String? _dienstleisterName;
 
@@ -47,7 +71,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
-  // Status-Lokalisierung
   String _getLocalizedStatus(String status, AppLocalizations l10n) {
     switch (status) {
       case 'offen':
@@ -90,7 +113,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       }
 
-      // Rolle und Abo-Typ laden (eigener User)
       final userResponse = await _supabase
           .from('users')
           .select('rolle, abo_typ')
@@ -105,7 +127,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _aboTyp = userResponse['abo_typ'] as String? ?? 'free';
       });
 
-      // Auftrag laden (aktuelle Daten)
       final auftragMap = await _supabase
           .from('auftraege')
           .select()
@@ -119,7 +140,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _auftragDetails = aktuellerAuftrag;
       });
 
-      // Kunden-E-Mail laden
       final kunde = await _supabase
           .from('users')
           .select('email')
@@ -129,7 +149,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _kundenName = kunde?['email'];
       });
 
-      // Telefonnummern laden, wenn der Auftrag in Bearbeitung ist und DL zugeordnet
       if (aktuellerAuftrag.status == 'in bearbeitung' && aktuellerAuftrag.dienstleisterId != null) {
         if (isDL) {
           setState(() {
@@ -147,11 +166,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         }
       }
 
-      // Bewertung & Dienstleisterinfos laden, wenn Dienstleister zugeordnet ist
       if (aktuellerAuftrag.dienstleisterId != null) {
         await _ladeDienstleisterBewertung(aktuellerAuftrag.dienstleisterId!);
 
-        // PROFILBILD-URL + ABOTYP laden
         final details = await _supabase
             .from('dienstleister_details')
             .select('profilbild_url, user_id')
@@ -161,7 +178,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           _dienstleisterProfilbildUrl = details?['profilbild_url'];
         });
 
-        // Dienstleister-E-Mail & AboTyp laden
         final dl = await _supabase
             .from('users')
             .select('email, abo_typ')
@@ -244,7 +260,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     try {
       int wochenLimit = 1; // Default: free
       if ((_aboTyp ?? 'free') == 'silver') wochenLimit = 3;
-      if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999; // "unbegrenzt"
+      if ((_aboTyp ?? 'free') == 'gold') wochenLimit = 99999;
 
       if ((_aboTyp ?? 'free') != 'gold') {
         final now = DateTime.now();
@@ -363,7 +379,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', _auftragDetails!.id);
 
-      Navigator.of(context).pop(); // Zurück zur Übersicht
+      Navigator.of(context).pop();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -372,7 +388,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // NEU: Auftrag erneut posten
   Future<void> _auftragErneutPosten() async {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
@@ -408,7 +423,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         SnackBar(content: Text(l10n.auftragErneutGepostet)),
       );
 
-      // Optional: Auftrag neu laden
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
       setState(() {
@@ -433,7 +447,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             Expanded(
               child: Text(
                 [
-                  if (ad.wochentag != null) l10n.jedenWochentag(ad.wochentag!),
+                  if ((ad.wochentag ?? '').isNotEmpty) l10n.jedenWochentag(ad.wochentag ?? ''),
                   if (ad.intervall != null) ad.intervall!,
                   if (ad.zeitVon != null && ad.zeitBis != null)
                     "${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr",
@@ -532,11 +546,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                ad.titel,
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 22),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      ad.titel,
+                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -593,7 +615,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           _zeitplanungAnzeige(),
           const SizedBox(height: 11),
 
-          // Beschreibung
           Text(
             l10n.beschreibung,
             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800]),
@@ -603,20 +624,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             child: Text(ad.beschreibung, style: const TextStyle(fontSize: 16)),
           ),
 
-          // Kategorie
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.category, color: primaryColor, size: 19),
+              Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 19),
               SizedBox(width: 7),
               Text(l10n.kategorie, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(width: 7),
-              Text(ad.kategorie),
+              // HIER! Multilingual Anzeige!
+              Text(getKategorieLabel(ad.kategorie, l10n)),
             ],
           ),
           const SizedBox(height: 8),
 
-          // Adresse
           if (ad.adresse != null && ad.adresse!.isNotEmpty)
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -629,7 +649,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ],
             ),
 
-          // Standort (Koordinaten)
           if (ad.latitude != null && ad.longitude != null)
             Padding(
               padding: const EdgeInsets.only(left: 32.0, top: 3),
@@ -640,7 +659,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             ),
           const SizedBox(height: 11),
 
-          // Status
           Row(
             children: [
               Text(l10n.status, style: TextStyle(fontWeight: FontWeight.w600)),
@@ -693,6 +711,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             child: Padding(
               padding: const EdgeInsets.all(18.0),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(Icons.phone, color: Colors.green, size: 30),
                   const SizedBox(width: 14),
@@ -709,7 +728,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 7),
-                        Text(
+                        SelectableText(
                           nummer,
                           style: const TextStyle(
                             fontSize: 20,
@@ -721,24 +740,28 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.copy, color: Colors.black54),
-                    tooltip: l10n.nummerKopieren,
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: nummer!));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.nummerKopiert)),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.call, color: Colors.green),
-                    tooltip: l10n.anrufen,
-                    onPressed: () {
-                      final uri = Uri(scheme: 'tel', path: nummer);
-                      launchUrl(uri);
-                    },
-                  ),
+                  Column(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.copy, color: Colors.black54),
+                        tooltip: l10n.nummerKopieren,
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: nummer!));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.nummerKopiert)),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.call, color: Colors.green),
+                        tooltip: l10n.anrufen,
+                        onPressed: () {
+                          final uri = Uri(scheme: 'tel', path: nummer);
+                          launchUrl(uri);
+                        },
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -789,30 +812,18 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
-        if (!_isDienstleister && ad.status == 'abgeschlossen')
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _kundeAuftragEntfernen,
-              icon: const Icon(Icons.delete_forever_rounded),
-              label: Text(l10n.auftragEntfernenUebersicht),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                elevation: 2,
-              ),
-            ),
-          ),
-        if (!_isDienstleister && ad.status == 'in bearbeitung')
+        // Für Kunden: Löschen-Button bei offen, in bearbeitung, abgeschlossen
+        if (!_isDienstleister && (ad.status == 'offen' || ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen'))
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _kundeAuftragEntfernen,
               icon: const Icon(Icons.delete),
-              label: Text(l10n.auftragEntfernen),
+              label: Text(
+                ad.status == 'abgeschlossen'
+                    ? l10n.auftragEntfernenUebersicht
+                    : l10n.auftragEntfernen,
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[600],
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -823,10 +834,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
-        // NEU: Abstand einfügen
         if (!_isDienstleister && ad.status == 'in bearbeitung')
           const SizedBox(height: 18),
-        // NEU: Auftrag erneut posten (nur für Kunden und wenn in Bearbeitung)
         if (!_isDienstleister && ad.status == 'in bearbeitung')
           SizedBox(
             width: double.infinity,

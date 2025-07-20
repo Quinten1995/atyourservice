@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../utils/geocoding_service.dart';
+import '../utils/category_utils.dart'; // <<--- Die Utility für Labels!
 import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
 
@@ -87,64 +88,6 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
         return l10n.weekday_sunday;
       default:
         return key;
-    }
-  }
-
-  // -- Hier ist die komplette Mapping-Funktion für Kategorie-Keys (Switch)
-  String getKategorieLabel(String key, AppLocalizations l10n) {
-    switch (key) {
-      case 'category_babysitter': return l10n.category_babysitter;
-      case 'category_catering': return l10n.category_catering;
-      case 'category_dachdecker': return l10n.category_dachdecker;
-      case 'category_elektriker': return l10n.category_elektriker;
-      case 'category_ernaehrungsberatung': return l10n.category_ernaehrungsberatung;
-      case 'category_eventplanung': return l10n.category_eventplanung;
-      case 'category_fahrdienste': return l10n.category_fahrdienste;
-      case 'category_fahrlehrer': return l10n.category_fahrlehrer;
-      case 'category_fensterputzer': return l10n.category_fensterputzer;
-      case 'category_fliesenleger': return l10n.category_fliesenleger;
-      case 'category_fotografie': return l10n.category_fotografie;
-      case 'category_friseur': return l10n.category_friseur;
-      case 'category_gartenpflege': return l10n.category_gartenpflege;
-      case 'category_grafikdesign': return l10n.category_grafikdesign;
-      case 'category_handy_reparatur': return l10n.category_handy_reparatur;
-      case 'category_haushaltsreinigung': return l10n.category_haushaltsreinigung;
-      case 'category_hausmeisterservice': return l10n.category_hausmeisterservice;
-      case 'category_heizungsbauer': return l10n.category_heizungsbauer;
-      case 'category_hundesitter': return l10n.category_hundesitter;
-      case 'category_it_support': return l10n.category_it_support;
-      case 'category_klempner': return l10n.category_klempner;
-      case 'category_kosmetik': return l10n.category_kosmetik;
-      case 'category_kuenstler': return l10n.category_kuenstler;
-      case 'category_kurierdienst': return l10n.category_kurierdienst;
-      case 'category_maler': return l10n.category_maler;
-      case 'category_massagen': return l10n.category_massagen;
-      case 'category_maurer': return l10n.category_maurer;
-      case 'category_moebelaufbau': return l10n.category_moebelaufbau;
-      case 'category_musikunterricht': return l10n.category_musikunterricht;
-      case 'category_nachhilfe': return l10n.category_nachhilfe;
-      case 'category_nagelstudio': return l10n.category_nagelstudio;
-      case 'category_pc_reparatur': return l10n.category_pc_reparatur;
-      case 'category_partyservice': return l10n.category_partyservice;
-      case 'category_personal_trainer': return l10n.category_personal_trainer;
-      case 'category_rasenmaeher_service': return l10n.category_rasenmaeher_service;
-      case 'category_rechtsberatung': return l10n.category_rechtsberatung;
-      case 'category_reparaturdienste': return l10n.category_reparaturdienste;
-      case 'category_seniorenbetreuung': return l10n.category_seniorenbetreuung;
-      case 'category_social_media': return l10n.category_social_media;
-      case 'category_sonstige': return l10n.category_sonstige;
-      case 'category_sprachunterricht': return l10n.category_sprachunterricht;
-      case 'category_steuerberatung': return l10n.category_steuerberatung;
-      case 'category_tischler': return l10n.category_tischler;
-      case 'category_transport': return l10n.category_transport;
-      case 'category_umzugstransporte': return l10n.category_umzugstransporte;
-      case 'category_umzugshelfer': return l10n.category_umzugshelfer;
-      case 'category_uebersetzungen': return l10n.category_uebersetzungen;
-      case 'category_waescheservice': return l10n.category_waescheservice;
-      case 'category_webdesign': return l10n.category_webdesign;
-      case 'category_einkaufsservice': return l10n.category_einkaufsservice;
-      case 'category_haustierbetreuung': return l10n.category_haustierbetreuung;
-      default: return key;
     }
   }
 
@@ -396,6 +339,7 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               });
                             }
                           },
+                          borderRadius: BorderRadius.circular(16), // abgerundetes Menü
                         ),
                         // ---------------------------------------------------------------
                         const SizedBox(height: 16),
@@ -572,22 +516,34 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                           const SizedBox(height: 10),
                           DropdownButtonFormField<String>(
                             value: _intervall,
-                            decoration: InputDecoration(labelText: l10n.intervallLabel),
+                            decoration: InputDecoration(
+                              labelText: l10n.intervallLabel,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
                             items: intervalKeys
                                 .map((key) => DropdownMenuItem(value: key, child: Text(getIntervalLabel(key, l10n))))
                                 .toList(),
                             onChanged: (val) => setState(() => _intervall = val),
                             validator: (val) => val == null ? l10n.intervallValidator : null,
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           const SizedBox(height: 10),
                           DropdownButtonFormField<String>(
                             value: _wochentag,
-                            decoration: InputDecoration(labelText: l10n.wochentagLabel),
+                            decoration: InputDecoration(
+                              labelText: l10n.wochentagLabel,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
                             items: weekdayKeys
                                 .map((key) => DropdownMenuItem(value: key, child: Text(getWeekdayLabel(key, l10n))))
                                 .toList(),
                             onChanged: (val) => setState(() => _wochentag = val),
                             validator: (val) => val == null ? l10n.wochentagValidator : null,
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           const SizedBox(height: 10),
                           TextFormField(

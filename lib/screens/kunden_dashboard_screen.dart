@@ -22,6 +22,25 @@ IconData getKategorieIcon(String kategorie) {
   }
 }
 
+// --- STATUS-ÜBERSETZUNG ---
+extension StatusTranslation on AppLocalizations {
+  String translateStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'offen':
+      case 'open':
+        return statusOffen;
+      case 'in bearbeitung':
+      case 'in_progress':
+        return statusInBearbeitung;
+      case 'abgeschlossen':
+      case 'completed':
+        return statusAbgeschlossen;
+      default:
+        return status ?? '';
+    }
+  }
+}
+
 class KundenDashboardScreen extends StatefulWidget {
   const KundenDashboardScreen({Key? key}) : super(key: key);
 
@@ -34,11 +53,9 @@ class KundenDashboardScreen extends StatefulWidget {
 
 class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   final supabase = Supabase.instance.client;
-
   bool _isLoading = true;
   String? _errorMessage;
 
-  // Raw-Listen, damit wir die Dienstleister-Objekte greifen können
   List<Map<String, dynamic>> _laufendeAuftraegeRaw = [];
   List<Auftrag> _offeneAuftraege = [];
   List<Auftrag> _abgeschlosseneAuftraege = [];
@@ -61,7 +78,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception(l10n.notLoggedIn);
 
-      // JOIN auf users für Dienstleister-Email!
       final auftraegeRaw = await supabase
           .from('auftraege')
           .select('*, dienstleister:users!auftraege_dienstleister_id_fkey(email)')
@@ -69,10 +85,8 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           .or('kunde_auftragsstatus.is.null,kunde_auftragsstatus.neq.entfernt')
           .order('erstellt_am', ascending: false);
 
-      // Die rohen Maps speichern (für die Dienstleister-Email)
       final auftraegeMaps = (auftraegeRaw as List).cast<Map<String, dynamic>>();
 
-      // Jetzt aufteilen nach Status
       _laufendeAuftraegeRaw = auftraegeMaps
           .where((map) => map['status'] == 'in bearbeitung')
           .toList();
@@ -97,7 +111,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   Widget _dashboardHeader() {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0, left: 2),
+      padding: const EdgeInsets.only(bottom: 10.0, left: 2, top: 8),
       child: Row(
         children: [
           Icon(Icons.person, color: KundenDashboardScreen.primaryColor, size: 28),
@@ -148,163 +162,84 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _errorMessage != null
-                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _dashboardHeader(),
+      body: Stack(
+        children: [
+          // Hintergrund: Gradient + Kreise
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFEBF4FF),
+                  Color(0xFFE7ECEF),
+                  Color(0xFFD9E4F5),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -70,
+            left: -70,
+            child: Container(
+              width: 170,
+              height: 170,
+              decoration: BoxDecoration(
+                color: KundenDashboardScreen.primaryColor.withOpacity(0.09),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -65,
+            right: -55,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: KundenDashboardScreen.primaryColor.withOpacity(0.09),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 0),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage != null
+                    ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 14),
+                          _dashboardHeader(),
 
-                      // ----------- Laufende Aufträge (horizontal) -----------
-                      if (_laufendeAuftraegeRaw.isNotEmpty) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          l10n.laufendeAuftraege,
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-                        ),
-                        const SizedBox(height: 7),
-                        SizedBox(
-                          height: 160,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _laufendeAuftraegeRaw.length,
-                            separatorBuilder: (context, i) => const SizedBox(width: 13),
-                            itemBuilder: (context, index) {
-                              final map = _laufendeAuftraegeRaw[index];
-                              final auftrag = Auftrag.fromJson(map);
-                              final dienstleister = map['dienstleister'];
-                              final dienstleisterEmail = dienstleister != null ? dienstleister['email'] as String? : null;
-
-                              return Material(
-                                elevation: 3,
-                                borderRadius: BorderRadius.circular(14),
-                                color: Colors.white,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
-                                      ),
-                                    ).then((_) => _ladeAuftraege());
-                                  },
-                                  child: Container(
-                                    width: 240,
-                                    padding: const EdgeInsets.all(14),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            // Kategorie-Icon
-                                            CircleAvatar(
-                                              radius: 22,
-                                              backgroundColor: KundenDashboardScreen.accentColor,
-                                              child: Icon(
-                                                getKategorieIcon(auftrag.kategorie),
-                                                color: KundenDashboardScreen.primaryColor,
-                                                size: 28,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            // Titel, max. 2 Zeilen
-                                            Expanded(
-                                              child: Text(
-                                                auftrag.titel,
-                                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.assignment, size: 17, color: KundenDashboardScreen.primaryColor),
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              l10n.statusPrefix(auftrag.status),
-                                              style: const TextStyle(fontSize: 13),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                        // Dienstleister anzeigen, falls vorhanden
-                                        if (dienstleisterEmail != null)
-                                          Text(
-                                            l10n.dienstleisterPrefix(dienstleisterEmail),
-                                            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const Divider(height: 32, thickness: 1.2),
-                      ],
-
-                      // ----------- Offene Aufträge (vertikal) -----------
-                      Text(
-                        l10n.offeneAuftraege,
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-                      ),
-                      const SizedBox(height: 7),
-                      Expanded(
-                        child: _offeneAuftraege.isEmpty
-                            ? Center(
-                                child: Text(
-                                  l10n.noOffeneAuftraege,
-                                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
-                                ),
-                              )
-                            : ListView.separated(
-                                itemCount: _offeneAuftraege.length,
-                                separatorBuilder: (context, i) => const SizedBox(height: 12),
+                          if (_laufendeAuftraegeRaw.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.laufendeAuftraege,
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
+                            ),
+                            const SizedBox(height: 7),
+                            SizedBox(
+                              height: 156,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _laufendeAuftraegeRaw.length,
+                                separatorBuilder: (context, i) => const SizedBox(width: 13),
                                 itemBuilder: (context, index) {
-                                  final auftrag = _offeneAuftraege[index];
+                                  final map = _laufendeAuftraegeRaw[index];
+                                  final auftrag = Auftrag.fromJson(map);
+                                  final dienstleister = map['dienstleister'];
+                                  final dienstleisterEmail = dienstleister != null ? dienstleister['email'] as String? : null;
                                   return Material(
-                                    color: Colors.white,
+                                    elevation: 3,
                                     borderRadius: BorderRadius.circular(14),
-                                    elevation: 2,
-                                    child: ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                                      leading: CircleAvatar(
-                                        radius: 22,
-                                        backgroundColor: KundenDashboardScreen.accentColor,
-                                        child: Icon(
-                                          getKategorieIcon(auftrag.kategorie),
-                                          color: KundenDashboardScreen.primaryColor,
-                                          size: 28,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        auftrag.titel,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      subtitle: auftrag.status != null
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(top: 3.0),
-                                              child: Text(
-                                                l10n.statusPrefix(auftrag.status),
-                                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                                              ),
-                                            )
-                                          : null,
-                                      trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),
+                                    color: Colors.white.withOpacity(0.97),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -313,99 +248,219 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                           ),
                                         ).then((_) => _ladeAuftraege());
                                       },
+                                      child: Container(
+                                        width: 230,
+                                        padding: const EdgeInsets.all(13),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: 22,
+                                                  backgroundColor: KundenDashboardScreen.accentColor,
+                                                  child: Icon(
+                                                    getKategorieIcon(auftrag.kategorie),
+                                                    color: KundenDashboardScreen.primaryColor,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Expanded(
+                                                  child: Text(
+                                                    auftrag.titel,
+                                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.assignment, size: 17, color: KundenDashboardScreen.primaryColor),
+                                                const SizedBox(width: 5),
+                                                // HIER wird übersetzt:
+                                                Text(
+                                                  l10n.statusPrefix(l10n.translateStatus(auftrag.status)),
+                                                  style: const TextStyle(fontSize: 13),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                            if (dienstleisterEmail != null)
+                                              Text(
+                                                l10n.dienstleisterPrefix(dienstleisterEmail),
+                                                style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   );
                                 },
                               ),
-                      ),
-
-                      // ----------- Abgeschlossene Aufträge -----------
-                      if (_abgeschlosseneAuftraege.isNotEmpty) ...[
-                        const Divider(height: 30, thickness: 1.2),
-                        Text(
-                          l10n.abgeschlosseneAuftraege,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
-                        ),
-                        const SizedBox(height: 7),
-                        SizedBox(
-                          height: 120,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _abgeschlosseneAuftraege.length,
-                            separatorBuilder: (context, i) => const SizedBox(width: 13),
-                            itemBuilder: (context, index) {
-                              final auftrag = _abgeschlosseneAuftraege[index];
-                              return Material(
-                                elevation: 2,
-                                borderRadius: BorderRadius.circular(14),
-                                color: Colors.white,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
-                                      ),
-                                    ).then((_) => _ladeAuftraege());
-                                  },
-                                  child: Container(
-                                    width: 200,
-                                    padding: const EdgeInsets.all(13),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 17,
-                                              backgroundColor: KundenDashboardScreen.accentColor,
-                                              child: Icon(
-                                                getKategorieIcon(auftrag.kategorie),
-                                                color: KundenDashboardScreen.primaryColor,
-                                                size: 20,
-                                              ),
+                            ),
+                            const Divider(height: 30, thickness: 1.2),
+                          ],
+                          Text(
+                            l10n.offeneAuftraege,
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
+                          ),
+                          const SizedBox(height: 7),
+                          Expanded(
+                            child: _offeneAuftraege.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      l10n.noOffeneAuftraege,
+                                      style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    itemCount: _offeneAuftraege.length,
+                                    separatorBuilder: (context, i) => const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final auftrag = _offeneAuftraege[index];
+                                      return Material(
+                                        color: Colors.white.withOpacity(0.97),
+                                        borderRadius: BorderRadius.circular(14),
+                                        elevation: 2,
+                                        child: ListTile(
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                          leading: CircleAvatar(
+                                            radius: 22,
+                                            backgroundColor: KundenDashboardScreen.accentColor,
+                                            child: Icon(
+                                              getKategorieIcon(auftrag.kategorie),
+                                              color: KundenDashboardScreen.primaryColor,
+                                              size: 28,
                                             ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Text(
-                                                auftrag.titel,
-                                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
+                                          ),
+                                          title: Text(
+                                            auftrag.titel,
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          subtitle: auftrag.status != null
+                                              ? Padding(
+                                                  padding: const EdgeInsets.only(top: 3.0),
+                                                  child: Text(
+                                                    l10n.statusPrefix(l10n.translateStatus(auftrag.status)),
+                                                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                                                  ),
+                                                )
+                                              : null,
+                                          trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
                                               ),
+                                            ).then((_) => _ladeAuftraege());
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          if (_abgeschlosseneAuftraege.isNotEmpty) ...[
+                            const Divider(height: 28, thickness: 1.2),
+                            Text(
+                              l10n.abgeschlosseneAuftraege,
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                            ),
+                            const SizedBox(height: 7),
+                            SizedBox(
+                              height: 112,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: _abgeschlosseneAuftraege.length,
+                                separatorBuilder: (context, i) => const SizedBox(width: 13),
+                                itemBuilder: (context, index) {
+                                  final auftrag = _abgeschlosseneAuftraege[index];
+                                  return Material(
+                                    elevation: 2,
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: Colors.white.withOpacity(0.97),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
+                                          ),
+                                        ).then((_) => _ladeAuftraege());
+                                      },
+                                      child: Container(
+                                        width: 190,
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: 17,
+                                                  backgroundColor: KundenDashboardScreen.accentColor,
+                                                  child: Icon(
+                                                    getKategorieIcon(auftrag.kategorie),
+                                                    color: KundenDashboardScreen.primaryColor,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    auftrag.titel,
+                                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            // Hier für abgeschlossene Aufträge kannst du es so lassen, weil du schon "Completed" aus der JSON nutzt:
+                                            Text(
+                                              l10n.abgeschlossenStatus,
+                                              style: TextStyle(fontSize: 13, color: Colors.teal[700]),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          l10n.abgeschlossenStatus,
-                                          style: TextStyle(fontSize: 13, color: Colors.teal[700]),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: Text(l10n.neuerAuftrag),
-        backgroundColor: KundenDashboardScreen.primaryColor,
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AuftragErstellenScreen()),
           ).then((_) => _ladeAuftraege());
         },
+        backgroundColor: KundenDashboardScreen.primaryColor,
+        elevation: 7,
+        tooltip: l10n.neuerAuftrag,
+        child: const Icon(Icons.add, size: 30),
+        shape: const CircleBorder(),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

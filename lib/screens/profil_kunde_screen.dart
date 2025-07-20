@@ -22,6 +22,8 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
+  String? _userEmail;
+
   @override
   void initState() {
     super.initState();
@@ -35,10 +37,11 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
       if (user == null) throw Exception(AppLocalizations.of(context)!.notLoggedIn);
       final res = await supabase
           .from('users')
-          .select('adresse')
+          .select('adresse, email')
           .eq('id', user.id)
           .maybeSingle();
       _adresseController.text = res?['adresse'] ?? '';
+      _userEmail = res?['email'] ?? '';
     } catch (e) {
       setState(() => _errorMessage = AppLocalizations.of(context)!.profileLoadError(e.toString()));
     } finally {
@@ -57,7 +60,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
           .update({'adresse': _adresseController.text.trim()})
           .eq('id', user.id);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.profileAddressSaved)),
+        SnackBar(content: Text(AppLocalizations.of(context)!.profileAddressSaved), backgroundColor: Colors.green[700]),
       );
     } catch (e) {
       setState(() => _errorMessage = AppLocalizations.of(context)!.profileSaveError(e.toString()));
@@ -71,7 +74,13 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.deleteAccountTitle),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red[800]),
+            const SizedBox(width: 8),
+            Text(l10n.deleteAccountTitle),
+          ],
+        ),
         content: Text(l10n.deleteAccountWarning),
         actions: [
           TextButton(
@@ -106,18 +115,14 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
       final session = supabase.auth.currentSession;
       if (user == null || session == null) throw Exception(l10n.notLoggedIn);
 
-      // 1. Bewertungen löschen (als Kunde oder Dienstleister)
       await supabase.from('bewertungen').delete()
         .or('kunde_id.eq.${user.id},dienstleister_id.eq.${user.id}');
 
-      // 2. Aufträge löschen (als Kunde oder Dienstleister)
       await supabase.from('auftraege').delete()
         .or('kunde_id.eq.${user.id},dienstleister_id.eq.${user.id}');
 
-      // 3. User löschen (DB)
       await supabase.from('users').delete().eq('id', user.id);
 
-      // 4. Supabase Edge Function aufrufen, um Auth-Account zu löschen!
       final supabaseFunctionUrl = 'https://npqanssmfxdvwauuaemd.supabase.co/functions/v1/delete_user';
       final response = await http.post(
         Uri.parse(supabaseFunctionUrl),
@@ -129,13 +134,11 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
       );
 
       if (response.statusCode == 200) {
-        // 5. Ausloggen
         await supabase.auth.signOut();
-
         if (mounted) {
           Navigator.of(context).popUntil((route) => route.isFirst);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.accountDeleted)),
+            SnackBar(content: Text(l10n.accountDeleted), backgroundColor: Colors.green[700]),
           );
         }
       } else {
@@ -166,7 +169,7 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: Text(l10n.profileAppBar),
+        title: Text(l10n.profileAppBar, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: primaryColor,
         elevation: 0,
@@ -176,56 +179,140 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
           padding: const EdgeInsets.all(24),
           child: _isLoading
               ? const CircularProgressIndicator()
-              : Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Profil-Card
+                    Card(
+                      color: Colors.white,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 26,
+                              backgroundColor: primaryColor.withOpacity(0.1),
+                              child: const Icon(Icons.person, color: Colors.blue, size: 32),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.hello,
+                                    style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+                                  ),
+                                  Text(
+                                    _userEmail ?? '-',
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 26),
+                    // Adressformular
+                    Form(
+                      key: _formKey,
+                      child: TextFormField(
                         controller: _adresseController,
                         decoration: InputDecoration(
                           labelText: l10n.profileAddressLabel,
+                          prefixIcon: const Icon(Icons.home_rounded),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        validator: (value) =>
-                            (value == null || value.isEmpty)
-                                ? l10n.profileAddressEmpty
-                                : null,
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? l10n.profileAddressEmpty
+                            : null,
+                        textInputAction: TextInputAction.done,
                       ),
-                      const SizedBox(height: 24),
-                      if (_errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Text(_errorMessage!,
-                              style: const TextStyle(color: Colors.red)),
-                        ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _speichereAdresse,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                    ),
+                    const SizedBox(height: 18),
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                            const SizedBox(width: 7),
+                            Flexible(
+                              child: Text(_errorMessage!,
+                                  style: const TextStyle(color: Colors.red, fontSize: 15)),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
-                          child: Text(
-                            l10n.profileSaveButton,
-                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                          ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 36),
-                      _deletingAccount
-                          ? const CircularProgressIndicator()
-                          : SizedBox(
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _speichereAdresse,
+                        icon: _isLoading
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.save),
+                        label: Text(
+                          l10n.profileSaveButton,
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 38),
+                    // Account löschen Bereich
+                    Card(
+                      color: Colors.red[50],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Colors.redAccent, width: 1),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 28),
+                                const SizedBox(width: 11),
+                                Expanded(
+                                  child: Text(
+                                    l10n.deleteAccountWarning,
+                                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w500, fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                icon: const Icon(Icons.delete_forever),
+                                icon: _deletingAccount
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Icon(Icons.delete_forever),
                                 label: Text(
                                   l10n.deleteAccountButton,
                                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -242,8 +329,11 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
                                 onPressed: _deletingAccount ? null : _kontoLoeschenDialog,
                               ),
                             ),
-                    ],
-                  ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
         ),
       ),

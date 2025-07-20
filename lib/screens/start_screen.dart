@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart'; // Pfad anpassen, falls nötig!
+import 'package:google_fonts/google_fonts.dart';
+import '../l10n/app_localizations.dart';
 import 'login_kunde_screen.dart';
 import 'login_dienstleister_screen.dart';
 
@@ -8,101 +9,157 @@ class StartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Die Hauptfarbe kannst du bei Bedarf global definieren
-    const primaryColor = Color(0xFF3876BF); // Modernes, ruhiges Blau
-    const accentColor = Color(0xFFE7ECEF);  // Sehr helles Grau/Blau als Hintergrund
+    const primaryColor = Color(0xFF3876BF);
 
     return Scaffold(
-      backgroundColor: accentColor,
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.appTitle, // <-- Lokalisierung!
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        foregroundColor: primaryColor,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Optional: Platz für ein Logo
-              // Padding(
-              //   padding: const EdgeInsets.only(bottom: 24.0),
-              //   child: Image.asset('assets/logo.png', height: 80),
-              // ),
-              Text(
-                AppLocalizations.of(context)!.hello, // <-- Lokalisierung!
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Kunden-Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginKundeScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 4,
-                    shadowColor: primaryColor.withOpacity(0.25),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.kundeButton, // <-- Lokalisierung!
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // Dienstleister-Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginDienstleisterScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      side: BorderSide(color: primaryColor, width: 1.5),
-                    ),
-                    elevation: 3,
-                    shadowColor: primaryColor.withOpacity(0.13),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.dienstleisterButton, // <-- Lokalisierung!
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, letterSpacing: 0.3),
-                  ),
-                ),
-              ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFF7FAFC), // oben
+              Color(0xFFE7ECEF), // mitte
+              Color(0xFFD9E4F5), // unten, ganz leicht bläulich
             ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
+        ),
+        child: Stack(
+          children: [
+            // Sanfter Kreis oben links
+            Positioned(
+              top: -60,
+              left: -60,
+              child: Container(
+                width: 170,
+                height: 170,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.06),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            // Sanfter Kreis unten rechts
+            Positioned(
+              bottom: -50,
+              right: -50,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.09),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            // Content
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Hero Image
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            'assets/hero_start.png',
+                            height: 180,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        // Headline
+                        Text(
+                          AppLocalizations.of(context)!.appTitle,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 30,
+                            color: primaryColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Subheadline
+                        Text(
+                          AppLocalizations.of(context)!.hello,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 19,
+                            color: Colors.black.withOpacity(0.82),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        // Kunden-Button (Primary)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const LoginKundeScreen()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              elevation: 4,
+                              shadowColor: primaryColor.withOpacity(0.17),
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(22),
+                              ),
+                              textStyle: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 19,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            child: Text(AppLocalizations.of(context)!.kundeButton),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // Dienstleister-Button (Outlined)
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const LoginDienstleisterScreen()),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: primaryColor,
+                              side: BorderSide(color: primaryColor, width: 1.7),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(22),
+                              ),
+                              textStyle: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 19,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            child: Text(AppLocalizations.of(context)!.dienstleisterButton),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

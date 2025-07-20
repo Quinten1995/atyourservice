@@ -7,16 +7,8 @@ import 'dart:convert';
 import 'package:atyourservice/utils/geocoding_service.dart';
 import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/category_utils.dart'; // <--- NEU
 import 'premium_screen.dart';
-
-// ---- Helper für Kategorien ----
-String getKategorieLabel(String key, AppLocalizations l10n) {
-  switch (key) {
-    // ... [bleibt wie gehabt, abgekürzt]
-    default: return key;
-  }
-}
-// ---- Ende Helper ----
 
 class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
@@ -646,6 +638,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 maxLines: 3,
                               ),
                               const SizedBox(height: 18),
+                              // <---- MODERNES, SORTIERTES, RUNDECKIGES DROPDOWN ---->
                               DropdownButtonFormField<String>(
                                 value: _selectedKategorie,
                                 decoration: _inputDecoration(l10n.categoryLabel),
@@ -665,7 +658,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 validator: (value) => (value == null || value.isEmpty)
                                     ? l10n.categoryValidator
                                     : null,
+                                borderRadius: BorderRadius.circular(16), // <--- Das rundet das Menü ab!
                               ),
+                              // <---- ENDE DROPDOWN ---->
                               const SizedBox(height: 18),
                               TextFormField(
                                 controller: _adresseController,

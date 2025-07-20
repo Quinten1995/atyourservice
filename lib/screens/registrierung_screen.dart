@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/kategorien.dart';
-import '../l10n/app_localizations.dart'; // NEU: Lokalisation importieren
+import '../l10n/app_localizations.dart'; // Lokalisation importieren
 
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
@@ -240,13 +240,13 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                         borderSide: BorderSide(color: primaryColor, width: 2),
                       ),
                     ),
+                    borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
                     items: [
                       DropdownMenuItem(
                         value: 'kunde',
@@ -279,13 +279,13 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
                       ),
+                      borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
                       items: kategorieKeys.map((kategorie) {
                         return DropdownMenuItem(
                           value: kategorie,
@@ -313,7 +313,6 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
@@ -342,7 +341,6 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor.withOpacity(0.15)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),

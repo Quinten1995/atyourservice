@@ -40,6 +40,10 @@ dependencies:
   # === In-App-Purchase ===
   in_app_purchase: ^3.2.3
 
+  # === Google Fonts ===
+  google_fonts: ^4.0.4
+  blobs: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -54,13 +58,10 @@ flutter:
   # Für automatische Generierung der Lokalisationen (optional, aber empfohlen)
   generate: true
 
-  # Optional, falls du was anpassen willst:
-  # l10n:
-  #   arb-dir: lib/l10n
-  #   template-arb-file: app_de.arb
-  #   output-localization-file: app_localizations.dart
+  assets:
+    - assets/hero_start.png
 
 flutter_icons:
-  image_path: "assets/icon/app_icon.png"   # Passe den Pfad ggf. an!
+  image_path: "assets/icon/app_icon.png"
   android: true
   ios: true
