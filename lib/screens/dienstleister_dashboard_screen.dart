@@ -11,6 +11,9 @@ import 'pdf_rechnung_screen.dart';
 class DienstleisterDashboardScreen extends StatefulWidget {
   const DienstleisterDashboardScreen({Key? key}) : super(key: key);
 
+  static const Color primaryColor = Color(0xFF3876BF);
+  static const Color accentColor = Color(0xFFE7ECEF);
+
   @override
   _DienstleisterDashboardScreenState createState() => _DienstleisterDashboardScreenState();
 }
@@ -31,9 +34,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   List<Map<String, dynamic>> _alleAbgeschlosseneAuftraegeRaw = [];
 
   List<Auftrag> _offenePassendeAuftraege = [];
-
-  static const Color primaryColor = Color(0xFF3876BF);
-  static const Color accentColor = Color(0xFFE7ECEF);
 
   @override
   void initState() {
@@ -132,17 +132,41 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     }
   }
 
+  // NEUER HEADER → Weiß & mit Schatten für perfekte Lesbarkeit!
   Widget _dashboardHeader() {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0, left: 2),
+      padding: const EdgeInsets.only(bottom: 10.0, left: 2, top: 8),
       child: Row(
         children: [
-          Icon(Icons.handyman, color: primaryColor, size: 28),
+          Icon(
+            Icons.handyman,
+            color: Colors.white,
+            size: 28,
+            shadows: [
+              Shadow(
+                blurRadius: 6,
+                color: Colors.black.withOpacity(0.36),
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
           const SizedBox(width: 10),
           Text(
             l10n.dienstleisterDashboardHeader,
-            style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: primaryColor),
+            style: TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.1,
+              shadows: [
+                Shadow(
+                  blurRadius: 6,
+                  color: Colors.black.withOpacity(0.36),
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -172,7 +196,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: auftraegeRaw.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 22),
+            separatorBuilder: (context, index) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
               final map = auftraegeRaw[index];
               final auftrag = Auftrag.fromJson(map);
@@ -180,11 +204,11 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               final kundenEmail = kunde?['email'] ?? 'Kunde';
 
               return Material(
-                elevation: 5,
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
+                elevation: 3,
+                borderRadius: BorderRadius.circular(18),
+                color: Colors.white.withOpacity(0.96),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -192,7 +216,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                     ).then((_) => _ladeProfilUndAuftraege());
                   },
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
+                    width: MediaQuery.of(context).size.width * 0.78,
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +245,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Icon(Icons.assignment, size: 15, color: primaryColor),
+                                Icon(Icons.assignment, size: 15, color: DienstleisterDashboardScreen.primaryColor),
                                 const SizedBox(width: 7),
                                 Text(
                                   l10n.statusPrefix(l10n.statusValue(auftrag.status)),
@@ -241,7 +265,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // --- Generate Invoice Button ---
                             ElevatedButton.icon(
                               icon: const Icon(Icons.picture_as_pdf, size: 17),
                               label: Text(
@@ -291,7 +314,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                               Center(
                                 child: IconButton(
                                   icon: const Icon(Icons.delete, color: Colors.redAccent, size: 28),
-                                  tooltip: l10n.deleteJobTooltip, // Key ggf. ergänzen
+                                  tooltip: l10n.deleteJobTooltip,
                                   onPressed: () {
                                     setState(() {
                                       _alleAbgeschlosseneAuftraegeRaw.removeWhere((element) => element['id'] == auftrag.id);
@@ -310,7 +333,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
             },
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
       ],
     );
   }
@@ -319,7 +342,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: accentColor,
+      backgroundColor: DienstleisterDashboardScreen.accentColor,
       appBar: AppBar(
         title: Text(
           l10n.dienstleisterDashboardAppBar,
@@ -327,13 +350,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        foregroundColor: primaryColor,
+        centerTitle: true,
+        foregroundColor: DienstleisterDashboardScreen.primaryColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refreshTooltip,
             onPressed: _ladeProfilUndAuftraege,
-            color: primaryColor,
+            color: DienstleisterDashboardScreen.primaryColor,
           ),
           IconButton(
             icon: const Icon(Icons.person),
@@ -345,103 +369,145 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               );
               _ladeProfilUndAuftraege();
             },
-            color: primaryColor,
+            color: DienstleisterDashboardScreen.primaryColor,
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _errorMessage != null
-                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _dashboardHeader(),
-                      if (_alleLaufendenAuftraegeRaw.isNotEmpty)
-                        _buildAuftragsListe(_alleLaufendenAuftraegeRaw, l10n.meineLaufendenAuftraege),
-                      if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty)
-                        _buildAuftragsListe(_alleAbgeschlosseneAuftraegeRaw, l10n.meineAbgeschlossenenAuftraege, isCompleted: true),
-                      Text(
-                        l10n.offenePassendeAuftraege,
-                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-                      ),
-                      const SizedBox(height: 7),
-                      Expanded(
-                        child: _offenePassendeAuftraege.isEmpty
-                            ? Center(
-                                child: Text(
-                                  l10n.noPassendeAuftraege,
-                                  style: TextStyle(fontSize: 15, color: Colors.grey[600]),
-                                ),
-                              )
-                            : ListView.separated(
-                                itemCount: _offenePassendeAuftraege.length,
-                                separatorBuilder: (context, i) => const SizedBox(height: 12),
-                                itemBuilder: (context, index) {
-                                  final Auftrag auftrag = _offenePassendeAuftraege[index];
-
-                                  String distText = '';
-                                  if (_meineLatitude != null &&
-                                      _meineLongitude != null &&
-                                      auftrag.latitude != null &&
-                                      auftrag.longitude != null) {
-                                    final double dist = berechneEntfernung(
-                                      _meineLatitude!,
-                                      _meineLongitude!,
-                                      auftrag.latitude!,
-                                      auftrag.longitude!,
-                                    );
-                                    distText = l10n.entfernungSuffix(dist.toStringAsFixed(1));
-                                  }
-
-                                  return Material(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(14),
-                                    elevation: 2,
-                                    child: ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                                      leading: Icon(Icons.assignment_outlined, color: primaryColor, size: 30),
-                                      title: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              auftrag.titel,
-                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          if (!auftrag.soSchnellWieMoeglich)
-                                            Tooltip(
-                                              message: l10n.geplanterAuftrag,
-                                              child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
-                                            ),
-                                        ],
-                                      ),
-                                      subtitle: distText.isNotEmpty
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(top: 3.0),
-                                              child: Text(distText, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
-                                            )
-                                          : null,
-                                      trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
-                                          ),
-                                        ).then((_) => _ladeProfilUndAuftraege());
-                                      },
+      body: Stack(
+        children: [
+          // Hintergrund: Gradient + Deko-Kreise wie bei den anderen Screens
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF3876BF),
+                  Color(0xFFE7ECEF),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -70,
+            left: -70,
+            child: Container(
+              width: 170,
+              height: 170,
+              decoration: BoxDecoration(
+                color: DienstleisterDashboardScreen.primaryColor.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -60,
+            right: -55,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: DienstleisterDashboardScreen.accentColor.withOpacity(0.20),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage != null
+                    ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _dashboardHeader(),
+                          if (_alleLaufendenAuftraegeRaw.isNotEmpty)
+                            _buildAuftragsListe(_alleLaufendenAuftraegeRaw, l10n.meineLaufendenAuftraege),
+                          if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty)
+                            _buildAuftragsListe(_alleAbgeschlosseneAuftraegeRaw, l10n.meineAbgeschlossenenAuftraege, isCompleted: true),
+                          Text(
+                            l10n.offenePassendeAuftraege,
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey[800]),
+                          ),
+                          const SizedBox(height: 7),
+                          Expanded(
+                            child: _offenePassendeAuftraege.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      l10n.noPassendeAuftraege,
+                                      style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                                     ),
-                                  );
-                                },
-                              ),
+                                  )
+                                : ListView.separated(
+                                    itemCount: _offenePassendeAuftraege.length,
+                                    separatorBuilder: (context, i) => const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final Auftrag auftrag = _offenePassendeAuftraege[index];
+                                      String distText = '';
+                                      if (_meineLatitude != null &&
+                                          _meineLongitude != null &&
+                                          auftrag.latitude != null &&
+                                          auftrag.longitude != null) {
+                                        final double dist = berechneEntfernung(
+                                          _meineLatitude!,
+                                          _meineLongitude!,
+                                          auftrag.latitude!,
+                                          auftrag.longitude!,
+                                        );
+                                        distText = l10n.entfernungSuffix(dist.toStringAsFixed(1));
+                                      }
+
+                                      return Material(
+                                        color: Colors.white.withOpacity(0.96),
+                                        borderRadius: BorderRadius.circular(18),
+                                        elevation: 2,
+                                        child: ListTile(
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+                                          leading: Icon(Icons.assignment_outlined, color: DienstleisterDashboardScreen.primaryColor, size: 30),
+                                          title: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  auftrag.titel,
+                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              if (!auftrag.soSchnellWieMoeglich)
+                                                Tooltip(
+                                                  message: l10n.geplanterAuftrag,
+                                                  child: Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 20),
+                                                ),
+                                            ],
+                                          ),
+                                          subtitle: distText.isNotEmpty
+                                              ? Padding(
+                                                  padding: const EdgeInsets.only(top: 3.0),
+                                                  child: Text(distText, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                                                )
+                                              : null,
+                                          trailing: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black38),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => AuftragDetailScreen(initialAuftrag: auftrag),
+                                              ),
+                                            ).then((_) => _ladeProfilUndAuftraege());
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+          ),
+        ],
       ),
     );
   }

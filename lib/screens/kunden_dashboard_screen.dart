@@ -5,24 +5,8 @@ import 'auftrag_detail_screen.dart';
 import 'auftrag_erstellen_screen.dart';
 import 'profil_kunde_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../data/kategorie_icons.dart'; // ICON-MAP importieren!
 
-// Hilfsfunktion: Wähle das passende Icon je Kategorie
-IconData getKategorieIcon(String kategorie) {
-  switch (kategorie.toLowerCase()) {
-    case 'elektriker':
-      return Icons.electrical_services;
-    case 'maler':
-      return Icons.format_paint;
-    case 'babysitter / kinderbetreuung':
-      return Icons.child_care;
-    case 'klempner':
-      return Icons.plumbing;
-    default:
-      return Icons.assignment_ind;
-  }
-}
-
-// --- STATUS-ÜBERSETZUNG ---
 extension StatusTranslation on AppLocalizations {
   String translateStatus(String? status) {
     switch (status?.toLowerCase()) {
@@ -114,14 +98,34 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       padding: const EdgeInsets.only(bottom: 10.0, left: 2, top: 8),
       child: Row(
         children: [
-          Icon(Icons.person, color: KundenDashboardScreen.primaryColor, size: 28),
+          Icon(
+            Icons.person,
+            color: Colors.white,
+            size: 28,
+            shadows: [
+              Shadow(
+                blurRadius: 6,
+                color: Colors.black.withOpacity(0.36),
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
           const SizedBox(width: 10),
           Text(
             l10n.kundenDashboardHeader,
             style: TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
-                color: KundenDashboardScreen.primaryColor),
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 1.1,
+              shadows: [
+                Shadow(
+                  blurRadius: 6,
+                  color: Colors.black.withOpacity(0.36),
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -140,6 +144,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         foregroundColor: KundenDashboardScreen.primaryColor,
         actions: [
           IconButton(
@@ -164,7 +169,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       ),
       body: Stack(
         children: [
-          // Hintergrund: Gradient + Kreise
+          // --- Hintergrund: Gradient + Kreise ---
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -173,13 +178,13 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFFEBF4FF),
+                  Color(0xFF3876BF),
                   Color(0xFFE7ECEF),
-                  Color(0xFFD9E4F5),
                 ],
               ),
             ),
           ),
+          // Oben Links
           Positioned(
             top: -70,
             left: -70,
@@ -187,19 +192,20 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
               width: 170,
               height: 170,
               decoration: BoxDecoration(
-                color: KundenDashboardScreen.primaryColor.withOpacity(0.09),
+                color: KundenDashboardScreen.primaryColor.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
             ),
           ),
+          // Unten Rechts
           Positioned(
-            bottom: -65,
+            bottom: -60,
             right: -55,
             child: Container(
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: KundenDashboardScreen.primaryColor.withOpacity(0.09),
+                color: KundenDashboardScreen.accentColor.withOpacity(0.20),
                 shape: BoxShape.circle,
               ),
             ),
@@ -236,10 +242,10 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                   final dienstleisterEmail = dienstleister != null ? dienstleister['email'] as String? : null;
                                   return Material(
                                     elevation: 3,
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white.withOpacity(0.97),
+                                    borderRadius: BorderRadius.circular(18),
+                                    color: Colors.white.withOpacity(0.96),
                                     child: InkWell(
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(18),
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -249,8 +255,8 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                         ).then((_) => _ladeAuftraege());
                                       },
                                       child: Container(
-                                        width: 230,
-                                        padding: const EdgeInsets.all(13),
+                                        width: 240,
+                                        padding: const EdgeInsets.all(16),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -267,7 +273,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                                     size: 28,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 10),
+                                                const SizedBox(width: 12),
                                                 Expanded(
                                                   child: Text(
                                                     auftrag.titel,
@@ -278,12 +284,11 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(height: 12),
+                                            const SizedBox(height: 14),
                                             Row(
                                               children: [
                                                 Icon(Icons.assignment, size: 17, color: KundenDashboardScreen.primaryColor),
                                                 const SizedBox(width: 5),
-                                                // HIER wird übersetzt:
                                                 Text(
                                                   l10n.statusPrefix(l10n.translateStatus(auftrag.status)),
                                                   style: const TextStyle(fontSize: 13),
@@ -322,15 +327,15 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                   )
                                 : ListView.separated(
                                     itemCount: _offeneAuftraege.length,
-                                    separatorBuilder: (context, i) => const SizedBox(height: 12),
+                                    separatorBuilder: (context, i) => const SizedBox(height: 14),
                                     itemBuilder: (context, index) {
                                       final auftrag = _offeneAuftraege[index];
                                       return Material(
-                                        color: Colors.white.withOpacity(0.97),
-                                        borderRadius: BorderRadius.circular(14),
+                                        color: Colors.white.withOpacity(0.96),
+                                        borderRadius: BorderRadius.circular(18),
                                         elevation: 2,
                                         child: ListTile(
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
                                           leading: CircleAvatar(
                                             radius: 22,
                                             backgroundColor: KundenDashboardScreen.accentColor,
@@ -381,15 +386,15 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                               child: ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: _abgeschlosseneAuftraege.length,
-                                separatorBuilder: (context, i) => const SizedBox(width: 13),
+                                separatorBuilder: (context, i) => const SizedBox(width: 14),
                                 itemBuilder: (context, index) {
                                   final auftrag = _abgeschlosseneAuftraege[index];
                                   return Material(
                                     elevation: 2,
-                                    borderRadius: BorderRadius.circular(14),
-                                    color: Colors.white.withOpacity(0.97),
+                                    borderRadius: BorderRadius.circular(18),
+                                    color: Colors.white.withOpacity(0.96),
                                     child: InkWell(
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(18),
                                       onTap: () {
                                         Navigator.push(
                                           context,
@@ -400,7 +405,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                       },
                                       child: Container(
                                         width: 190,
-                                        padding: const EdgeInsets.all(12),
+                                        padding: const EdgeInsets.all(14),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -416,7 +421,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                                     size: 20,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8),
+                                                const SizedBox(width: 10),
                                                 Expanded(
                                                   child: Text(
                                                     auftrag.titel,
@@ -428,7 +433,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                                               ],
                                             ),
                                             const SizedBox(height: 8),
-                                            // Hier für abgeschlossene Aufträge kannst du es so lassen, weil du schon "Completed" aus der JSON nutzt:
                                             Text(
                                               l10n.abgeschlossenStatus,
                                               style: TextStyle(fontSize: 13, color: Colors.teal[700]),
