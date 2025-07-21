@@ -6,10 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../utils/in_app_purchase_service.dart';
 
 // IDs wie im Play Store/App Store angelegt!
-const Set<String> _kProductIds = {
-  'atyourservice_silver',
-  'atyourservice_gold',
-};
+const Set<String> _kProductIds = {'atyourservice_silver', 'atyourservice_gold'};
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -30,9 +27,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
     super.initState();
     _ladeAboTyp();
     _ladeStoreProdukte();
-    _purchaseSubscription = InAppPurchaseService()
-        .listenToPurchases()
-        .listen(_handlePurchases);
+    _purchaseSubscription = InAppPurchaseService().listenToPurchases().listen(
+      _handlePurchases,
+    );
   }
 
   @override
@@ -80,7 +77,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
     print('IAP DEBUG: getProducts() abgeschlossen');
     print('======== IAP DEBUG ========');
-    print('Gefundene Produkte: ${resp.productDetails.map((e) => e.id).toList()}');
+    print(
+      'Gefundene Produkte: ${resp.productDetails.map((e) => e.id).toList()}',
+    );
     print('Nicht gefundene IDs: ${resp.notFoundIDs}');
     print('===========================');
 
@@ -119,13 +118,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
             _aboTyp = typ;
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.premiumActivated)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
         }
       } else if (purchase.status == PurchaseStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.premiumPurchaseFailed(purchase.error?.message ?? ''))),
+          SnackBar(
+            content: Text(
+              l10n.premiumPurchaseFailed(purchase.error?.message ?? ''),
+            ),
+          ),
         );
       }
     }
@@ -159,7 +162,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 children: [
                   Text(
                     l10n.premiumChoosePlan,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   if (_aboTyp != null)
@@ -167,23 +173,39 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
-                          Icon(Icons.verified_user, color: Colors.blueAccent, size: 23),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.premiumCurrentPlan,
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          Icon(
+                            Icons.verified_user,
+                            color: Colors.blueAccent,
+                            size: 23,
                           ),
-                          Text(
-                            _aboTyp!.toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: _aboTyp == 'gold'
-                                  ? Colors.amber[900]
-                                  : _aboTyp == 'silver'
-                                      ? Colors.blueGrey[700]
-                                      : Colors.grey[600],
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              l10n.premiumCurrentPlan,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              _aboTyp!.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: _aboTyp == 'gold'
+                                    ? Colors.amber[900]
+                                    : _aboTyp == 'silver'
+                                    ? Colors.blueGrey[700]
+                                    : Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -334,27 +356,44 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  priceText,
-                  style: TextStyle(
-                    color: Colors.blueGrey[900],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                Flexible(
+                  child: Text(
+                    priceText,
+                    style: TextStyle(
+                      color: Colors.blueGrey[900],
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            ...?features?.map((f) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 17),
-                      const SizedBox(width: 7),
-                      Text(f, style: const TextStyle(fontSize: 15)),
-                    ],
-                  ),
-                )),
+            ...?features?.map(
+              (f) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 17,
+                    ),
+                    const SizedBox(width: 7),
+                    Flexible(
+                      child: Text(
+                        f,
+                        style: const TextStyle(fontSize: 15),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             if (showButton) ...[
               const SizedBox(height: 14),
               SizedBox(
@@ -364,8 +403,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   child: Text(l10n.premiumChooseButton(title)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
                 ),
