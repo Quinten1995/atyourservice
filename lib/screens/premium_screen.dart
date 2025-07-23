@@ -62,27 +62,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   // Lädt Store-Produkte (Abos)
   Future<void> _ladeStoreProdukte() async {
-    print('IAP DEBUG: Starte _ladeStoreProdukte()');
     final available = await InAppPurchaseService().isAvailable();
-    print('IAP DEBUG: isAvailable() -> $available');
     if (!available) {
       setState(() {
         _storeAvailable = false;
       });
-      print('IAP DEBUG: Store nicht verfügbar');
       return;
     }
-    print('IAP DEBUG: Store verfügbar, hole Produkte...');
     final resp = await InAppPurchaseService().getProducts();
-
-    print('IAP DEBUG: getProducts() abgeschlossen');
-    print('======== IAP DEBUG ========');
-    print(
-      'Gefundene Produkte: ${resp.productDetails.map((e) => e.id).toList()}',
-    );
-    print('Nicht gefundene IDs: ${resp.notFoundIDs}');
-    print('===========================');
-
     setState(() {
       _storeAvailable = true;
       _products = resp.productDetails.toList();
@@ -98,17 +85,20 @@ class _PremiumScreenState extends State<PremiumScreen> {
     }
   }
 
-  // Stream-Callback für Käufe
+  // Stream-Callback für Käufe + automatische Rückstufung auf "free"
   void _handlePurchases(List<PurchaseDetails> purchases) async {
     final l10n = AppLocalizations.of(context)!;
+    bool foundActive = false;
+
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         // Abo-Typ anhand der Produkt-ID bestimmen
         final typ = _aboTypFromProductId(purchase.productID);
         final user = Supabase.instance.client.auth.currentUser;
-        if (user != null && typ != null) {
-          // In Supabase Abo-Typ speichern
+
+        // Wenn sich wirklich etwas ändert
+        if (user != null && typ != null && typ != _aboTyp) {
           await Supabase.instance.client
               .from('users')
               .update({'abo_typ': typ})
@@ -122,6 +112,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
             context,
           ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
         }
+        foundActive = true;
+
+        // Kauf als abgeschlossen markieren!
+        if (purchase.pendingCompletePurchase) {
+          await InAppPurchase.instance.completePurchase(purchase);
+        }
       } else if (purchase.status == PurchaseStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -130,6 +126,25 @@ class _PremiumScreenState extends State<PremiumScreen> {
             ),
           ),
         );
+      }
+    }
+
+    // Wenn KEIN aktives Abo gefunden wurde, zurück auf free!
+    if (!foundActive) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null && _aboTyp != 'free') {
+        await Supabase.instance.client
+            .from('users')
+            .update({'abo_typ': 'free'})
+            .eq('id', user.id);
+
+        setState(() {
+          _aboTyp = 'free';
+        });
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
       }
     }
   }

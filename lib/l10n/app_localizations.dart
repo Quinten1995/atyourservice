@@ -1838,6 +1838,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// No description provided for @premiumDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium deactivated.'**
+  String get premiumDeactivated;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -924,4 +924,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get cancel => 'Annulla';
+
+  @override
+  String get premiumDeactivated => 'Premium disattivato.';
 }

@@ -296,7 +296,9 @@
   "deleteAccountWarning": "Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Tüm verileriniz geri alınamaz şekilde silinecek.",
   "deleteAccountButton": "Hesabı Sil",
   "accountDeleted": "Hesabınız silindi.",
-  "cancel": "İptal"
+  "cancel": "İptal",
+  "premiumDeactivated": "Premium devre dışı bırakıldı."
+
 
   
 

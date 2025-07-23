@@ -323,7 +323,9 @@
   "deleteAccountWarning": "Voulez-vous vraiment supprimer définitivement votre compte ? Toutes vos données seront supprimées de façon irréversible.",
   "deleteAccountButton": "Supprimer le compte",
   "accountDeleted": "Votre compte a été supprimé.",
-  "cancel": "Annuler"
+  "cancel": "Annuler",
+  "premiumDeactivated": "Premium désactivé."
+
 
 
 

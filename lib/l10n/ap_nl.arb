@@ -286,7 +286,9 @@
   "deleteAccountWarning": "Weet je zeker dat je je account permanent wilt verwijderen? Al je gegevens worden onherroepelijk verwijderd.",
   "deleteAccountButton": "Account verwijderen",
   "accountDeleted": "Je account is verwijderd.",
-  "cancel": "Annuleren"
+  "cancel": "Annuleren",
+  "premiumDeactivated": "Premium gedeactiveerd."
+
 
 
 }

@@ -924,4 +924,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cancel => 'İptal';
+
+  @override
+  String get premiumDeactivated => 'Premium devre dışı bırakıldı.';
 }

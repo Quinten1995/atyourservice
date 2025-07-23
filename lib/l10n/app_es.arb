@@ -296,7 +296,9 @@
   "deleteAccountWarning": "¿Seguro que deseas eliminar tu cuenta de forma permanente? Todos tus datos se eliminarán de forma irreversible.",
   "deleteAccountButton": "Eliminar cuenta",
   "accountDeleted": "Tu cuenta ha sido eliminada.",
-  "cancel": "Cancelar"
+  "cancel": "Cancelar",
+  "premiumDeactivated": "Premium desactivado."
+
 
 
 
