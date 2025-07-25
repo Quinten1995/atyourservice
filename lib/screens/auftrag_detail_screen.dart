@@ -7,7 +7,7 @@ import 'bewertung_dialog.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/pdf_invoice_service.dart';
 import 'pdf_rechnung_screen.dart';
-import '../utils/category_utils.dart'; // <-- für die Labels!
+import '../utils/category_utils.dart';
 
 // Hilfsfunktion für Kategorie-Icons
 IconData getKategorieIcon(String? kategorie) {
@@ -34,7 +34,6 @@ IconData getKategorieIcon(String? kategorie) {
     case 'category_transport':
     case 'transport':
       return Icons.local_shipping;
-    // ... weitere Kategorien nach Bedarf ...
     default:
       return Icons.assignment_ind;
   }
@@ -42,8 +41,7 @@ IconData getKategorieIcon(String? kategorie) {
 
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
-  const AuftragDetailScreen({Key? key, required this.initialAuftrag})
-    : super(key: key);
+  const AuftragDetailScreen({Key? key, required this.initialAuftrag}) : super(key: key);
 
   @override
   _AuftragDetailScreenState createState() => _AuftragDetailScreenState();
@@ -134,8 +132,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .eq('id', widget.initialAuftrag.id)
           .maybeSingle();
 
-      if (auftragMap == null)
-        throw Exception(AppLocalizations.of(context)!.auftragNichtGefunden);
+      if (auftragMap == null) throw Exception(AppLocalizations.of(context)!.auftragNichtGefunden);
 
       final Auftrag aktuellerAuftrag = Auftrag.fromJson(auftragMap);
       setState(() {
@@ -151,8 +148,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _kundenName = kunde?['email'];
       });
 
-      if (aktuellerAuftrag.status == 'in bearbeitung' &&
-          aktuellerAuftrag.dienstleisterId != null) {
+      if (aktuellerAuftrag.status == 'in bearbeitung' && aktuellerAuftrag.dienstleisterId != null) {
         if (isDL) {
           setState(() {
             _kundenTelefonnummer = aktuellerAuftrag.telefon;
@@ -225,10 +221,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
   Future<void> _zeigeBewertungsDialogWennNoetig() async {
     final userId = _supabase.auth.currentUser?.id;
-    if (userId == null ||
-        _auftragDetails == null ||
-        _isDienstleister ||
-        _auftragDetails!.status != 'abgeschlossen') {
+    if (userId == null || _auftragDetails == null || _isDienstleister || _auftragDetails!.status != 'abgeschlossen') {
       return;
     }
 
@@ -271,11 +264,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       if ((_aboTyp ?? 'free') != 'gold') {
         final now = DateTime.now();
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        final weekStartUtc = DateTime.utc(
-          weekStart.year,
-          weekStart.month,
-          weekStart.day,
-        );
+        final weekStartUtc = DateTime.utc(weekStart.year, weekStart.month, weekStart.day);
 
         final auftraegeDieseWoche = await _supabase
             .from('auftraege')
@@ -284,8 +273,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             .gte('angenommen_am', weekStartUtc.toIso8601String())
             .inFilter('status', ['in bearbeitung', 'abgeschlossen']);
 
-        if (auftraegeDieseWoche is List &&
-            auftraegeDieseWoche.length >= wochenLimit) {
+        if (auftraegeDieseWoche is List && auftraegeDieseWoche.length >= wochenLimit) {
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -371,13 +359,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         content: Text(l10n.auftragEntfernenText),
         actions: [
           TextButton(
-            child: Text(l10n.abbrechen),
-            onPressed: () => Navigator.of(ctx).pop(false),
-          ),
+              child: Text(l10n.abbrechen),
+              onPressed: () => Navigator.of(ctx).pop(false)),
           TextButton(
-            child: Text(l10n.entfernen),
-            onPressed: () => Navigator.of(ctx).pop(true),
-          ),
+              child: Text(l10n.entfernen),
+              onPressed: () => Navigator.of(ctx).pop(true)),
         ],
       ),
     );
@@ -387,13 +373,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _supabase
-          .from('auftraege')
-          .update({
-            'kunde_auftragsstatus': 'entfernt',
-            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('id', _auftragDetails!.id);
+      await _supabase.from('auftraege').update({
+        'kunde_auftragsstatus': 'entfernt',
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', _auftragDetails!.id);
 
       Navigator.of(context).pop();
     } catch (e) {
@@ -428,19 +411,16 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _supabase
-          .from('auftraege')
-          .update({
-            'status': 'offen',
-            'dienstleister_id': null,
-            'angenommen_am': null,
-            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('id', _auftragDetails!.id);
+      await _supabase.from('auftraege').update({
+        'status': 'offen',
+        'dienstleister_id': null,
+        'angenommen_am': null,
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', _auftragDetails!.id);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.auftragErneutGepostet)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.auftragErneutGepostet)),
+      );
 
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
@@ -466,23 +446,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             Expanded(
               child: Text(
                 [
-                  if ((ad.wochentag ?? '').isNotEmpty)
-                    l10n.jedenWochentag(ad.wochentag ?? ''),
+                  if ((ad.wochentag ?? '').isNotEmpty) l10n.jedenWochentag(ad.wochentag ?? ''),
                   if (ad.intervall != null) ad.intervall!,
                   if (ad.zeitVon != null && ad.zeitBis != null)
                     "${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr",
                   if (ad.wiederholenBis != null)
                     l10n.bisDatum(
-                      "${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}",
-                    ),
+                        "${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}"),
                   if (ad.anzahlWiederholungen != null)
-                    "${ad.anzahlWiederholungen} ${l10n.malSuffix}",
+                    "${ad.anzahlWiederholungen} ${l10n.malSuffix}"
                 ].where((s) => s.isNotEmpty).join(", "),
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.deepPurple,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(fontSize: 15, color: Colors.deepPurple, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -500,11 +474,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               child: Text(
                 "${ad.terminDatum!.day.toString().padLeft(2, '0')}.${ad.terminDatum!.month.toString().padLeft(2, '0')}.${ad.terminDatum!.year}"
                 "${ad.zeitVon != null && ad.zeitBis != null ? ", ${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr" : ""}",
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.blueGrey,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(fontSize: 15, color: Colors.blueGrey, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -520,11 +490,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             const SizedBox(width: 8),
             Text(
               l10n.soSchnellWieMoeglich,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Colors.orange,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 15, color: Colors.orange, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -567,14 +533,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             padding: const EdgeInsets.only(right: 10),
             child: CircleAvatar(
               radius: 24,
-              backgroundImage:
-                  (_dienstleisterProfilbildUrl != null &&
-                      _dienstleisterProfilbildUrl!.isNotEmpty)
+              backgroundImage: (_dienstleisterProfilbildUrl != null && _dienstleisterProfilbildUrl!.isNotEmpty)
                   ? NetworkImage(_dienstleisterProfilbildUrl!)
                   : null,
-              child:
-                  (_dienstleisterProfilbildUrl == null ||
-                      _dienstleisterProfilbildUrl!.isEmpty)
+              child: (_dienstleisterProfilbildUrl == null || _dienstleisterProfilbildUrl!.isEmpty)
                   ? const Icon(Icons.person, size: 30, color: Colors.grey)
                   : null,
             ),
@@ -585,20 +547,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             children: [
               Row(
                 children: [
-                  Icon(
-                    getKategorieIcon(ad.kategorie),
-                    color: primaryColor,
-                    size: 22,
-                  ),
+                  Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 22),
                   const SizedBox(width: 7),
                   Expanded(
                     child: Text(
                       ad.titel,
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
+                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -623,8 +577,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                     ),
                   if (!_isDienstleister &&
                       ad.dienstleisterId != null &&
-                      (ad.status == 'in bearbeitung' ||
-                          ad.status == 'abgeschlossen') &&
+                      (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen') &&
                       _dienstleisterAboTyp == 'gold')
                     _premiumBadge(),
                 ],
@@ -660,41 +613,25 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           const SizedBox(height: 16),
           _zeitplanungAnzeige(),
           const SizedBox(height: 11),
+
           Text(
             l10n.beschreibung,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
-            ),
+            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800]),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 2, top: 1, bottom: 7),
             child: Text(ad.beschreibung, style: const TextStyle(fontSize: 16)),
           ),
 
-          /// ---- HIER DIE KATEGORIE-ROW: Alles Overflow-sicher ----
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                getKategorieIcon(ad.kategorie),
-                color: primaryColor,
-                size: 19,
-              ),
+              Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 19),
               SizedBox(width: 7),
-              Text(
-                l10n.kategorie,
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              Text(l10n.kategorie, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(width: 7),
-              Expanded(
-                child: Text(
-                  getKategorieLabel(ad.kategorie, l10n),
-                  style: TextStyle(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+              // HIER! Multilingual Anzeige!
+              Text(getKategorieLabel(ad.kategorie, l10n)),
             ],
           ),
           const SizedBox(height: 8),
@@ -705,14 +642,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               children: [
                 Icon(Icons.location_on, color: Colors.redAccent, size: 19),
                 SizedBox(width: 7),
-                Text(
-                  l10n.adresse,
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+                Text(l10n.adresse, style: TextStyle(fontWeight: FontWeight.w600)),
                 SizedBox(width: 7),
-                Expanded(
-                  child: Text(ad.adresse!, overflow: TextOverflow.ellipsis),
-                ),
+                Expanded(child: Text(ad.adresse!, overflow: TextOverflow.ellipsis)),
               ],
             ),
 
@@ -744,9 +676,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                 backgroundColor: ad.status == 'abgeschlossen'
                     ? Colors.green
                     : accentColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ],
           ),
@@ -755,6 +685,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     );
   }
 
+  // ########## NEUES KONTAKTFELD ##############
   Widget _kontaktBereich() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
@@ -765,9 +696,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         label = l10n.kundePrefix(_kundenName ?? l10n.roleKunde);
         nummer = _kundenTelefonnummer;
       } else if (!_isDienstleister && _dienstleisterTelefonnummer != null) {
-        label = l10n.dienstleisterPrefix(
-          _dienstleisterName ?? l10n.roleDienstleister,
-        );
+        label = l10n.dienstleisterPrefix(_dienstleisterName ?? l10n.roleDienstleister);
         nummer = _dienstleisterTelefonnummer;
       }
       if (label != null && nummer != null) {
@@ -781,25 +710,24 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(18.0),
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.phone, color: Colors.green, size: 30),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.kontaktZuLabel(label),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 7),
-                        SelectableText(
+                  Text(
+                    l10n.kontaktZuLabel(label),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Row(
+                    children: [
+                      Icon(Icons.contact_phone, color: Colors.blueGrey, size: 24), // <- Deko, nicht klickbar!
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: SelectableText(
                           nummer,
                           style: const TextStyle(
                             fontSize: 20,
@@ -807,12 +735,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1.2,
                           ),
+                          maxLines: 1,
                         ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    children: [
+                      ),
                       IconButton(
                         icon: const Icon(Icons.copy, color: Colors.black54),
                         tooltip: l10n.nummerKopieren,
@@ -827,7 +752,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                         icon: const Icon(Icons.call, color: Colors.green),
                         tooltip: l10n.anrufen,
                         onPressed: () {
-                          final uri = Uri(scheme: 'tel', path: nummer);
+                          final uri = Uri(scheme: 'tel', path: nummer!);
                           launchUrl(uri);
                         },
                       ),
@@ -883,11 +808,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
-        // Für Kunden: Löschen-Button bei offen, in bearbeitung, abgeschlossen
-        if (!_isDienstleister &&
-            (ad.status == 'offen' ||
-                ad.status == 'in bearbeitung' ||
-                ad.status == 'abgeschlossen'))
+        if (!_isDienstleister && (ad.status == 'offen' || ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen'))
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -944,10 +865,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
-        title: Text(
-          l10n.auftragDetailTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(l10n.auftragDetailTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -958,17 +876,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-            ? Center(child: Text(l10n.keineDatenVerfuegbar))
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _auftragInfoCard(),
-                    _kontaktBereich(),
-                    _actionButtons(),
-                  ],
-                ),
-              ),
+                ? Center(child: Text(l10n.keineDatenVerfuegbar))
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _auftragInfoCard(),
+                        _kontaktBereich(),
+                        _actionButtons(),
+                      ],
+                    ),
+                  ),
       ),
     );
   }
