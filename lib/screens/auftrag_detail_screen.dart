@@ -70,6 +70,42 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
+  // --- Hilfsfunktionen für Zeit/Intervall ---
+  String getIntervalLabel(String? key, AppLocalizations l10n) {
+    switch (key) {
+      case 'interval_weekly':
+        return l10n.interval_weekly;
+      case 'interval_biweekly':
+        return l10n.interval_biweekly;
+      case 'interval_monthly':
+        return l10n.interval_monthly;
+      default:
+        return key ?? '';
+    }
+  }
+
+  String getWeekdayLabel(String? key, AppLocalizations l10n) {
+    switch (key) {
+      case 'weekday_monday':
+        return l10n.weekday_monday;
+      case 'weekday_tuesday':
+        return l10n.weekday_tuesday;
+      case 'weekday_wednesday':
+        return l10n.weekday_wednesday;
+      case 'weekday_thursday':
+        return l10n.weekday_thursday;
+      case 'weekday_friday':
+        return l10n.weekday_friday;
+      case 'weekday_saturday':
+        return l10n.weekday_saturday;
+      case 'weekday_sunday':
+        return l10n.weekday_sunday;
+      default:
+        return key ?? '';
+    }
+  }
+  // ------------------------------------------
+
   String _getLocalizedStatus(String status, AppLocalizations l10n) {
     switch (status) {
       case 'offen':
@@ -432,10 +468,40 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // Angepasst: Zeitplan-/Intervall-Anzeige
   Widget _zeitplanungAnzeige() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
+
     if (ad.wiederkehrend == true) {
+      final parts = <String>[];
+
+      // Wochentag
+      if ((ad.wochentag ?? '').isNotEmpty) {
+        parts.add(l10n.jedenWochentag(getWeekdayLabel(ad.wochentag, l10n)));
+      }
+
+      // Intervall (übersetzt!)
+      if (ad.intervall != null && ad.intervall!.isNotEmpty) {
+        parts.add(getIntervalLabel(ad.intervall, l10n));
+      }
+
+      // Uhrzeit
+      if (ad.zeitVon != null && ad.zeitBis != null) {
+        parts.add('${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr');
+      }
+
+      // Bis-Datum
+      if (ad.wiederholenBis != null) {
+        final bisDatum = '${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}';
+        parts.add(l10n.bisDatum(bisDatum));
+      }
+
+      // Anzahl Wiederholungen
+      if (ad.anzahlWiederholungen != null) {
+        parts.add('${ad.anzahlWiederholungen} ${l10n.malSuffix}');
+      }
+
       return Padding(
         padding: const EdgeInsets.only(top: 6, bottom: 3),
         child: Row(
@@ -445,17 +511,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                [
-                  if ((ad.wochentag ?? '').isNotEmpty) l10n.jedenWochentag(ad.wochentag ?? ''),
-                  if (ad.intervall != null) ad.intervall!,
-                  if (ad.zeitVon != null && ad.zeitBis != null)
-                    "${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr",
-                  if (ad.wiederholenBis != null)
-                    l10n.bisDatum(
-                        "${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}"),
-                  if (ad.anzahlWiederholungen != null)
-                    "${ad.anzahlWiederholungen} ${l10n.malSuffix}"
-                ].where((s) => s.isNotEmpty).join(", "),
+                parts.join(', '),
                 style: const TextStyle(fontSize: 15, color: Colors.deepPurple, fontWeight: FontWeight.w600),
               ),
             ),
@@ -472,8 +528,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                "${ad.terminDatum!.day.toString().padLeft(2, '0')}.${ad.terminDatum!.month.toString().padLeft(2, '0')}.${ad.terminDatum!.year}"
-                "${ad.zeitVon != null && ad.zeitBis != null ? ", ${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr" : ""}",
+                '${ad.terminDatum!.day.toString().padLeft(2, '0')}.${ad.terminDatum!.month.toString().padLeft(2, '0')}.${ad.terminDatum!.year}'
+                '${ad.zeitVon != null && ad.zeitBis != null ? ", ${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr" : ""}',
                 style: const TextStyle(fontSize: 15, color: Colors.blueGrey, fontWeight: FontWeight.w600),
               ),
             ),
@@ -498,6 +554,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // ... alles andere bleibt unverändert (ab hier ↓)
   Widget _premiumBadge() {
     final l10n = AppLocalizations.of(context)!;
     return Container(

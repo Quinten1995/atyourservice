@@ -326,7 +326,9 @@
   "cancel": "Annuler",
   "premiumDeactivated": "Premium désactivé.",
   "acceptedByLabel": "Accepté par {name}",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "adresseValidator": "Veuillez saisir une adresse."
+
 
 
 

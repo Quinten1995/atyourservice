@@ -1850,6 +1850,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accepted by {name}'**
   String acceptedByLabel(Object name);
+
+  /// No description provided for @adresseValidator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an address.'**
+  String get adresseValidator;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

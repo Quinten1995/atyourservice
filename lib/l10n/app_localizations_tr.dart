@@ -932,4 +932,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String acceptedByLabel(Object name) {
     return '$name tarafından kabul edildi';
   }
+
+  @override
+  String get adresseValidator => 'Lütfen bir adres girin.';
 }

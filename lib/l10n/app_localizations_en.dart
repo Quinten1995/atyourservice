@@ -932,4 +932,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String acceptedByLabel(Object name) {
     return 'Accepted by $name';
   }
+
+  @override
+  String get adresseValidator => 'Please enter an address.';
 }

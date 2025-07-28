@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../utils/geocoding_service.dart';
-import '../utils/category_utils.dart'; // <<--- Die Utility für Labels!
+import '../utils/category_utils.dart';
 import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
 
@@ -381,6 +381,12 @@ class _AuftragErstellenScreenState extends State<AuftragErstellenScreen> {
                               borderSide: BorderSide(color: primaryColor, width: 2),
                             ),
                           ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return l10n.adresseValidator;
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         TextFormField(

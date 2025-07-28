@@ -299,7 +299,9 @@
   "cancel": "İptal",
   "premiumDeactivated": "Premium devre dışı bırakıldı.",
   "acceptedByLabel": "{name} tarafından kabul edildi",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "adresseValidator": "Lütfen bir adres girin."
+
 
 
   

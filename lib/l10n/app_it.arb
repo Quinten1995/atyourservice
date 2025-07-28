@@ -297,7 +297,9 @@
   "cancel": "Annulla",
   "premiumDeactivated": "Premium disattivato.",
   "acceptedByLabel": "Accettato da {name}",
-  "premiumBadgeLabel": "Premium"
+  "premiumBadgeLabel": "Premium",
+  "adresseValidator": "Per favore inserisci un indirizzo."
+
 
 
 
