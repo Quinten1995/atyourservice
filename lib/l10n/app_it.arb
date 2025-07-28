@@ -295,7 +295,9 @@
   "deleteAccountButton": "Elimina account",
   "accountDeleted": "Il tuo account è stato eliminato.",
   "cancel": "Annulla",
-  "premiumDeactivated": "Premium disattivato."
+  "premiumDeactivated": "Premium disattivato.",
+  "acceptedByLabel": "Accettato da {name}",
+  "premiumBadgeLabel": "Premium"
 
 
 

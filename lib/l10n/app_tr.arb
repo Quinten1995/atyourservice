@@ -297,7 +297,9 @@
   "deleteAccountButton": "Hesabı Sil",
   "accountDeleted": "Hesabınız silindi.",
   "cancel": "İptal",
-  "premiumDeactivated": "Premium devre dışı bırakıldı."
+  "premiumDeactivated": "Premium devre dışı bırakıldı.",
+  "acceptedByLabel": "{name} tarafından kabul edildi",
+  "premiumBadgeLabel": "Premium"
 
 
   

@@ -287,7 +287,9 @@
   "deleteAccountButton": "Account verwijderen",
   "accountDeleted": "Je account is verwijderd.",
   "cancel": "Annuleren",
-  "premiumDeactivated": "Premium gedeactiveerd."
+  "premiumDeactivated": "Premium gedeactiveerd.",
+  "acceptedByLabel": "Geaccepteerd door {name}",
+  "premiumBadgeLabel": "Premium"
 
 
 

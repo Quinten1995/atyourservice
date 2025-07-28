@@ -500,8 +500,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
   Widget _premiumBadge() {
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.only(left: 6.0),
+    return Container(
+      margin: const EdgeInsets.only(top: 4.0, left: 0.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+      decoration: BoxDecoration(
+        color: Colors.amber[100],
+        borderRadius: BorderRadius.circular(7),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -517,75 +522,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _kopfbereichMitProfilbild() {
-    final l10n = AppLocalizations.of(context)!;
-    final ad = _auftragDetails!;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (!_isDienstleister &&
-            ad.dienstleisterId != null &&
-            (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen'))
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: CircleAvatar(
-              radius: 24,
-              backgroundImage: (_dienstleisterProfilbildUrl != null && _dienstleisterProfilbildUrl!.isNotEmpty)
-                  ? NetworkImage(_dienstleisterProfilbildUrl!)
-                  : null,
-              child: (_dienstleisterProfilbildUrl == null || _dienstleisterProfilbildUrl!.isEmpty)
-                  ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                  : null,
-            ),
-          ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 22),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: Text(
-                      ad.titel,
-                      style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 5,
-                children: [
-                  Icon(Icons.star, color: Colors.amber, size: 22),
-                  Text(
-                    _dlDurchschnitt != null
-                        ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
-                        : '—',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
-                    Text(
-                      l10n.ratingsCount(_dlAnzahlBewertungen!),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                    ),
-                  if (!_isDienstleister &&
-                      ad.dienstleisterId != null &&
-                      (ad.status == 'in bearbeitung' || ad.status == 'abgeschlossen') &&
-                      _dienstleisterAboTyp == 'gold')
-                    _premiumBadge(),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -609,11 +545,24 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _kopfbereichMitProfilbild(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(getKategorieIcon(ad.kategorie), color: primaryColor, size: 22),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  ad.titel,
+                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: primaryColor),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           _zeitplanungAnzeige(),
           const SizedBox(height: 11),
-
           Text(
             l10n.beschreibung,
             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[800]),
@@ -622,7 +571,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
             padding: const EdgeInsets.only(left: 2, top: 1, bottom: 7),
             child: Text(ad.beschreibung, style: const TextStyle(fontSize: 16)),
           ),
-
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -630,12 +578,10 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               SizedBox(width: 7),
               Text(l10n.kategorie, style: TextStyle(fontWeight: FontWeight.w600)),
               SizedBox(width: 7),
-              // HIER! Multilingual Anzeige!
               Text(getKategorieLabel(ad.kategorie, l10n)),
             ],
           ),
           const SizedBox(height: 8),
-
           if (ad.adresse != null && ad.adresse!.isNotEmpty)
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -647,7 +593,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                 Expanded(child: Text(ad.adresse!, overflow: TextOverflow.ellipsis)),
               ],
             ),
-
           if (ad.latitude != null && ad.longitude != null)
             Padding(
               padding: const EdgeInsets.only(left: 32.0, top: 3),
@@ -657,7 +602,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           const SizedBox(height: 11),
-
           Row(
             children: [
               Text(l10n.status, style: TextStyle(fontWeight: FontWeight.w600)),
@@ -685,7 +629,98 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     );
   }
 
-  // ########## NEUES KONTAKTFELD ##############
+  Widget _angenommenVonInfo() {
+    if (_auftragDetails == null ||
+        _auftragDetails!.dienstleisterId == null ||
+        !(_auftragDetails!.status == 'in bearbeitung' || _auftragDetails!.status == 'abgeschlossen')) {
+      return const SizedBox.shrink();
+    }
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, left: 2, right: 2, bottom: 2),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle, color: Colors.green[800], size: 20),
+          const SizedBox(width: 7),
+          Flexible(
+            child: Text(
+              l10n.acceptedByLabel(_dienstleisterName ?? l10n.roleDienstleister),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.green[800],
+                fontWeight: FontWeight.w700,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dienstleisterVisitenkarte() {
+    if (_auftragDetails == null ||
+        _auftragDetails!.dienstleisterId == null ||
+        !(_auftragDetails!.status == 'in bearbeitung' || _auftragDetails!.status == 'abgeschlossen')) {
+      return const SizedBox.shrink();
+    }
+    final l10n = AppLocalizations.of(context)!;
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+      margin: const EdgeInsets.only(top: 8, bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 27,
+              backgroundImage: (_dienstleisterProfilbildUrl != null && _dienstleisterProfilbildUrl!.isNotEmpty)
+                  ? NetworkImage(_dienstleisterProfilbildUrl!)
+                  : null,
+              child: (_dienstleisterProfilbildUrl == null || _dienstleisterProfilbildUrl!.isEmpty)
+                  ? const Icon(Icons.person, size: 34, color: Colors.grey)
+                  : null,
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name und Premium Badge als Column (Badge unter Name, kein Überlappen!)
+                  Text(
+                    _dienstleisterName ?? l10n.roleDienstleister,
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (_dienstleisterAboTyp == 'gold') _premiumBadge(),
+                  const SizedBox(height: 7),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 22),
+                      Text(
+                        _dlDurchschnitt != null
+                            ? '${_dlDurchschnitt!.toStringAsFixed(2)} / 5'
+                            : '—',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      if (_dlAnzahlBewertungen != null && _dlAnzahlBewertungen! > 0)
+                        Text(
+                          l10n.ratingsCount(_dlAnzahlBewertungen!),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _kontaktBereich() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
@@ -724,7 +759,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                   const SizedBox(height: 7),
                   Row(
                     children: [
-                      Icon(Icons.contact_phone, color: Colors.blueGrey, size: 24), // <- Deko, nicht klickbar!
+                      Icon(Icons.contact_phone, color: Colors.blueGrey, size: 24),
                       const SizedBox(width: 10),
                       Expanded(
                         child: SelectableText(
@@ -882,6 +917,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _auftragInfoCard(),
+                        _angenommenVonInfo(),
+                        _dienstleisterVisitenkarte(),
                         _kontaktBereich(),
                         _actionButtons(),
                       ],

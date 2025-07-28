@@ -927,4 +927,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get premiumDeactivated => 'Premium désactivé.';
+
+  @override
+  String acceptedByLabel(Object name) {
+    return 'Accepté par $name';
+  }
 }

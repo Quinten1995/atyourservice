@@ -1844,6 +1844,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Premium deactivated.'**
   String get premiumDeactivated;
+
+  /// No description provided for @acceptedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted by {name}'**
+  String acceptedByLabel(Object name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

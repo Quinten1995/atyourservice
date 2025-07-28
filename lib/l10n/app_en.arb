@@ -297,7 +297,9 @@
   "deleteAccountButton": "Delete Account",
   "accountDeleted": "Your account has been deleted.",
   "cancel": "Cancel",
-  "premiumDeactivated": "Premium deactivated."
+  "premiumDeactivated": "Premium deactivated.",
+  "acceptedByLabel": "Accepted by {name}",
+  "premiumBadgeLabel": "Premium"
 
 
 

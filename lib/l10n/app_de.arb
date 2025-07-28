@@ -295,7 +295,9 @@
   "deleteAccountButton": "Konto löschen",
   "accountDeleted": "Ihr Konto wurde gelöscht.",
   "cancel": "Abbrechen",
-  "premiumDeactivated": "Premium deaktiviert."
+  "premiumDeactivated": "Premium deaktiviert.",
+  "acceptedByLabel": "Angenommen von {name}",
+  "premiumBadgeLabel": "Premium"
 
 
 
