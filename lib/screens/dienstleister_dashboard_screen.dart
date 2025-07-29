@@ -4,6 +4,7 @@ import '../models/auftrag.dart';
 import '../utils/entfernung_utils.dart';
 import 'auftrag_detail_screen.dart';
 import 'profil_dienstleister_screen.dart';
+import 'achievement_screen.dart'; // <--- ACHTUNG: Import für Achievement-Screen!
 import '../l10n/app_localizations.dart';
 import '../l10n/status_value_extension.dart';
 import 'pdf_rechnung_screen.dart';
@@ -411,6 +412,22 @@ class _DienstleisterDashboardScreenState
         centerTitle: true,
         foregroundColor: DienstleisterDashboardScreen.primaryColor,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.emoji_events_rounded, color: Colors.amber),
+            tooltip: l10n.achievementTitle,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AchievementScreen(
+                    aboTyp: _aboTyp ?? 'free',
+                    isTopBewertet: false, // TODO: Wert aus Backend holen!
+                    completedJobsCount: 0, // TODO: Wert aus Backend holen!
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refreshTooltip,

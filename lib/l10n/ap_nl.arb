@@ -290,7 +290,38 @@
   "premiumDeactivated": "Premium gedeactiveerd.",
   "acceptedByLabel": "Geaccepteerd door {name}",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Vul een adres in."
+  "adresseValidator": "Vul een adres in.",
+  "abgeschlosseneAuftraegeHinweis": "Hier kun je voltooide opdrachten verwijderen en je dienstverlener beoordelen.",
+  "goldBadgeLabel": "Goud",
+  "silverBadgeLabel": "Zilver",
+  "topBewertetBadgeLabel": "Top beoordeeld",
+  "badgeCertified": "Gecertificeerd",
+  "badgeExperienced": "Ervaren",
+  "badgeExpert": "Expert",
+  "badgeMaster": "Meester",
+  "badgeCertifiedCounter": "{count} klussen afgerond",
+  "badgeExperiencedCounter": "{count} klussen afgerond",
+  "badgeExpertCounter": "{count} klussen afgerond",
+  "badgeMasterCounter": "{count} klussen afgerond",
+  "achievementTitle": "Successen & Badges",
+  "goldBadgeLabel": "Gold-abonnement",
+  "goldBadgeDesc": "Je hebt een Gold-abonnement en kunt onbeperkt klussen aannemen.",
+  "silverBadgeLabel": "Silver-abonnement",
+  "silverBadgeDesc": "Je hebt een Silver-abonnement en kunt 3 klussen per week aannemen.",
+  "topBewertetBadgeLabel": "Top beoordeeld",
+  "topBewertetBadgeDesc": "Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 2 beoordelingen.",
+  "badgeCertifiedProgress": "Gecertificeerd ({count}/1)",
+  "badgeCertifiedDesc": "Rond je allereerste klus af.",
+  "badgeExperiencedProgress": "Ervaren ({count}/2)",
+  "badgeExperiencedDesc": "Rond in totaal 2 klussen af.",
+  "badgeExpertProgress": "Expert ({count}/3)",
+  "badgeExpertDesc": "Rond in totaal 3 klussen af.",
+  "badgeMasterProgress": "Meester ({count}/4)",
+  "badgeMasterDesc": "Rond in totaal 4 klussen af."
+
+
+
+
 
 
 

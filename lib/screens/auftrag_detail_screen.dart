@@ -8,8 +8,8 @@ import '../l10n/app_localizations.dart';
 import '../utils/pdf_invoice_service.dart';
 import 'pdf_rechnung_screen.dart';
 import '../utils/category_utils.dart';
+import '../widgets/dienstleister_badges_widget.dart';
 
-// Hilfsfunktion für Kategorie-Icons
 IconData getKategorieIcon(String? kategorie) {
   if (kategorie == null) return Icons.assignment_ind;
   switch (kategorie.toLowerCase()) {
@@ -64,13 +64,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
   String? _dienstleisterAboTyp;
   String? _kundenName;
   String? _dienstleisterName;
+  int? _completedJobsCount;
 
   final SupabaseClient _supabase = Supabase.instance.client;
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
-  // --- Hilfsfunktionen für Zeit/Intervall ---
   String getIntervalLabel(String? key, AppLocalizations l10n) {
     switch (key) {
       case 'interval_weekly':
@@ -104,7 +104,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         return key ?? '';
     }
   }
-  // ------------------------------------------
 
   String _getLocalizedStatus(String status, AppLocalizations l10n) {
     switch (status) {
@@ -140,6 +139,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       _kundenName = null;
       _dienstleisterName = null;
       _dienstleisterAboTyp = null;
+      _completedJobsCount = null;
     });
 
     try {
@@ -206,11 +206,12 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
 
         final details = await _supabase
             .from('dienstleister_details')
-            .select('profilbild_url, user_id')
+            .select('profilbild_url, completed_jobs_count')
             .eq('user_id', aktuellerAuftrag.dienstleisterId!)
             .maybeSingle();
         setState(() {
           _dienstleisterProfilbildUrl = details?['profilbild_url'];
+          _completedJobsCount = details?['completed_jobs_count'] ?? 0;
         });
 
         final dl = await _supabase
@@ -468,7 +469,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
-  // Angepasst: Zeitplan-/Intervall-Anzeige
   Widget _zeitplanungAnzeige() {
     final l10n = AppLocalizations.of(context)!;
     final ad = _auftragDetails!;
@@ -476,28 +476,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     if (ad.wiederkehrend == true) {
       final parts = <String>[];
 
-      // Wochentag
       if ((ad.wochentag ?? '').isNotEmpty) {
         parts.add(l10n.jedenWochentag(getWeekdayLabel(ad.wochentag, l10n)));
       }
-
-      // Intervall (übersetzt!)
       if (ad.intervall != null && ad.intervall!.isNotEmpty) {
         parts.add(getIntervalLabel(ad.intervall, l10n));
       }
-
-      // Uhrzeit
       if (ad.zeitVon != null && ad.zeitBis != null) {
         parts.add('${ad.zeitVon!.format(context)}–${ad.zeitBis!.format(context)} Uhr');
       }
-
-      // Bis-Datum
       if (ad.wiederholenBis != null) {
         final bisDatum = '${ad.wiederholenBis!.day.toString().padLeft(2, '0')}.${ad.wiederholenBis!.month.toString().padLeft(2, '0')}.${ad.wiederholenBis!.year}';
         parts.add(l10n.bisDatum(bisDatum));
       }
-
-      // Anzahl Wiederholungen
       if (ad.anzahlWiederholungen != null) {
         parts.add('${ad.anzahlWiederholungen} ${l10n.malSuffix}');
       }
@@ -552,34 +543,6 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         ),
       );
     }
-  }
-
-  // ... alles andere bleibt unverändert (ab hier ↓)
-  Widget _premiumBadge() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(top: 4.0, left: 0.0),
-      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-      decoration: BoxDecoration(
-        color: Colors.amber[100],
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.workspace_premium, color: Colors.amber[800], size: 20),
-          const SizedBox(width: 3),
-          Text(
-            l10n.premiumBadgeLabel,
-            style: TextStyle(
-              color: Colors.amber[900],
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _auftragInfoCard() {
@@ -715,6 +678,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     );
   }
 
+  /// ---- HIER die Visitenkarte mit **Badges im Wrap** (keine Überläufe mehr!) ----
   Widget _dienstleisterVisitenkarte() {
     if (_auftragDetails == null ||
         _auftragDetails!.dienstleisterId == null ||
@@ -729,7 +693,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 27,
@@ -745,13 +709,24 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name und Premium Badge als Column (Badge unter Name, kein Überlappen!)
                   Text(
                     _dienstleisterName ?? l10n.roleDienstleister,
                     style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (_dienstleisterAboTyp == 'gold') _premiumBadge(),
+                  if (_dienstleisterAboTyp != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+                      child: Wrap(
+                        spacing: 7,
+                        runSpacing: 4,
+                        children: DienstleisterBadgesHelper(
+                          aboTyp: _dienstleisterAboTyp!,
+                          isTopBewertet: _dlDurchschnitt != null && _dlDurchschnitt! >= 4.5 && _dlAnzahlBewertungen != null && _dlAnzahlBewertungen! >= 2,
+                          completedJobsCount: _completedJobsCount ?? 0,
+                        ).buildBadges(context), // <-- Wichtig!
+                      ),
+                    ),
                   const SizedBox(height: 7),
                   Row(
                     children: [

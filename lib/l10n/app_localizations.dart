@@ -1856,6 +1856,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter an address.'**
   String get adresseValidator;
+
+  /// No description provided for @abgeschlosseneAuftraegeHinweis.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you can delete completed jobs and rate your service provider.'**
+  String get abgeschlosseneAuftraegeHinweis;
+
+  /// No description provided for @goldBadgeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold Subscription'**
+  String get goldBadgeLabel;
+
+  /// No description provided for @silverBadgeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver Subscription'**
+  String get silverBadgeLabel;
+
+  /// No description provided for @topBewertetBadgeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Rated'**
+  String get topBewertetBadgeLabel;
+
+  /// No description provided for @badgeCertified.
+  ///
+  /// In en, this message translates to:
+  /// **'Certified'**
+  String get badgeCertified;
+
+  /// No description provided for @badgeExperienced.
+  ///
+  /// In en, this message translates to:
+  /// **'Experienced'**
+  String get badgeExperienced;
+
+  /// No description provided for @badgeExpert.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert'**
+  String get badgeExpert;
+
+  /// No description provided for @badgeMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Master'**
+  String get badgeMaster;
+
+  /// No description provided for @badgeCertifiedCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs completed'**
+  String badgeCertifiedCounter(Object count);
+
+  /// No description provided for @badgeExperiencedCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs completed'**
+  String badgeExperiencedCounter(Object count);
+
+  /// No description provided for @badgeExpertCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs completed'**
+  String badgeExpertCounter(Object count);
+
+  /// No description provided for @badgeMasterCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs completed'**
+  String badgeMasterCounter(Object count);
+
+  /// No description provided for @achievementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements & Badges'**
+  String get achievementTitle;
+
+  /// No description provided for @goldBadgeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a Gold subscription and can accept unlimited jobs.'**
+  String get goldBadgeDesc;
+
+  /// No description provided for @silverBadgeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a Silver subscription and can accept 3 jobs per week.'**
+  String get silverBadgeDesc;
+
+  /// No description provided for @topBewertetBadgeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain an average rating of at least 4.5 stars from at least 2 reviews.'**
+  String get topBewertetBadgeDesc;
+
+  /// No description provided for @badgeCertifiedProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Certified ({count}/1)'**
+  String badgeCertifiedProgress(Object count);
+
+  /// No description provided for @badgeCertifiedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your very first job.'**
+  String get badgeCertifiedDesc;
+
+  /// No description provided for @badgeExperiencedProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Experienced ({count}/2)'**
+  String badgeExperiencedProgress(Object count);
+
+  /// No description provided for @badgeExperiencedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a total of 2 jobs.'**
+  String get badgeExperiencedDesc;
+
+  /// No description provided for @badgeExpertProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Expert ({count}/3)'**
+  String badgeExpertProgress(Object count);
+
+  /// No description provided for @badgeExpertDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a total of 3 jobs.'**
+  String get badgeExpertDesc;
+
+  /// No description provided for @badgeMasterProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Master ({count}/4)'**
+  String badgeMasterProgress(Object count);
+
+  /// No description provided for @badgeMasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a total of 4 jobs.'**
+  String get badgeMasterDesc;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

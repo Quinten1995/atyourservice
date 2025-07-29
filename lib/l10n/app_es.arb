@@ -300,7 +300,38 @@
   "premiumDeactivated": "Premium desactivado.",
   "acceptedByLabel": "Aceptado por {name}",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Por favor, introduce una dirección."
+  "adresseValidator": "Por favor, introduce una dirección.",
+  "abgeschlosseneAuftraegeHinweis": "Aquí puedes eliminar trabajos completados y valorar a tu proveedor de servicios.",
+  "goldBadgeLabel": "Oro",
+  "silverBadgeLabel": "Plata",
+  "topBewertetBadgeLabel": "Mejor valorado",
+  "badgeCertified": "Certificado",
+  "badgeExperienced": "Experimentado",
+  "badgeExpert": "Experto",
+  "badgeMaster": "Maestro",
+  "badgeCertifiedCounter": "{count} trabajos completados",
+  "badgeExperiencedCounter": "{count} trabajos completados",
+  "badgeExpertCounter": "{count} trabajos completados",
+  "badgeMasterCounter": "{count} trabajos completados",
+  "achievementTitle": "Logros y Insignias",
+  "goldBadgeLabel": "Suscripción Gold",
+  "goldBadgeDesc": "Tienes una suscripción Gold y puedes aceptar trabajos ilimitados.",
+  "silverBadgeLabel": "Suscripción Silver",
+  "silverBadgeDesc": "Tienes una suscripción Silver y puedes aceptar 3 trabajos por semana.",
+  "topBewertetBadgeLabel": "Mejor valorado",
+  "topBewertetBadgeDesc": "Obtén una media de al menos 4,5 estrellas de al menos 2 valoraciones.",
+  "badgeCertifiedProgress": "Certificado ({count}/1)",
+  "badgeCertifiedDesc": "Completa tu primer trabajo.",
+  "badgeExperiencedProgress": "Experimentado ({count}/2)",
+  "badgeExperiencedDesc": "Completa un total de 2 trabajos.",
+  "badgeExpertProgress": "Experto ({count}/3)",
+  "badgeExpertDesc": "Completa un total de 3 trabajos.",
+  "badgeMasterProgress": "Maestro ({count}/4)",
+  "badgeMasterDesc": "Completa un total de 4 trabajos."
+
+
+
+
 
 
 

@@ -298,7 +298,38 @@
   "premiumDeactivated": "Premium deaktiviert.",
   "acceptedByLabel": "Angenommen von {name}",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Bitte gib eine Adresse an."
+  "adresseValidator": "Bitte gib eine Adresse an.",
+  "abgeschlosseneAuftraegeHinweis": "Hier kannst du abgeschlossene Aufträge löschen und deinen Dienstleister bewerten.",
+  "goldBadgeLabel": "Gold",
+  "silverBadgeLabel": "Silver",
+  "topBewertetBadgeLabel": "Top bewertet",
+  "badgeCertified": "Zertifiziert",
+  "badgeExperienced": "Erfahren",
+  "badgeExpert": "Experte",
+  "badgeMaster": "Master",
+  "badgeCertifiedCounter": "{count} Aufträge abgeschlossen",
+  "badgeExperiencedCounter": "{count} Aufträge abgeschlossen",
+  "badgeExpertCounter": "{count} Aufträge abgeschlossen",
+  "badgeMasterCounter": "{count} Aufträge abgeschlossen",
+  "achievementTitle": "Erfolge & Abzeichen",
+  "goldBadgeLabel": "Gold-Abo",
+  "goldBadgeDesc": "Du besitzt ein Gold-Abo und kannst unbegrenzt viele Aufträge annehmen.",
+  "silverBadgeLabel": "Silber-Abo",
+  "silverBadgeDesc": "Du besitzt ein Silber-Abo und kannst 3 Aufträge pro Woche annehmen.",
+  "topBewertetBadgeLabel": "Top bewertet",
+  "topBewertetBadgeDesc": "Erhalte einen Schnitt von mindestens 4,5 Sternen aus mindestens 2 Bewertungen.",
+  "badgeCertifiedProgress": "Zertifiziert ({count}/1)",
+  "badgeCertifiedDesc": "Schließe deinen allerersten Auftrag ab.",
+  "badgeExperiencedProgress": "Erfahren ({count}/2)",
+  "badgeExperiencedDesc": "Schließe insgesamt 2 Aufträge ab.",
+  "badgeExpertProgress": "Experte ({count}/3)",
+  "badgeExpertDesc": "Schließe insgesamt 3 Aufträge ab.",
+  "badgeMasterProgress": "Meister ({count}/4)",
+  "badgeMasterDesc": "Schließe insgesamt 4 Aufträge ab."
+
+
+
+
 
 
 

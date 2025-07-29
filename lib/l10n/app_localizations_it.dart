@@ -935,4 +935,92 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get adresseValidator => 'Per favore inserisci un indirizzo.';
+
+  @override
+  String get abgeschlosseneAuftraegeHinweis => 'Qui puoi eliminare incarichi completati e valutare il tuo fornitore di servizi.';
+
+  @override
+  String get goldBadgeLabel => 'Abbonamento Gold';
+
+  @override
+  String get silverBadgeLabel => 'Abbonamento Silver';
+
+  @override
+  String get topBewertetBadgeLabel => 'Valutazione top';
+
+  @override
+  String get badgeCertified => 'Certificato';
+
+  @override
+  String get badgeExperienced => 'Esperto';
+
+  @override
+  String get badgeExpert => 'Esperto';
+
+  @override
+  String get badgeMaster => 'Maestro';
+
+  @override
+  String badgeCertifiedCounter(Object count) {
+    return '$count lavori completati';
+  }
+
+  @override
+  String badgeExperiencedCounter(Object count) {
+    return '$count lavori completati';
+  }
+
+  @override
+  String badgeExpertCounter(Object count) {
+    return '$count lavori completati';
+  }
+
+  @override
+  String badgeMasterCounter(Object count) {
+    return '$count lavori completati';
+  }
+
+  @override
+  String get achievementTitle => 'Traguardi & Badge';
+
+  @override
+  String get goldBadgeDesc => 'Hai un abbonamento Gold e puoi accettare lavori illimitati.';
+
+  @override
+  String get silverBadgeDesc => 'Hai un abbonamento Silver e puoi accettare 3 lavori a settimana.';
+
+  @override
+  String get topBewertetBadgeDesc => 'Ottieni una media di almeno 4,5 stelle da almeno 2 recensioni.';
+
+  @override
+  String badgeCertifiedProgress(Object count) {
+    return 'Certificato ($count/1)';
+  }
+
+  @override
+  String get badgeCertifiedDesc => 'Completa il tuo primo lavoro.';
+
+  @override
+  String badgeExperiencedProgress(Object count) {
+    return 'Esperto ($count/2)';
+  }
+
+  @override
+  String get badgeExperiencedDesc => 'Completa un totale di 2 lavori.';
+
+  @override
+  String badgeExpertProgress(Object count) {
+    return 'Professionista ($count/3)';
+  }
+
+  @override
+  String get badgeExpertDesc => 'Completa un totale di 3 lavori.';
+
+  @override
+  String badgeMasterProgress(Object count) {
+    return 'Maestro ($count/4)';
+  }
+
+  @override
+  String get badgeMasterDesc => 'Completa un totale di 4 lavori.';
 }

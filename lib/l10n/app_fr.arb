@@ -327,7 +327,38 @@
   "premiumDeactivated": "Premium désactivé.",
   "acceptedByLabel": "Accepté par {name}",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Veuillez saisir une adresse."
+  "adresseValidator": "Veuillez saisir une adresse.",
+  "abgeschlosseneAuftraegeHinweis": "Ici, tu peux supprimer des missions terminées et évaluer ton prestataire.",
+  "goldBadgeLabel": "Or",
+  "silverBadgeLabel": "Argent",
+  "topBewertetBadgeLabel": "Top noté",
+  "badgeCertified": "Certifié",
+  "badgeExperienced": "Expérimenté",
+  "badgeExpert": "Expert",
+  "badgeMaster": "Maître",
+  "badgeCertifiedCounter": "{count} missions terminées",
+  "badgeExperiencedCounter": "{count} missions terminées",
+  "badgeExpertCounter": "{count} missions terminées",
+  "badgeMasterCounter": "{count} missions terminées",
+  "achievementTitle": "Succès & Badges",
+  "goldBadgeLabel": "Abonnement Gold",
+  "goldBadgeDesc": "Vous avez un abonnement Gold et pouvez accepter un nombre illimité de missions.",
+  "silverBadgeLabel": "Abonnement Silver",
+  "silverBadgeDesc": "Vous avez un abonnement Silver et pouvez accepter 3 missions par semaine.",
+  "topBewertetBadgeLabel": "Top évalué",
+  "topBewertetBadgeDesc": "Obtenez une moyenne d'au moins 4,5 étoiles sur au moins 2 évaluations.",
+  "badgeCertifiedProgress": "Certifié ({count}/1)",
+  "badgeCertifiedDesc": "Terminez votre toute première mission.",
+  "badgeExperiencedProgress": "Expérimenté ({count}/2)",
+  "badgeExperiencedDesc": "Terminez un total de 2 missions.",
+  "badgeExpertProgress": "Expert ({count}/3)",
+  "badgeExpertDesc": "Terminez un total de 3 missions.",
+  "badgeMasterProgress": "Maître ({count}/4)",
+  "badgeMasterDesc": "Terminez un total de 4 missions."
+
+
+
+
 
 
 

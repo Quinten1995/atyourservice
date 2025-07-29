@@ -935,4 +935,92 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adresseValidator => 'Lütfen bir adres girin.';
+
+  @override
+  String get abgeschlosseneAuftraegeHinweis => 'Buradan tamamlanan işleri silebilir ve hizmet sağlayıcını değerlendirebilirsin.';
+
+  @override
+  String get goldBadgeLabel => 'Altın Abonelik';
+
+  @override
+  String get silverBadgeLabel => 'Gümüş Abonelik';
+
+  @override
+  String get topBewertetBadgeLabel => 'En yüksek puanlı';
+
+  @override
+  String get badgeCertified => 'Sertifikalı';
+
+  @override
+  String get badgeExperienced => 'Deneyimli';
+
+  @override
+  String get badgeExpert => 'Uzman';
+
+  @override
+  String get badgeMaster => 'Usta';
+
+  @override
+  String badgeCertifiedCounter(Object count) {
+    return '$count iş tamamlandı';
+  }
+
+  @override
+  String badgeExperiencedCounter(Object count) {
+    return '$count iş tamamlandı';
+  }
+
+  @override
+  String badgeExpertCounter(Object count) {
+    return '$count iş tamamlandı';
+  }
+
+  @override
+  String badgeMasterCounter(Object count) {
+    return '$count iş tamamlandı';
+  }
+
+  @override
+  String get achievementTitle => 'Başarılar & Rozetler';
+
+  @override
+  String get goldBadgeDesc => 'Altın aboneliğiniz var ve sınırsız iş kabul edebilirsiniz.';
+
+  @override
+  String get silverBadgeDesc => 'Gümüş aboneliğiniz var ve haftada 3 iş kabul edebilirsiniz.';
+
+  @override
+  String get topBewertetBadgeDesc => 'En az 2 değerlendirmeden ortalama en az 4,5 yıldız alın.';
+
+  @override
+  String badgeCertifiedProgress(Object count) {
+    return 'Sertifikalı ($count/1)';
+  }
+
+  @override
+  String get badgeCertifiedDesc => 'İlk işini tamamla.';
+
+  @override
+  String badgeExperiencedProgress(Object count) {
+    return 'Deneyimli ($count/2)';
+  }
+
+  @override
+  String get badgeExperiencedDesc => 'Toplam 2 işi tamamla.';
+
+  @override
+  String badgeExpertProgress(Object count) {
+    return 'Uzman ($count/3)';
+  }
+
+  @override
+  String get badgeExpertDesc => 'Toplam 3 işi tamamla.';
+
+  @override
+  String badgeMasterProgress(Object count) {
+    return 'Usta ($count/4)';
+  }
+
+  @override
+  String get badgeMasterDesc => 'Toplam 4 işi tamamla.';
 }

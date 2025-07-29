@@ -300,7 +300,39 @@
   "premiumDeactivated": "Premium deactivated.",
   "acceptedByLabel": "Accepted by {name}",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Please enter an address."
+  "adresseValidator": "Please enter an address.",
+  "abgeschlosseneAuftraegeHinweis": "Here you can delete completed jobs and rate your service provider.",
+  "goldBadgeLabel": "Gold",
+  "silverBadgeLabel": "Silver",
+  "topBewertetBadgeLabel": "Top rated",
+  "badgeCertified": "Certified",
+  "badgeExperienced": "Experienced",
+  "badgeExpert": "Expert",
+  "badgeMaster": "Master",
+  "badgeCertifiedCounter": "{count} jobs completed",
+  "badgeExperiencedCounter": "{count} jobs completed",
+  "badgeExpertCounter": "{count} jobs completed",
+  "badgeMasterCounter": "{count} jobs completed",
+  "achievementTitle": "Achievements & Badges",
+  "goldBadgeLabel": "Gold Subscription",
+  "goldBadgeDesc": "You have a Gold subscription and can accept unlimited jobs.",
+  "silverBadgeLabel": "Silver Subscription",
+  "silverBadgeDesc": "You have a Silver subscription and can accept 3 jobs per week.",
+  "topBewertetBadgeLabel": "Top Rated",
+  "topBewertetBadgeDesc": "Maintain an average rating of at least 4.5 stars from at least 2 reviews.",
+  "badgeCertifiedProgress": "Certified ({count}/1)",
+  "badgeCertifiedDesc": "Complete your very first job.",
+  "badgeExperiencedProgress": "Experienced ({count}/2)",
+  "badgeExperiencedDesc": "Complete a total of 2 jobs.",
+  "badgeExpertProgress": "Expert ({count}/3)",
+  "badgeExpertDesc": "Complete a total of 3 jobs.",
+  "badgeMasterProgress": "Master ({count}/4)",
+  "badgeMasterDesc": "Complete a total of 4 jobs."
+
+
+
+
+
 
 
 

@@ -376,9 +376,28 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                           ),
                           if (_abgeschlosseneAuftraege.isNotEmpty) ...[
                             const Divider(height: 28, thickness: 1.2),
+                            // Überschrift
                             Text(
                               l10n.abgeschlosseneAuftraege,
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                            ),
+                            // HINWEIS-ZEILE
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.info_outline, color: Colors.amber[700], size: 20),
+                                const SizedBox(width: 7),
+                                Expanded(
+                                  child: Text(
+                                    l10n.abgeschlosseneAuftraegeHinweis,
+                                    style: TextStyle(
+                                      color: Colors.amber[900],
+                                      fontSize: 13.4,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 7),
                             SizedBox(

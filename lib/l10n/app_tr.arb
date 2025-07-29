@@ -300,7 +300,38 @@
   "premiumDeactivated": "Premium devre dışı bırakıldı.",
   "acceptedByLabel": "{name} tarafından kabul edildi",
   "premiumBadgeLabel": "Premium",
-  "adresseValidator": "Lütfen bir adres girin."
+  "adresseValidator": "Lütfen bir adres girin.",
+  "abgeschlosseneAuftraegeHinweis": "Buradan tamamlanan işleri silebilir ve hizmet sağlayıcını değerlendirebilirsin.",
+  "goldBadgeLabel": "Altın",
+  "silverBadgeLabel": "Gümüş",
+  "topBewertetBadgeLabel": "En çok oy alan",
+  "badgeCertified": "Sertifikalı",
+  "badgeExperienced": "Deneyimli",
+  "badgeExpert": "Uzman",
+  "badgeMaster": "Usta",
+ "badgeCertifiedCounter": "{count} iş tamamlandı",
+  "badgeExperiencedCounter": "{count} iş tamamlandı",
+  "badgeExpertCounter": "{count} iş tamamlandı",
+  "badgeMasterCounter": "{count} iş tamamlandı",
+  "achievementTitle": "Başarılar & Rozetler",
+  "goldBadgeLabel": "Altın Abonelik",
+  "goldBadgeDesc": "Altın aboneliğiniz var ve sınırsız iş kabul edebilirsiniz.",
+  "silverBadgeLabel": "Gümüş Abonelik",
+  "silverBadgeDesc": "Gümüş aboneliğiniz var ve haftada 3 iş kabul edebilirsiniz.",
+  "topBewertetBadgeLabel": "En yüksek puanlı",
+  "topBewertetBadgeDesc": "En az 2 değerlendirmeden ortalama en az 4,5 yıldız alın.",
+  "badgeCertifiedProgress": "Sertifikalı ({count}/1)",
+  "badgeCertifiedDesc": "İlk işini tamamla.",
+  "badgeExperiencedProgress": "Deneyimli ({count}/2)",
+  "badgeExperiencedDesc": "Toplam 2 işi tamamla.",
+  "badgeExpertProgress": "Uzman ({count}/3)",
+  "badgeExpertDesc": "Toplam 3 işi tamamla.",
+  "badgeMasterProgress": "Usta ({count}/4)",
+  "badgeMasterDesc": "Toplam 4 işi tamamla."
+
+
+
+
 
 
 

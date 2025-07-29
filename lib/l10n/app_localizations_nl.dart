@@ -935,4 +935,92 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get adresseValidator => 'Vul een adres in.';
+
+  @override
+  String get abgeschlosseneAuftraegeHinweis => 'Hier kun je voltooide opdrachten verwijderen en je dienstverlener beoordelen.';
+
+  @override
+  String get goldBadgeLabel => 'Gold-abonnement';
+
+  @override
+  String get silverBadgeLabel => 'Silver-abonnement';
+
+  @override
+  String get topBewertetBadgeLabel => 'Top beoordeeld';
+
+  @override
+  String get badgeCertified => 'Gecertificeerd';
+
+  @override
+  String get badgeExperienced => 'Ervaren';
+
+  @override
+  String get badgeExpert => 'Expert';
+
+  @override
+  String get badgeMaster => 'Meester';
+
+  @override
+  String badgeCertifiedCounter(Object count) {
+    return '$count klussen afgerond';
+  }
+
+  @override
+  String badgeExperiencedCounter(Object count) {
+    return '$count klussen afgerond';
+  }
+
+  @override
+  String badgeExpertCounter(Object count) {
+    return '$count klussen afgerond';
+  }
+
+  @override
+  String badgeMasterCounter(Object count) {
+    return '$count klussen afgerond';
+  }
+
+  @override
+  String get achievementTitle => 'Successen & Badges';
+
+  @override
+  String get goldBadgeDesc => 'Je hebt een Gold-abonnement en kunt onbeperkt klussen aannemen.';
+
+  @override
+  String get silverBadgeDesc => 'Je hebt een Silver-abonnement en kunt 3 klussen per week aannemen.';
+
+  @override
+  String get topBewertetBadgeDesc => 'Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 2 beoordelingen.';
+
+  @override
+  String badgeCertifiedProgress(Object count) {
+    return 'Gecertificeerd ($count/1)';
+  }
+
+  @override
+  String get badgeCertifiedDesc => 'Rond je allereerste klus af.';
+
+  @override
+  String badgeExperiencedProgress(Object count) {
+    return 'Ervaren ($count/2)';
+  }
+
+  @override
+  String get badgeExperiencedDesc => 'Rond in totaal 2 klussen af.';
+
+  @override
+  String badgeExpertProgress(Object count) {
+    return 'Expert ($count/3)';
+  }
+
+  @override
+  String get badgeExpertDesc => 'Rond in totaal 3 klussen af.';
+
+  @override
+  String badgeMasterProgress(Object count) {
+    return 'Meester ($count/4)';
+  }
+
+  @override
+  String get badgeMasterDesc => 'Rond in totaal 4 klussen af.';
 }

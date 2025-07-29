@@ -935,4 +935,92 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adresseValidator => 'Veuillez saisir une adresse.';
+
+  @override
+  String get abgeschlosseneAuftraegeHinweis => 'Ici, tu peux supprimer des missions terminées et évaluer ton prestataire.';
+
+  @override
+  String get goldBadgeLabel => 'Abonnement Gold';
+
+  @override
+  String get silverBadgeLabel => 'Abonnement Silver';
+
+  @override
+  String get topBewertetBadgeLabel => 'Top évalué';
+
+  @override
+  String get badgeCertified => 'Certifié';
+
+  @override
+  String get badgeExperienced => 'Expérimenté';
+
+  @override
+  String get badgeExpert => 'Expert';
+
+  @override
+  String get badgeMaster => 'Maître';
+
+  @override
+  String badgeCertifiedCounter(Object count) {
+    return '$count missions terminées';
+  }
+
+  @override
+  String badgeExperiencedCounter(Object count) {
+    return '$count missions terminées';
+  }
+
+  @override
+  String badgeExpertCounter(Object count) {
+    return '$count missions terminées';
+  }
+
+  @override
+  String badgeMasterCounter(Object count) {
+    return '$count missions terminées';
+  }
+
+  @override
+  String get achievementTitle => 'Succès & Badges';
+
+  @override
+  String get goldBadgeDesc => 'Vous avez un abonnement Gold et pouvez accepter un nombre illimité de missions.';
+
+  @override
+  String get silverBadgeDesc => 'Vous avez un abonnement Silver et pouvez accepter 3 missions par semaine.';
+
+  @override
+  String get topBewertetBadgeDesc => 'Obtenez une moyenne d\'au moins 4,5 étoiles sur au moins 2 évaluations.';
+
+  @override
+  String badgeCertifiedProgress(Object count) {
+    return 'Certifié ($count/1)';
+  }
+
+  @override
+  String get badgeCertifiedDesc => 'Terminez votre toute première mission.';
+
+  @override
+  String badgeExperiencedProgress(Object count) {
+    return 'Expérimenté ($count/2)';
+  }
+
+  @override
+  String get badgeExperiencedDesc => 'Terminez un total de 2 missions.';
+
+  @override
+  String badgeExpertProgress(Object count) {
+    return 'Expert ($count/3)';
+  }
+
+  @override
+  String get badgeExpertDesc => 'Terminez un total de 3 missions.';
+
+  @override
+  String badgeMasterProgress(Object count) {
+    return 'Maître ($count/4)';
+  }
+
+  @override
+  String get badgeMasterDesc => 'Terminez un total de 4 missions.';
 }
