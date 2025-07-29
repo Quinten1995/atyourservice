@@ -4,10 +4,10 @@ import '../models/auftrag.dart';
 import '../utils/entfernung_utils.dart';
 import 'auftrag_detail_screen.dart';
 import 'profil_dienstleister_screen.dart';
-import 'achievement_screen.dart'; // <--- ACHTUNG: Import für Achievement-Screen!
 import '../l10n/app_localizations.dart';
 import '../l10n/status_value_extension.dart';
 import 'pdf_rechnung_screen.dart';
+import 'achievement_screen.dart'; // ACHTUNG: Pfad ggf. anpassen
 
 class DienstleisterDashboardScreen extends StatefulWidget {
   const DienstleisterDashboardScreen({Key? key}) : super(key: key);
@@ -37,6 +37,59 @@ class _DienstleisterDashboardScreenState
   List<Map<String, dynamic>> _alleAbgeschlosseneAuftraegeRaw = [];
 
   List<Auftrag> _offenePassendeAuftraege = [];
+
+  // Für Achievement-Icon-Loading
+  bool _isAchievementsLoading = false;
+
+  Future<void> _openAchievementsScreen() async {
+    setState(() => _isAchievementsLoading = true);
+
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // 1. Lade abgeschlossene Jobs
+      final detailsRes = await supabase
+          .from('dienstleister_details')
+          .select('completed_jobs_count')
+          .eq('user_id', user.id)
+          .maybeSingle();
+      final completedJobsCount = detailsRes?['completed_jobs_count'] ?? 0;
+
+      // 2. Lade Bewertungen
+      final bewertungenRes = await supabase
+          .from('bewertungen')
+          .select('bewertung')
+          .eq('dienstleister_id', user.id);
+
+      double durchschnitt = 0.0;
+      int anzahl = 0;
+      if (bewertungenRes is List && bewertungenRes.isNotEmpty) {
+        anzahl = bewertungenRes.length;
+        final values = bewertungenRes.map((b) => (b['bewertung'] as int?) ?? 0).toList();
+        durchschnitt = values.reduce((a, b) => a + b) / anzahl;
+      }
+      final isTopBewertet = (anzahl >= 2 && durchschnitt >= 4.5);
+
+      setState(() => _isAchievementsLoading = false);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AchievementScreen(
+            aboTyp: _aboTyp ?? 'free',
+            isTopBewertet: isTopBewertet,
+            completedJobsCount: completedJobsCount,
+          ),
+        ),
+      );
+    } catch (e) {
+      setState(() => _isAchievementsLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler beim Laden der Achievements: $e')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -214,7 +267,7 @@ class _DienstleisterDashboardScreenState
         ),
         const SizedBox(height: 7),
         SizedBox(
-          height: 240, // Mehr Platz für alle Inhalte, inkl. Delete!
+          height: 240,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: auftraegeRaw.length,
@@ -246,7 +299,6 @@ class _DienstleisterDashboardScreenState
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Auftrag Infos
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -304,7 +356,6 @@ class _DienstleisterDashboardScreenState
                             ),
                           ],
                         ),
-                        // Unten: Button + ggf. Delete
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -412,28 +463,31 @@ class _DienstleisterDashboardScreenState
         centerTitle: true,
         foregroundColor: DienstleisterDashboardScreen.primaryColor,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.emoji_events_rounded, color: Colors.amber),
-            tooltip: l10n.achievementTitle,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AchievementScreen(
-                    aboTyp: _aboTyp ?? 'free',
-                    isTopBewertet: false, // TODO: Wert aus Backend holen!
-                    completedJobsCount: 0, // TODO: Wert aus Backend holen!
+          // ACHIEVEMENT-ICON (Pokál/Medaille)
+          if (_isAchievementsLoading)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Center(
+                child: SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.6,
+                    color: Colors.orange[700],
                   ),
                 ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: l10n.refreshTooltip,
-            onPressed: _ladeProfilUndAuftraege,
-            color: DienstleisterDashboardScreen.primaryColor,
-          ),
+              ),
+            )
+          else
+            IconButton(
+              icon: Icon(
+                Icons.emoji_events, // Goldene Medaille/Pokál
+                color: Colors.orange[700],
+                size: 28,
+              ),
+              tooltip: l10n.achievementTitle,
+              onPressed: _openAchievementsScreen,
+            ),
           IconButton(
             icon: const Icon(Icons.person),
             tooltip: l10n.editProfileTooltip,
