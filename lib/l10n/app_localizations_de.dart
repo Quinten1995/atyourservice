@@ -1023,4 +1023,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get badgeMasterDesc => 'Schließe insgesamt 4 Aufträge ab.';
+
+  @override
+  String get trafficScreenInfoText => 'Hier sehen Sie, wie viele Dienstleister pro Kategorie aktuell in Ihrer Umgebung aktiv sind. Je mehr Dienstleister, desto schneller wird Ihr Auftrag in der Regel angenommen.';
 }

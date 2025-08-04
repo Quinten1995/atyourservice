@@ -327,7 +327,9 @@
   "badgeExpertProgress": "Expert ({count}/3)",
   "badgeExpertDesc": "Complete a total of 3 jobs.",
   "badgeMasterProgress": "Master ({count}/4)",
-  "badgeMasterDesc": "Complete a total of 4 jobs."
+  "badgeMasterDesc": "Complete a total of 4 jobs.",
+  "trafficScreenInfoText": "Here you can see how many service providers are currently active in each category in your area. The more providers, the faster your request is usually accepted."
+
 
 
 

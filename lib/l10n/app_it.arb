@@ -325,7 +325,9 @@
   "badgeExpertProgress": "Professionista ({count}/3)",
   "badgeExpertDesc": "Completa un totale di 3 lavori.",
   "badgeMasterProgress": "Maestro ({count}/4)",
-  "badgeMasterDesc": "Completa un totale di 4 lavori."
+  "badgeMasterDesc": "Completa un totale di 4 lavori.",
+  "trafficScreenInfoText": "Qui puoi vedere quanti fornitori di servizi sono attualmente attivi per categoria nella tua zona. Più fornitori ci sono, più velocemente la tua richiesta verrà generalmente accettata."
+
 
 
 

@@ -94,9 +94,29 @@ class _DienstleisterDashboardScreenState
   @override
   void initState() {
     super.initState();
+    _updateZuletztOnline();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _ladeProfilUndAuftraege();
     });
+  }
+
+  // Update in beiden Tabellen!
+  Future<void> _updateZuletztOnline() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+    final jetzt = DateTime.now().toIso8601String();
+    try {
+      // users Tabelle
+      await supabase
+          .from('users')
+          .update({'zuletzt_online': jetzt})
+          .eq('id', user.id);
+      // dienstleister_details Tabelle
+      await supabase
+          .from('dienstleister_details')
+          .update({'zuletzt_online': jetzt})
+          .eq('user_id', user.id);
+    } catch (_) {}
   }
 
   Future<void> _ladeProfilUndAuftraege() async {
@@ -551,143 +571,147 @@ class _DienstleisterDashboardScreenState
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
-                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _dashboardHeader(),
-                      if (_alleLaufendenAuftraegeRaw.isNotEmpty)
-                        _buildAuftragsListe(
-                          _alleLaufendenAuftraegeRaw,
-                          l10n.meineLaufendenAuftraege,
-                        ),
-                      if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty)
-                        _buildAuftragsListe(
-                          _alleAbgeschlosseneAuftraegeRaw,
-                          l10n.meineAbgeschlossenenAuftraege,
-                          isCompleted: true,
-                        ),
-                      Text(
-                        l10n.offenePassendeAuftraege,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      const SizedBox(height: 7),
-                      Expanded(
-                        child: _offenePassendeAuftraege.isEmpty
-                            ? Center(
-                                child: Text(
-                                  l10n.noPassendeAuftraege,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              )
-                            : ListView.separated(
-                                itemCount: _offenePassendeAuftraege.length,
-                                separatorBuilder: (context, i) =>
-                                    const SizedBox(height: 12),
-                                itemBuilder: (context, index) {
-                                  final Auftrag auftrag =
-                                      _offenePassendeAuftraege[index];
-                                  String distText = '';
-                                  if (_meineLatitude != null &&
-                                      _meineLongitude != null &&
-                                      auftrag.latitude != null &&
-                                      auftrag.longitude != null) {
-                                    final double dist = berechneEntfernung(
-                                      _meineLatitude!,
-                                      _meineLongitude!,
-                                      auftrag.latitude!,
-                                      auftrag.longitude!,
-                                    );
-                                    distText = l10n.entfernungSuffix(
-                                      dist.toStringAsFixed(1),
-                                    );
-                                  }
+                    ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _dashboardHeader(),
+                          if (_alleLaufendenAuftraegeRaw.isNotEmpty)
+                            _buildAuftragsListe(
+                              _alleLaufendenAuftraegeRaw,
+                              l10n.meineLaufendenAuftraege,
+                            ),
+                          if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty)
+                            _buildAuftragsListe(
+                              _alleAbgeschlosseneAuftraegeRaw,
+                              l10n.meineAbgeschlossenenAuftraege,
+                              isCompleted: true,
+                            ),
+                          Text(
+                            l10n.offenePassendeAuftraege,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Expanded(
+                            child: _offenePassendeAuftraege.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      l10n.noPassendeAuftraege,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    itemCount: _offenePassendeAuftraege.length,
+                                    separatorBuilder: (context, i) =>
+                                        const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final Auftrag auftrag =
+                                          _offenePassendeAuftraege[index];
+                                      String distText = '';
+                                      if (_meineLatitude != null &&
+                                          _meineLongitude != null &&
+                                          auftrag.latitude != null &&
+                                          auftrag.longitude != null) {
+                                        final double dist = berechneEntfernung(
+                                          _meineLatitude!,
+                                          _meineLongitude!,
+                                          auftrag.latitude!,
+                                          auftrag.longitude!,
+                                        );
+                                        distText = l10n.entfernungSuffix(
+                                          dist.toStringAsFixed(1),
+                                        );
+                                      }
 
-                                  return Material(
-                                    color: Colors.white.withOpacity(0.96),
-                                    borderRadius: BorderRadius.circular(18),
-                                    elevation: 2,
-                                    child: ListTile(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
+                                      return Material(
+                                        color: Colors.white.withOpacity(0.96),
+                                        borderRadius: BorderRadius.circular(18),
+                                        elevation: 2,
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
                                             vertical: 16,
                                             horizontal: 18,
                                           ),
-                                      leading: Icon(
-                                        Icons.assignment_outlined,
-                                        color: DienstleisterDashboardScreen
-                                            .primaryColor,
-                                        size: 30,
-                                      ),
-                                      title: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              auftrag.titel,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
+                                          leading: Icon(
+                                            Icons.assignment_outlined,
+                                            color: DienstleisterDashboardScreen
+                                                .primaryColor,
+                                            size: 30,
                                           ),
-                                          if (!auftrag.soSchnellWieMoeglich)
-                                            Tooltip(
-                                              message: l10n.geplanterAuftrag,
-                                              child: Icon(
-                                                Icons.access_time_rounded,
-                                                color: Colors.teal[700],
-                                                size: 20,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      subtitle: distText.isNotEmpty
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 3.0,
-                                              ),
-                                              child: Text(
-                                                distText,
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.grey[700],
+                                          title: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  auftrag.titel,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                            )
-                                          : null,
-                                      trailing: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 18,
-                                        color: Colors.black38,
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => AuftragDetailScreen(
-                                              initialAuftrag: auftrag,
-                                            ),
+                                              if (!auftrag.soSchnellWieMoeglich)
+                                                Tooltip(
+                                                  message:
+                                                      l10n.geplanterAuftrag,
+                                                  child: Icon(
+                                                    Icons.access_time_rounded,
+                                                    color: Colors.teal[700],
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                        ).then(
-                                          (_) => _ladeProfilUndAuftraege(),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
+                                          subtitle: distText.isNotEmpty
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                    top: 3.0,
+                                                  ),
+                                                  child: Text(
+                                                    distText,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey[700],
+                                                    ),
+                                                  ),
+                                                )
+                                              : null,
+                                          trailing: const Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 18,
+                                            color: Colors.black38,
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    AuftragDetailScreen(
+                                                  initialAuftrag: auftrag,
+                                                ),
+                                              ),
+                                            ).then(
+                                              (_) => _ladeProfilUndAuftraege(),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
           ),
         ],
       ),

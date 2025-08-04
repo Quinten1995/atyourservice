@@ -1023,4 +1023,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get badgeMasterDesc => 'Toplam 4 işi tamamla.';
+
+  @override
+  String get trafficScreenInfoText => 'Burada, bulunduğunuz bölgede her kategoride kaç hizmet sağlayıcının aktif olduğunu görebilirsiniz. Ne kadar çok sağlayıcı varsa, talebiniz genellikle o kadar hızlı kabul edilir.';
 }

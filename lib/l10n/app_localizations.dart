@@ -2000,6 +2000,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete a total of 4 jobs.'**
   String get badgeMasterDesc;
+
+  /// No description provided for @trafficScreenInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you can see how many service providers are currently active in each category in your area. The more providers, the faster your request is usually accepted.'**
+  String get trafficScreenInfoText;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

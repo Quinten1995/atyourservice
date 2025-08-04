@@ -1023,4 +1023,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get badgeMasterDesc => 'Completa un total de 4 trabajos.';
+
+  @override
+  String get trafficScreenInfoText => 'Aquí puede ver cuántos proveedores de servicios hay actualmente activos por categoría en su zona. Cuantos más proveedores haya, más rápido se suele aceptar su solicitud.';
 }

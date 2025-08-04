@@ -4,8 +4,9 @@ import '../models/auftrag.dart';
 import 'auftrag_detail_screen.dart';
 import 'auftrag_erstellen_screen.dart';
 import 'profil_kunde_screen.dart';
+import 'traffic_screen.dart'; // <--- NEU: Importiere deinen neuen TrafficScreen!
 import '../l10n/app_localizations.dart';
-import '../data/kategorie_icons.dart'; // ICON-MAP importieren!
+import '../data/kategorie_icons.dart';
 
 extension StatusTranslation on AppLocalizations {
   String translateStatus(String? status) {
@@ -147,6 +148,18 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         centerTitle: true,
         foregroundColor: KundenDashboardScreen.primaryColor,
         actions: [
+          IconButton(
+            icon: Icon(Icons.show_chart, color: Colors.amber[700], size: 28),
+            tooltip: "Markt & Aktivität",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TrafficScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refreshTooltip,
