@@ -2006,6 +2006,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Here you can see how many service providers are currently active in each category in your area. The more providers, the faster your request is usually accepted.'**
   String get trafficScreenInfoText;
+
+  /// No description provided for @filterAbgeschlossen.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get filterAbgeschlossen;
+
+  /// No description provided for @auftraege.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs'**
+  String get auftraege;
+
+  /// No description provided for @profil.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profil;
+
+  /// No description provided for @filterAlle.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAlle;
+
+  /// No description provided for @filterOffen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get filterOffen;
+
+  /// No description provided for @filterLaufend.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get filterLaufend;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

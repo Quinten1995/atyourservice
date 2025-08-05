@@ -355,7 +355,14 @@
   "badgeExpertDesc": "Terminez un total de 3 missions.",
   "badgeMasterProgress": "Maître ({count}/4)",
   "badgeMasterDesc": "Terminez un total de 4 missions.",
-  "trafficScreenInfoText": "Ici, vous voyez combien de prestataires de services sont actuellement actifs par catégorie dans votre région. Plus il y a de prestataires, plus votre demande sera généralement acceptée rapidement."
+  "trafficScreenInfoText": "Ici, vous voyez combien de prestataires de services sont actuellement actifs par catégorie dans votre région. Plus il y a de prestataires, plus votre demande sera généralement acceptée rapidement.",
+  "filterAbgeschlossen": "Terminé",
+  "auftraege": "Travaux",
+  "profil": "Profil",
+  "filterAlle": "Tous",
+"filterOffen": "Ouvert",
+"filterLaufend": "En cours",
+"filterAbgeschlossen": "Terminé"
 
 
 

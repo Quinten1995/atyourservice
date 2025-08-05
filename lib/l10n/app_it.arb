@@ -326,7 +326,15 @@
   "badgeExpertDesc": "Completa un totale di 3 lavori.",
   "badgeMasterProgress": "Maestro ({count}/4)",
   "badgeMasterDesc": "Completa un totale di 4 lavori.",
-  "trafficScreenInfoText": "Qui puoi vedere quanti fornitori di servizi sono attualmente attivi per categoria nella tua zona. Più fornitori ci sono, più velocemente la tua richiesta verrà generalmente accettata."
+  "trafficScreenInfoText": "Qui puoi vedere quanti fornitori di servizi sono attualmente attivi per categoria nella tua zona. Più fornitori ci sono, più velocemente la tua richiesta verrà generalmente accettata.",
+  "filterAbgeschlossen": "Completato",
+  "auftraege": "Lavori",
+  "profil": "Profilo",
+  "filterAlle": "Tutti",
+"filterOffen": "Aperto",
+"filterLaufend": "In corso",
+"filterAbgeschlossen": "Completato"
+
 
 
 

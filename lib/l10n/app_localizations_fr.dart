@@ -1026,4 +1026,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trafficScreenInfoText => 'Ici, vous voyez combien de prestataires de services sont actuellement actifs par catégorie dans votre région. Plus il y a de prestataires, plus votre demande sera généralement acceptée rapidement.';
+
+  @override
+  String get filterAbgeschlossen => 'Terminé';
+
+  @override
+  String get auftraege => 'Travaux';
+
+  @override
+  String get profil => 'Profil';
+
+  @override
+  String get filterAlle => 'Tous';
+
+  @override
+  String get filterOffen => 'Ouvert';
+
+  @override
+  String get filterLaufend => 'En cours';
 }

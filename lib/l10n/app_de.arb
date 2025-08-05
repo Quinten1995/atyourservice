@@ -326,7 +326,14 @@
   "badgeExpertDesc": "Schließe insgesamt 3 Aufträge ab.",
   "badgeMasterProgress": "Meister ({count}/4)",
   "badgeMasterDesc": "Schließe insgesamt 4 Aufträge ab.",
-  "trafficScreenInfoText": "Hier sehen Sie, wie viele Dienstleister pro Kategorie aktuell in Ihrer Umgebung aktiv sind. Je mehr Dienstleister, desto schneller wird Ihr Auftrag in der Regel angenommen."
+  "trafficScreenInfoText": "Hier sehen Sie, wie viele Dienstleister pro Kategorie aktuell in Ihrer Umgebung aktiv sind. Je mehr Dienstleister, desto schneller wird Ihr Auftrag in der Regel angenommen.",
+  "filterAbgeschlossen": "Abgeschlossen",
+  "auftraege": "Aufträge",
+  "profil": "Profil",
+  "filterAlle": "Alle",
+"filterOffen": "Offen",
+"filterLaufend": "Laufend",
+"filterAbgeschlossen": "Abgeschlossen"
 
 
 

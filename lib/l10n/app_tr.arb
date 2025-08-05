@@ -328,7 +328,15 @@
   "badgeExpertDesc": "Toplam 3 işi tamamla.",
   "badgeMasterProgress": "Usta ({count}/4)",
   "badgeMasterDesc": "Toplam 4 işi tamamla.",
-  "trafficScreenInfoText": "Burada, bulunduğunuz bölgede her kategoride kaç hizmet sağlayıcının aktif olduğunu görebilirsiniz. Ne kadar çok sağlayıcı varsa, talebiniz genellikle o kadar hızlı kabul edilir."
+  "trafficScreenInfoText": "Burada, bulunduğunuz bölgede her kategoride kaç hizmet sağlayıcının aktif olduğunu görebilirsiniz. Ne kadar çok sağlayıcı varsa, talebiniz genellikle o kadar hızlı kabul edilir.",
+   "filterAbgeschlossen": "Tamamlandı",
+  "auftraege": "İşler",
+  "profil": "Profil",
+  "filterAlle": "Tümü",
+"filterOffen": "Açık",
+"filterLaufend": "Devam eden",
+"filterAbgeschlossen": "Tamamlandı"
+
 
 
 

@@ -1026,4 +1026,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trafficScreenInfoText => 'Hier ziet u hoeveel dienstverleners per categorie momenteel actief zijn in uw omgeving. Hoe meer dienstverleners, hoe sneller uw opdracht meestal wordt geaccepteerd.';
+
+  @override
+  String get filterAbgeschlossen => 'Afgerond';
+
+  @override
+  String get auftraege => 'Opdrachten';
+
+  @override
+  String get profil => 'Profiel';
+
+  @override
+  String get filterAlle => 'Alles';
+
+  @override
+  String get filterOffen => 'Open';
+
+  @override
+  String get filterLaufend => 'Lopend';
 }

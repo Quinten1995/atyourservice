@@ -1026,4 +1026,22 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trafficScreenInfoText => 'Qui puoi vedere quanti fornitori di servizi sono attualmente attivi per categoria nella tua zona. Più fornitori ci sono, più velocemente la tua richiesta verrà generalmente accettata.';
+
+  @override
+  String get filterAbgeschlossen => 'Completato';
+
+  @override
+  String get auftraege => 'Lavori';
+
+  @override
+  String get profil => 'Profilo';
+
+  @override
+  String get filterAlle => 'Tutti';
+
+  @override
+  String get filterOffen => 'Aperto';
+
+  @override
+  String get filterLaufend => 'In corso';
 }
