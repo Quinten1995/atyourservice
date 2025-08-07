@@ -1056,4 +1056,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get resetMailSent => 'Il link è stato inviato. Controlla la tua casella di posta!';
+
+  @override
+  String get keineDienstleisterInRegion => 'Nessun fornitore di servizi trovato nella tua zona.';
+
+  @override
+  String get trafficScreenKeineAdresse => 'Nessun indirizzo trovato nel tuo profilo.';
+
+  @override
+  String get trafficScreenAdresseFehler => 'Il tuo indirizzo non può essere convertito in coordinate.';
 }

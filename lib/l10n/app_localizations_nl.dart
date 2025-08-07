@@ -1056,4 +1056,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get resetMailSent => 'De link is verstuurd. Controleer je inbox!';
+
+  @override
+  String get keineDienstleisterInRegion => 'Nog geen dienstverlener gevonden in jouw regio.';
+
+  @override
+  String get trafficScreenKeineAdresse => 'Geen adres gevonden in je profiel.';
+
+  @override
+  String get trafficScreenAdresseFehler => 'Je adres kon niet worden omgezet in coördinaten.';
 }

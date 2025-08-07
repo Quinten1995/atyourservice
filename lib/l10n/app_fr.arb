@@ -366,7 +366,11 @@
 "forgotPasswordButton": "Mot de passe oublié ?",
 "forgotPasswordInfo": "Saisissez votre adresse e-mail enregistrée. Vous recevrez un lien pour réinitialiser votre mot de passe.",
 "sendResetLinkButton": "Envoyer le lien de réinitialisation",
-"resetMailSent": "Le lien a été envoyé. Vérifiez votre boîte de réception !"
+"resetMailSent": "Le lien a été envoyé. Vérifiez votre boîte de réception !",
+"keineDienstleisterInRegion": "Aucun prestataire de services trouvé dans votre région.",
+"trafficScreenKeineAdresse": "Aucune adresse trouvée dans votre profil.",
+"trafficScreenAdresseFehler": "Votre adresse n’a pas pu être convertie en coordonnées."
+
 
 
 

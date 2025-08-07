@@ -339,7 +339,11 @@
 "forgotPasswordButton": "Forgot password?",
 "forgotPasswordInfo": "Enter your registered email address. You will receive a link to reset your password.",
 "sendResetLinkButton": "Send reset link",
-"resetMailSent": "Link has been sent. Please check your inbox!"
+"resetMailSent": "Link has been sent. Please check your inbox!",
+"keineDienstleisterInRegion": "No service provider found in your area yet.",
+"trafficScreenKeineAdresse": "No address found in your profile.",
+"trafficScreenAdresseFehler": "Your address could not be converted to coordinates."
+
 
 
 

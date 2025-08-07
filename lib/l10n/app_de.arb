@@ -337,7 +337,11 @@
 "forgotPasswordButton": "Passwort vergessen?",
 "forgotPasswordInfo": "Gib deine registrierte E-Mail-Adresse ein. Du erhältst einen Link zum Zurücksetzen deines Passworts.",
 "sendResetLinkButton": "Reset-Link senden",
-"resetMailSent": "Link wurde versendet. Prüfe dein Postfach!"
+"resetMailSent": "Link wurde versendet. Prüfe dein Postfach!",
+"keineDienstleisterInRegion": "In deiner Region wurde noch kein Dienstleister gefunden.",
+"trafficScreenKeineAdresse": "Keine Adresse in deinem Profil gefunden.",
+"trafficScreenAdresseFehler": "Deine Adresse konnte nicht in Koordinaten umgewandelt werden."
+
 
 
 

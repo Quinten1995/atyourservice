@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_localizations.dart';
+import '../utils/geocoding_service.dart';
+import '../utils/entfernung_utils.dart';
 
 class TrafficScreen extends StatefulWidget {
   const TrafficScreen({Key? key}) : super(key: key);
@@ -16,6 +18,8 @@ class _TrafficScreenState extends State<TrafficScreen> {
   bool _isLoading = true;
   String? _error;
 
+  final double maxEntfernungKm = 20.0;
+
   @override
   void initState() {
     super.initState();
@@ -29,12 +33,76 @@ class _TrafficScreenState extends State<TrafficScreen> {
     });
 
     try {
-      final List data = await supabase
-          .from('dienstleister_details')
-          .select('kategorie');
+      // 1. Aktuellen Kunden (User) mit Adresse holen
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) {
+        setState(() {
+          _isLoading = false;
+          _error = "Nicht eingeloggt.";
+        });
+        return;
+      }
 
-      Map<String, int> kategorieCounts = {};
+      final userResult = await supabase
+          .from('users')
+          .select('adresse')
+          .eq('id', userId)
+          .maybeSingle();
+
+      final kundenAdresse = userResult?['adresse'] as String?;
+      print('Kundenadresse: $kundenAdresse');
+
+      if (kundenAdresse == null || kundenAdresse.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _error = AppLocalizations.of(context)!.trafficScreenKeineAdresse;
+        });
+        return;
+      }
+
+      // 2. Adresse zu Koordinaten wandeln
+      final userCoords = await GeocodingService().getCoordinates(kundenAdresse);
+      print('Geocoded userCoords: $userCoords');
+
+      if (userCoords == null) {
+        setState(() {
+          _isLoading = false;
+          _error = AppLocalizations.of(context)!.trafficScreenAdresseFehler;
+        });
+        return;
+      }
+      final double userLat = userCoords['lat']!;
+      final double userLon = userCoords['lng']!;
+
+      // 3. Dienstleister mit Standort & Kategorie laden
+      final List<dynamic> data = await supabase
+          .from('dienstleister_details')
+          .select('kategorie, latitude, longitude');
+
       for (var item in data) {
+        print('DL: Kategorie=${item['kategorie']}, lat=${item['latitude']}, lon=${item['longitude']}');
+      }
+
+      // 4. Nur Dienstleister im Radius behalten
+      final regionDienstleister = data.where((item) {
+        final lat = item['latitude'];
+        final lon = item['longitude'];
+        if (lat == null || lon == null) return false;
+        final entfernung = berechneEntfernung(
+          userLat,
+          userLon,
+          (lat as num).toDouble(),
+          (lon as num).toDouble(),
+        );
+        print('→ DL ${item['kategorie']}: Entfernung = $entfernung km');
+        return entfernung <= maxEntfernungKm;
+      }).toList();
+
+      print('Dienstleister im Umkreis ($maxEntfernungKm km): ${regionDienstleister.length}');
+
+      // 5. Kategorien zählen
+      Map<String, int> kategorieCounts = {};
+      for (var item in regionDienstleister) {
         String kategorie = item['kategorie'] ?? 'Unbekannt';
         kategorieCounts[kategorie] = (kategorieCounts[kategorie] ?? 0) + 1;
       }
@@ -100,8 +168,18 @@ class _TrafficScreenState extends State<TrafficScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
                     ? Center(child: Text(_error!))
-                    : _trafficData == null || _trafficData!.isEmpty
-                        ? Center(child: Text(l10n.keineDatenVerfuegbar))
+                    : (_trafficData == null || _trafficData!.isEmpty)
+                        ? Center(
+                            child: Text(
+                              l10n.keineDienstleisterInRegion,
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
                         : ListView.builder(
                             itemCount: _trafficData!.length,
                             itemBuilder: (context, index) {
@@ -153,7 +231,7 @@ class _TrafficScreenState extends State<TrafficScreen> {
   }
 }
 
-// Kategorie-Mapping: ALLE Keys aus deiner ARB-Datei – fertig zur Lokalisierung!
+// ------ Extension für die Kategorie-Übersetzung (direkt hier am Dateiende!) ------
 extension KategorieL10nExtension on AppLocalizations {
   String getKategorieName(String kategorie) {
     switch (kategorie) {

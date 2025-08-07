@@ -1056,4 +1056,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get resetMailSent => 'Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!';
+
+  @override
+  String get keineDienstleisterInRegion => 'Bölgenizde henüz bir hizmet sağlayıcı bulunamadı.';
+
+  @override
+  String get trafficScreenKeineAdresse => 'Profilinizde bir adres bulunamadı.';
+
+  @override
+  String get trafficScreenAdresseFehler => 'Adresiniz koordinatlara dönüştürülemedi.';
 }

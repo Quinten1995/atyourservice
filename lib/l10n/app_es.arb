@@ -339,7 +339,11 @@
 "forgotPasswordButton": "¿Olvidaste tu contraseña?",
 "forgotPasswordInfo": "Introduce tu dirección de correo electrónico registrada. Recibirás un enlace para restablecer tu contraseña.",
 "sendResetLinkButton": "Enviar enlace de restablecimiento",
-"resetMailSent": "El enlace ha sido enviado. ¡Revisa tu bandeja de entrada!"
+"resetMailSent": "El enlace ha sido enviado. ¡Revisa tu bandeja de entrada!",
+"keineDienstleisterInRegion": "No se ha encontrado ningún proveedor de servicios en tu región.",
+"trafficScreenKeineAdresse": "No se ha encontrado ninguna dirección en tu perfil.",
+"trafficScreenAdresseFehler": "No se pudo convertir tu dirección en coordenadas."
+
 
 
 

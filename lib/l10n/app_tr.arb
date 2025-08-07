@@ -339,7 +339,11 @@
 "forgotPasswordButton": "Şifrenizi mi unuttunuz?",
 "forgotPasswordInfo": "Kayıtlı e-posta adresinizi girin. Şifrenizi sıfırlamak için bir bağlantı alacaksınız.",
 "sendResetLinkButton": "Sıfırlama bağlantısı gönder",
-"resetMailSent": "Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!"
+"resetMailSent": "Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!",
+"keineDienstleisterInRegion": "Bölgenizde henüz bir hizmet sağlayıcı bulunamadı.",
+"trafficScreenKeineAdresse": "Profilinizde bir adres bulunamadı.",
+"trafficScreenAdresseFehler": "Adresiniz koordinatlara dönüştürülemedi."
+
 
 
 

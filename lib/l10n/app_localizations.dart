@@ -2066,6 +2066,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Link has been sent. Please check your inbox!'**
   String get resetMailSent;
+
+  /// No description provided for @keineDienstleisterInRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'No service provider found in your area yet.'**
+  String get keineDienstleisterInRegion;
+
+  /// No description provided for @trafficScreenKeineAdresse.
+  ///
+  /// In en, this message translates to:
+  /// **'No address found in your profile.'**
+  String get trafficScreenKeineAdresse;
+
+  /// No description provided for @trafficScreenAdresseFehler.
+  ///
+  /// In en, this message translates to:
+  /// **'Your address could not be converted to coordinates.'**
+  String get trafficScreenAdresseFehler;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
