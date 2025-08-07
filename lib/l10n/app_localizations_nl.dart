@@ -1044,4 +1044,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get filterLaufend => 'Lopend';
+
+  @override
+  String get forgotPasswordButton => 'Wachtwoord vergeten?';
+
+  @override
+  String get forgotPasswordInfo => 'Voer je geregistreerde e-mailadres in. Je ontvangt een link om je wachtwoord te resetten.';
+
+  @override
+  String get sendResetLinkButton => 'Reset-link versturen';
+
+  @override
+  String get resetMailSent => 'De link is verstuurd. Controleer je inbox!';
 }

@@ -333,7 +333,13 @@
   "filterAlle": "Tutti",
 "filterOffen": "Aperto",
 "filterLaufend": "In corso",
-"filterAbgeschlossen": "Completato"
+"filterAbgeschlossen": "Completato",
+"forgotPasswordButton": "Hai dimenticato la password?",
+"forgotPasswordInfo": "Inserisci il tuo indirizzo e-mail registrato. Riceverai un link per reimpostare la password.",
+"sendResetLinkButton": "Invia link di reset",
+"resetMailSent": "Il link è stato inviato. Controlla la tua casella di posta!"
+
+
 
 
 

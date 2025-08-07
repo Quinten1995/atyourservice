@@ -333,7 +333,13 @@
   "filterAlle": "Alle",
 "filterOffen": "Offen",
 "filterLaufend": "Laufend",
-"filterAbgeschlossen": "Abgeschlossen"
+"filterAbgeschlossen": "Abgeschlossen",
+"forgotPasswordButton": "Passwort vergessen?",
+"forgotPasswordInfo": "Gib deine registrierte E-Mail-Adresse ein. Du erhältst einen Link zum Zurücksetzen deines Passworts.",
+"sendResetLinkButton": "Reset-Link senden",
+"resetMailSent": "Link wurde versendet. Prüfe dein Postfach!"
+
+
 
 
 

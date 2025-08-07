@@ -335,7 +335,13 @@
   "filterAlle": "Todos",
 "filterOffen": "Abierto",
 "filterLaufend": "En curso",
-"filterAbgeschlossen": "Completado"
+"filterAbgeschlossen": "Completado",
+"forgotPasswordButton": "¿Olvidaste tu contraseña?",
+"forgotPasswordInfo": "Introduce tu dirección de correo electrónico registrada. Recibirás un enlace para restablecer tu contraseña.",
+"sendResetLinkButton": "Enviar enlace de restablecimiento",
+"resetMailSent": "El enlace ha sido enviado. ¡Revisa tu bandeja de entrada!"
+
+
 
 
 

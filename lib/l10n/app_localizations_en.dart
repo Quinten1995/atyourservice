@@ -1044,4 +1044,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterLaufend => 'Ongoing';
+
+  @override
+  String get forgotPasswordButton => 'Forgot password?';
+
+  @override
+  String get forgotPasswordInfo => 'Enter your registered email address. You will receive a link to reset your password.';
+
+  @override
+  String get sendResetLinkButton => 'Send reset link';
+
+  @override
+  String get resetMailSent => 'Link has been sent. Please check your inbox!';
 }

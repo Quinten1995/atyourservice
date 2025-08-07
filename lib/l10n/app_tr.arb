@@ -335,7 +335,13 @@
   "filterAlle": "Tümü",
 "filterOffen": "Açık",
 "filterLaufend": "Devam eden",
-"filterAbgeschlossen": "Tamamlandı"
+"filterAbgeschlossen": "Tamamlandı",
+"forgotPasswordButton": "Şifrenizi mi unuttunuz?",
+"forgotPasswordInfo": "Kayıtlı e-posta adresinizi girin. Şifrenizi sıfırlamak için bir bağlantı alacaksınız.",
+"sendResetLinkButton": "Sıfırlama bağlantısı gönder",
+"resetMailSent": "Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!"
+
+
 
 
 

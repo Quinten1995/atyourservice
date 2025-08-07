@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
 import 'registrierung_screen.dart';
+import 'passwort_vergessen_screen.dart'; // <-- HINZUGEFÜGT
 import '../l10n/app_localizations.dart';
 
 class LoginDienstleisterScreen extends StatefulWidget {
@@ -131,7 +132,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         ),
         child: Stack(
           children: [
-            // Dekorativer Kreis oben links
             Positioned(
               top: -60,
               left: -60,
@@ -144,7 +144,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                 ),
               ),
             ),
-            // Dekorativer Kreis unten rechts
             Positioned(
               bottom: -40,
               right: -40,
@@ -175,7 +174,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // User Icon
                             Icon(Icons.business_center_rounded, size: 56, color: primaryColor),
                             const SizedBox(height: 18),
                             Text(
@@ -237,7 +235,26 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                               validator: _validatePasswort,
                             ),
 
-                            const SizedBox(height: 34),
+                            // Passwort vergessen-Button (wie beim Kunden)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => PasswortVergessenScreen()),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: primaryColor,
+                                  textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                ),
+                                child: Text(l10n.forgotPasswordButton),
+                              ),
+                            ),
+
+                            const SizedBox(height: 24),
+
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : SizedBox(

@@ -325,7 +325,13 @@
   "filterAlle": "Alles",
 "filterOffen": "Open",
 "filterLaufend": "Lopend",
-"filterAbgeschlossen": "Afgerond"
+"filterAbgeschlossen": "Afgerond",
+"forgotPasswordButton": "Wachtwoord vergeten?",
+"forgotPasswordInfo": "Voer je geregistreerde e-mailadres in. Je ontvangt een link om je wachtwoord te resetten.",
+"sendResetLinkButton": "Reset-link versturen",
+"resetMailSent": "De link is verstuurd. Controleer je inbox!"
+
+
 
 
 

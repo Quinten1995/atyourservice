@@ -362,7 +362,13 @@
   "filterAlle": "Tous",
 "filterOffen": "Ouvert",
 "filterLaufend": "En cours",
-"filterAbgeschlossen": "Terminé"
+"filterAbgeschlossen": "Terminé",
+"forgotPasswordButton": "Mot de passe oublié ?",
+"forgotPasswordInfo": "Saisissez votre adresse e-mail enregistrée. Vous recevrez un lien pour réinitialiser votre mot de passe.",
+"sendResetLinkButton": "Envoyer le lien de réinitialisation",
+"resetMailSent": "Le lien a été envoyé. Vérifiez votre boîte de réception !"
+
+
 
 
 

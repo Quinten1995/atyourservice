@@ -2042,6 +2042,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ongoing'**
   String get filterLaufend;
+
+  /// No description provided for @forgotPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordButton;
+
+  /// No description provided for @forgotPasswordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your registered email address. You will receive a link to reset your password.'**
+  String get forgotPasswordInfo;
+
+  /// No description provided for @sendResetLinkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get sendResetLinkButton;
+
+  /// No description provided for @resetMailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Link has been sent. Please check your inbox!'**
+  String get resetMailSent;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

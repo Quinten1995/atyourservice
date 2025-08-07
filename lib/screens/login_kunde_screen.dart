@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'kunden_dashboard_screen.dart';
 import 'registrierung_screen.dart';
+import 'passwort_vergessen_screen.dart'; // <-- NEU: Passwort vergessen Screen importieren!
 import '../l10n/app_localizations.dart';
 
 class LoginKundeScreen extends StatefulWidget {
@@ -158,7 +159,6 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // User Icon oder App-Logo
                             Icon(Icons.account_circle_rounded, size: 56, color: primaryColor),
                             const SizedBox(height: 18),
                             Text(
@@ -178,7 +178,6 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               ),
                             ),
                             const SizedBox(height: 32),
-
                             // E-Mail
                             TextFormField(
                               controller: _emailController,
@@ -199,7 +198,6 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               validator: _validateEmail,
                             ),
                             const SizedBox(height: 20),
-
                             // Passwort
                             TextFormField(
                               controller: _passwortController,
@@ -219,8 +217,24 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               obscureText: true,
                               validator: _validatePasswort,
                             ),
-
-                            const SizedBox(height: 34),
+                            // Passwort vergessen? Button
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => PasswortVergessenScreen()),
+                                  );
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: primaryColor,
+                                  textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                ),
+                                child: Text(l10n.forgotPasswordButton),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : SizedBox(

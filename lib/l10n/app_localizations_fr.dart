@@ -1044,4 +1044,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get filterLaufend => 'En cours';
+
+  @override
+  String get forgotPasswordButton => 'Mot de passe oublié ?';
+
+  @override
+  String get forgotPasswordInfo => 'Saisissez votre adresse e-mail enregistrée. Vous recevrez un lien pour réinitialiser votre mot de passe.';
+
+  @override
+  String get sendResetLinkButton => 'Envoyer le lien de réinitialisation';
+
+  @override
+  String get resetMailSent => 'Le lien a été envoyé. Vérifiez votre boîte de réception !';
 }

@@ -1044,4 +1044,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get filterLaufend => 'Devam eden';
+
+  @override
+  String get forgotPasswordButton => 'Şifrenizi mi unuttunuz?';
+
+  @override
+  String get forgotPasswordInfo => 'Kayıtlı e-posta adresinizi girin. Şifrenizi sıfırlamak için bir bağlantı alacaksınız.';
+
+  @override
+  String get sendResetLinkButton => 'Sıfırlama bağlantısı gönder';
+
+  @override
+  String get resetMailSent => 'Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!';
 }

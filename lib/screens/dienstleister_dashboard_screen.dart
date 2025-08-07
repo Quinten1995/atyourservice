@@ -15,6 +15,17 @@ class DienstleisterDashboardScreen extends StatefulWidget {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
+  static const Map<String, Color> statusColors = {
+    'offen': Color(0xFF43A047),
+    'in bearbeitung': Color(0xFF1E88E5),
+    'abgeschlossen': Color(0xFF757575),
+  };
+  static const Map<String, IconData> statusIcons = {
+    'offen': Icons.inbox,
+    'in bearbeitung': Icons.hourglass_bottom,
+    'abgeschlossen': Icons.check_circle,
+  };
+
   @override
   State<DienstleisterDashboardScreen> createState() => _DienstleisterDashboardScreenState();
 }
@@ -38,6 +49,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
   int _selectedFilter = 0; // 0: Alle, 1: Offen, 2: Laufend, 3: Abgeschlossen
   int _bottomNavIndex = 0;
 
+  int _completedJobsCount = 0;
+  double _durchschnittsbewertung = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +69,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       _alleLaufendenAuftraegeRaw = [];
       _alleAbgeschlosseneAuftraegeRaw = [];
       _offenePassendeAuftraege = [];
+      _completedJobsCount = 0;
+      _durchschnittsbewertung = 0.0;
     });
 
     try {
@@ -107,6 +123,26 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .eq('dienstleister_id', user.id);
       _alleAbgeschlosseneAuftraegeRaw = rawAbgeschlossen.cast<Map<String, dynamic>>();
 
+      _completedJobsCount = _alleAbgeschlosseneAuftraegeRaw.length;
+
+      final bewertungenData = await supabase
+          .from('bewertungen')
+          .select('bewertung')
+          .eq('dienstleister_id', user.id);
+
+      if (bewertungenData != null && bewertungenData is List && bewertungenData.isNotEmpty) {
+        double sum = 0.0;
+        int count = 0;
+        for (var b in bewertungenData) {
+          final val = (b['bewertung'] as num?)?.toDouble();
+          if (val != null) {
+            sum += val;
+            count++;
+          }
+        }
+        if (count > 0) _durchschnittsbewertung = sum / count;
+      }
+
       double radiusKm = 5.0;
       if (_aboTyp == 'silver')
         radiusKm = 15.0;
@@ -128,7 +164,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               return dist <= radiusKm;
             })
             .toList();
-        // ---- SORTIERUNG NACH DISTANZ ----
         _offenePassendeAuftraege.sort((a, b) {
           final distA = (a.latitude != null && a.longitude != null)
               ? berechneEntfernung(_meineLatitude!, _meineLongitude!, a.latitude!, a.longitude!)
@@ -153,7 +188,37 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     }
   }
 
-  // ===== FILTERCHIPS =====
+  Widget buildStatusBadge(String status, AppLocalizations l10n) {
+    final lowerStatus = status.toLowerCase();
+    final color = DienstleisterDashboardScreen.statusColors[lowerStatus] ?? Colors.grey;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.13),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            DienstleisterDashboardScreen.statusIcons[lowerStatus] ?? Icons.info,
+            color: color,
+            size: 17,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            l10n.statusValue(status),
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFilterChips(AppLocalizations l10n) {
     final labels = [
       l10n.filterAlle,
@@ -161,6 +226,19 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       l10n.filterLaufend,
       l10n.filterAbgeschlossen,
     ];
+    final chipIcons = [
+      Icons.filter_alt,
+      DienstleisterDashboardScreen.statusIcons['offen']!,
+      DienstleisterDashboardScreen.statusIcons['in bearbeitung']!,
+      DienstleisterDashboardScreen.statusIcons['abgeschlossen']!,
+    ];
+    final chipColors = [
+      Colors.grey,
+      DienstleisterDashboardScreen.statusColors['offen']!,
+      DienstleisterDashboardScreen.statusColors['in bearbeitung']!,
+      DienstleisterDashboardScreen.statusColors['abgeschlossen']!,
+    ];
+
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 10),
       child: Row(
@@ -169,9 +247,16 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             child: ChoiceChip(
-              label: Text(labels[i]),
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(chipIcons[i], size: 17, color: isSelected ? Colors.white : chipColors[i]),
+                  const SizedBox(width: 6),
+                  Text(labels[i]),
+                ],
+              ),
               selected: isSelected,
-              selectedColor: DienstleisterDashboardScreen.primaryColor,
+              selectedColor: chipColors[i],
               backgroundColor: Colors.grey[200],
               labelStyle: TextStyle(
                 color: isSelected ? Colors.white : Colors.black87,
@@ -188,7 +273,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     );
   }
 
-  // ===== ICON BUTTONS AUF DEN KARTEN =====
   Widget _buildCardActions({
     required bool showPdf,
     required VoidCallback? onPdf,
@@ -223,7 +307,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     );
   }
 
-  // ===== AUFTRAGSKARTE (Für alle Typen) =====
   Widget _buildAuftragsKarte({
     required Auftrag auftrag,
     String? kundenEmail,
@@ -261,12 +344,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
                   const SizedBox(height: 7),
                   Row(
                     children: [
-                      Icon(Icons.assignment, size: 16, color: DienstleisterDashboardScreen.primaryColor),
-                      const SizedBox(width: 7),
-                      Text(
-                        l10n.statusValue(auftrag.status), // <-- HIER WIRD DER STATUS PER L10N-EXTENSION ANGEZEIGT!
-                        style: const TextStyle(fontSize: 13),
-                      ),
+                      buildStatusBadge(auftrag.status, l10n),
                       if (!auftrag.soSchnellWieMoeglich) ...[
                         const SizedBox(width: 12),
                         Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 16),
@@ -304,7 +382,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     );
   }
 
-  // ===== AUFTRAGSLISTEN JE FILTER =====
   List<Widget> _buildOffeneKarten(AppLocalizations l10n) {
     return _offenePassendeAuftraege.map((auftrag) {
       String distText = '';
@@ -439,7 +516,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     }).toList();
   }
 
-  // ===== FILTERED LISTE =====
+  // ==== HIER KOMMT DER REST: FILTERED LISTE, NAV & BUILD ====
+
   Widget _buildFilteredList(AppLocalizations l10n) {
     List<Widget> cards = [];
     if (_selectedFilter == 0) {
@@ -481,7 +559,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     );
   }
 
-  // ===== BOTTOM NAVIGATION BAR =====
   Widget _buildBottomNav(AppLocalizations l10n) {
     return BottomNavigationBar(
       currentIndex: _bottomNavIndex,
@@ -494,16 +571,19 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
         if (i == _bottomNavIndex) return;
         setState(() => _bottomNavIndex = i);
         if (i == 1) {
+          final isTopBewertet =
+              _completedJobsCount >= 1 && _durchschnittsbewertung >= 4.5;
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => AchievementScreen(
                 aboTyp: _aboTyp ?? 'free',
-                isTopBewertet: false,
-                completedJobsCount: 0,
+                isTopBewertet: isTopBewertet,
+                completedJobsCount: _completedJobsCount,
               ),
             ),
           );
+          setState(() => _bottomNavIndex = 0); // <--- Reset Index nach Rückkehr!
         } else if (i == 2) {
           await Navigator.push(
             context,
@@ -511,6 +591,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               builder: (_) => const ProfilDienstleisterScreen(),
             ),
           );
+          setState(() => _bottomNavIndex = 0); // <--- Reset Index nach Rückkehr!
           _ladeProfilUndAuftraege();
         }
       },
