@@ -1065,4 +1065,151 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get trafficScreenAdresseFehler => 'Adresiniz koordinatlara dönüştürülemedi.';
+
+  @override
+  String get auftragWiederkehrendAppBar => 'Tekrarlayan Görev';
+
+  @override
+  String get auftragWiederkehrendHeadline => 'Bu görev düzenli olarak tekrar edilsin mi?';
+
+  @override
+  String get auftragWiederkehrendInfo => 'Görevin otomatik olarak ne sıklıkta gerçekleştirileceğini seçin.';
+
+  @override
+  String get auftragReviewAppBar => 'Gözden geçir ve gönder';
+
+  @override
+  String get auftragReviewHeadline => 'Her şey doğru mu?';
+
+  @override
+  String get auftragReviewInfo => 'Görevi göndermeden önce bilgilerinizi gözden geçirin.';
+
+  @override
+  String get absendenButton => 'Gönder';
+
+  @override
+  String get ja => 'Evet';
+
+  @override
+  String get nein => 'Hayır';
+
+  @override
+  String get wiederholenBisLabelPlain => 'Şu tarihe kadar tekrarla';
+
+  @override
+  String get auftragAdresseAppBar => 'Adres ve iletişim';
+
+  @override
+  String get auftragAdresseHeadline => 'Görev nerede yapılmalı?';
+
+  @override
+  String get auftragAdresseInfo => 'Hizmet sağlayıcının sizinle iletişime geçebilmesi için adres ve telefon numaranızı girin.';
+
+  @override
+  String get adresseHint => 'örn. Örnek Sokak 12, 12345 İstanbul';
+
+  @override
+  String get telefonnummerHint => 'örn. 0532 123 45 67';
+
+  @override
+  String get zurueckButton => 'Geri';
+
+  @override
+  String get weiterButton => 'İleri';
+
+  @override
+  String get auftragKategorieAppBar => 'Kategori seç';
+
+  @override
+  String get auftragKategorieHeadline => 'Hangi kategori için yardım arıyorsunuz?';
+
+  @override
+  String get auftragKategorieInfo => 'Doğru hizmeti seçin. Daha sonra ayrıntıları belirtebilirsiniz.';
+
+  @override
+  String get kategorieValidator => 'Lütfen bir kategori seçin.';
+
+  @override
+  String get auftragDetailsAppBar => 'Görev ayrıntıları';
+
+  @override
+  String get auftragDetailsHeadline => 'Görevi açıklayın';
+
+  @override
+  String get auftragDetailsInfo => 'Ne yapılmalı? Ne kadar ayrıntılı, o kadar iyi!';
+
+  @override
+  String get auftragTerminAppBar => 'Tarih ve saat';
+
+  @override
+  String get auftragTerminHeadline => 'Görev ne zaman yapılmalı?';
+
+  @override
+  String get auftragTerminInfo => 'Tarih ve saati ayarlayın veya \'en kısa sürede\'yi seçin.';
+
+  @override
+  String get terminLabel => 'Tarih';
+
+  @override
+  String get preisLabel => 'Fiyat (€) veya \'pazarlık yapılabilir\'';
+
+  @override
+  String get preisHint => 'örn. 60 veya \'pazarlık yapılabilir\'';
+
+  @override
+  String get preisValidator => 'Lütfen geçerli bir fiyat girin veya \'pazarlık yapılabilir\' yazın.';
+
+  @override
+  String get preisHinweisLabel => 'Fiyat notu (isteğe bağlı)';
+
+  @override
+  String get preisHinweisHint => 'örn. saatlik ücret, malzeme maliyeti, pazarlık yapılabilir vb.';
+
+  @override
+  String get preisTypLabel => 'Fiyat seçeneği seçin';
+
+  @override
+  String get preisTypGesamt => 'Toplam fiyat';
+
+  @override
+  String get preisTypStunden => 'Saatlik ücret';
+
+  @override
+  String get preisTypVerhandelbar => 'Karşılıklı anlaşma / pazarlık yapılabilir';
+
+  @override
+  String get preisLabelGesamt => 'Toplam fiyat (€)';
+
+  @override
+  String get preisHintGesamt => 'örn. 120';
+
+  @override
+  String get preisLabelStunden => 'Saatlik ücret (€ / saat)';
+
+  @override
+  String get preisHintStunden => 'örn. 20';
+
+  @override
+  String get preisHinweisVerhandelbar => 'Fiyat karşılıklı anlaşmayla / tekliflere açık';
+
+  @override
+  String get preisTypGesamtDesc => 'İş için toplam fiyatı belirtiyorsunuz.';
+
+  @override
+  String get preisTypStundenDesc => 'İş için saatlik bir ücret belirtiyorsunuz.';
+
+  @override
+  String get preisTypVerhandelbarDesc => 'Fiyat, hizmet sağlayıcı ile doğrudan görüşülerek belirlenir.';
+
+  @override
+  String get heimatadresseButtonInfo => 'Kayıtlı ev adresini otomatik doldurmak için buraya tıkla.';
+
+  @override
+  String get verhandelbarLabel => 'Pazarlık edilebilir';
+
+  @override
+  String get terminValidierungFehler => 'Lütfen bir tarih ve her iki saati seçin.';
+
+  @override
+  String get wiederkehrendValidierungFehler => 'Lütfen yinelenen işler için aralığı, haftanın gününü ve tekrar sayısını doğru şekilde seçin.';
 }

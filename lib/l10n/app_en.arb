@@ -342,7 +342,67 @@
 "resetMailSent": "Link has been sent. Please check your inbox!",
 "keineDienstleisterInRegion": "No service provider found in your area yet.",
 "trafficScreenKeineAdresse": "No address found in your profile.",
-"trafficScreenAdresseFehler": "Your address could not be converted to coordinates."
+"trafficScreenAdresseFehler": "Your address could not be converted to coordinates.",
+"auftragWiederkehrendAppBar": "Recurring Job",
+"auftragWiederkehrendHeadline": "Should this job be repeated regularly?",
+"auftragWiederkehrendInfo": "Choose whether and how often the job should be performed automatically.",
+"auftragReviewAppBar": "Review & Submit",
+"auftragReviewHeadline": "Everything correct?",
+"auftragReviewInfo": "Please review your entries before submitting the job.",
+"absendenButton": "Submit",
+"ja": "Yes",
+"nein": "No",
+"wiederholenBisLabelPlain": "Repeat until",
+"auftragAdresseAppBar": "Address & Contact",
+"auftragAdresseHeadline": "Where should the job be performed?",
+"auftragAdresseInfo": "Please enter the address and your phone number so the provider can contact you.",
+"adresseHint": "e.g. Main Street 12, 12345 Berlin",
+"telefonnummerHint": "e.g. 0176 12345678",
+"zurueckButton": "Back",
+"weiterButton": "Next",
+"auftragKategorieAppBar": "Select category",
+"auftragKategorieHeadline": "For which category do you need help?",
+"auftragKategorieInfo": "Choose the right service. You can specify more details later.",
+"kategorieValidator": "Please select a category.",
+
+"auftragDetailsAppBar": "Job details",
+"auftragDetailsHeadline": "Describe your job",
+"auftragDetailsInfo": "What needs to be done? The more details, the better!",
+
+"auftragTerminAppBar": "Date & Time",
+"auftragTerminHeadline": "When should the job be done?",
+"auftragTerminInfo": "Set the date and time or choose 'as soon as possible'.",
+"terminLabel": "Date",
+"preisLabel": "Price (€) or 'negotiable'",
+"preisHint": "e.g. 60 or 'negotiable'",
+"preisValidator": "Please enter a valid price or 'negotiable'.",
+"preisHinweisLabel": "Price note (optional)",
+"preisHinweisHint": "e.g. hourly rate, material costs, negotiable, etc.",
+"preisTypLabel": "Select price option",
+  "preisTypGesamt": "Total price",
+  "preisTypStunden": "Hourly rate",
+  "preisTypVerhandelbar": "Negotiable / on request",
+  "preisLabelGesamt": "Total price (€)",
+  "preisHintGesamt": "e.g. 120",
+  "preisLabelStunden": "Hourly rate (€ per hour)",
+  "preisHintStunden": "e.g. 20",
+  "preisHinweisVerhandelbar": "Price negotiable / offers welcome",
+  "preisTypGesamtDesc": "You specify the total price for the job.",
+"preisTypStundenDesc": "You specify an hourly rate for the job.",
+"preisTypVerhandelbarDesc": "The price will be negotiated directly with the service provider.",
+"heimatadresseButtonInfo": "Tap here to auto-fill your saved home address. (Configurable in your profile)",
+"verhandelbarLabel": "Negotiable",
+"terminValidierungFehler": "Please select a date and both time slots.",
+"wiederkehrendValidierungFehler": "Please select interval, weekday, and number of repetitions for recurring tasks correctly."
+
+
+
+
+
+
+
+
+
 
 
 

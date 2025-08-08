@@ -342,7 +342,67 @@
 "resetMailSent": "El enlace ha sido enviado. ¡Revisa tu bandeja de entrada!",
 "keineDienstleisterInRegion": "No se ha encontrado ningún proveedor de servicios en tu región.",
 "trafficScreenKeineAdresse": "No se ha encontrado ninguna dirección en tu perfil.",
-"trafficScreenAdresseFehler": "No se pudo convertir tu dirección en coordenadas."
+"trafficScreenAdresseFehler": "No se pudo convertir tu dirección en coordenadas.",
+"auftragWiederkehrendAppBar": "Tarea recurrente",
+"auftragWiederkehrendHeadline": "¿Debe esta tarea repetirse regularmente?",
+"auftragWiederkehrendInfo": "Elige si y con qué frecuencia la tarea debe realizarse automáticamente.",
+"auftragReviewAppBar": "Revisar y enviar",
+"auftragReviewHeadline": "¿Todo correcto?",
+"auftragReviewInfo": "Revisa tus datos antes de enviar la tarea.",
+"absendenButton": "Enviar",
+"ja": "Sí",
+"nein": "No",
+"wiederholenBisLabelPlain": "Repetir hasta",
+"auftragAdresseAppBar": "Dirección y contacto",
+"auftragAdresseHeadline": "¿Dónde debe realizarse la tarea?",
+"auftragAdresseInfo": "Introduce la dirección y tu número de teléfono para que el proveedor pueda contactarte.",
+"adresseHint": "p. ej. Calle Ejemplo 12, 12345 Madrid",
+"telefonnummerHint": "p. ej. 612 345 678",
+"zurueckButton": "Atrás",
+"weiterButton": "Siguiente",
+"auftragKategorieAppBar": "Seleccionar categoría",
+"auftragKategorieHeadline": "¿Para qué categoría necesitas ayuda?",
+"auftragKategorieInfo": "Elige el servicio adecuado. Puedes dar más detalles después.",
+"kategorieValidator": "Por favor, selecciona una categoría.",
+
+"auftragDetailsAppBar": "Detalles de la tarea",
+"auftragDetailsHeadline": "Describe la tarea",
+"auftragDetailsInfo": "¿Qué hay que hacer? ¡Cuantos más detalles, mejor!",
+
+"auftragTerminAppBar": "Fecha y hora",
+"auftragTerminHeadline": "¿Cuándo debe realizarse la tarea?",
+"auftragTerminInfo": "Elige la fecha y la hora o selecciona 'lo antes posible'.",
+"terminLabel": "Fecha",
+"preisLabel": "Precio (€) o 'negociable'",
+"preisHint": "p.ej. 60 o 'negociable'",
+"preisValidator": "Por favor, introduce un precio válido o 'negociable'.",
+"preisHinweisLabel": "Nota de precio (opcional)",
+"preisHinweisHint": "p.ej. tarifa por hora, coste de material, negociable, etc.",
+"preisTypLabel": "Seleccionar opción de precio",
+  "preisTypGesamt": "Precio total",
+  "preisTypStunden": "Tarifa por hora",
+  "preisTypVerhandelbar": "A convenir / negociable",
+  "preisLabelGesamt": "Precio total (€)",
+  "preisHintGesamt": "p. ej. 120",
+  "preisLabelStunden": "Tarifa por hora (€ por hora)",
+  "preisHintStunden": "p. ej. 20",
+  "preisHinweisVerhandelbar": "Precio a convenir / se aceptan ofertas",
+  "preisTypGesamtDesc": "Indicas el precio total para el trabajo.",
+"preisTypStundenDesc": "Indicas una tarifa por hora para el trabajo.",
+"preisTypVerhandelbarDesc": "El precio se negociará directamente con el proveedor de servicios.",
+"heimatadresseButtonInfo": "Toca aquí para rellenar automáticamente tu dirección guardada.",
+"verhandelbarLabel": "Negociable",
+"terminValidierungFehler": "Por favor, selecciona una fecha y ambas horas.",
+"wiederkehrendValidierungFehler": "Por favor, selecciona correctamente el intervalo, el día de la semana y el número de repeticiones para las tareas recurrentes."
+
+
+
+
+
+
+
+
+
 
 
 

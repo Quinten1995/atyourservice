@@ -1065,4 +1065,151 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trafficScreenAdresseFehler => 'Je adres kon niet worden omgezet in coördinaten.';
+
+  @override
+  String get auftragWiederkehrendAppBar => 'Terugkerende opdracht';
+
+  @override
+  String get auftragWiederkehrendHeadline => 'Moet deze opdracht regelmatig herhaald worden?';
+
+  @override
+  String get auftragWiederkehrendInfo => 'Kies of en hoe vaak de opdracht automatisch moet worden uitgevoerd.';
+
+  @override
+  String get auftragReviewAppBar => 'Controleren & verzenden';
+
+  @override
+  String get auftragReviewHeadline => 'Alles correct?';
+
+  @override
+  String get auftragReviewInfo => 'Controleer je invoer voordat je de opdracht verstuurt.';
+
+  @override
+  String get absendenButton => 'Verzenden';
+
+  @override
+  String get ja => 'Ja';
+
+  @override
+  String get nein => 'Nee';
+
+  @override
+  String get wiederholenBisLabelPlain => 'Herhalen tot';
+
+  @override
+  String get auftragAdresseAppBar => 'Adres & contact';
+
+  @override
+  String get auftragAdresseHeadline => 'Waar moet de opdracht worden uitgevoerd?';
+
+  @override
+  String get auftragAdresseInfo => 'Vul het adres en je telefoonnummer in zodat de dienstverlener contact kan opnemen.';
+
+  @override
+  String get adresseHint => 'bijv. Voorbeeldstraat 12, 1234 AB Amsterdam';
+
+  @override
+  String get telefonnummerHint => 'bijv. 06 12345678';
+
+  @override
+  String get zurueckButton => 'Terug';
+
+  @override
+  String get weiterButton => 'Volgende';
+
+  @override
+  String get auftragKategorieAppBar => 'Categorie kiezen';
+
+  @override
+  String get auftragKategorieHeadline => 'Voor welke categorie zoek je hulp?';
+
+  @override
+  String get auftragKategorieInfo => 'Kies de juiste dienst. Je kunt later nog details toevoegen.';
+
+  @override
+  String get kategorieValidator => 'Selecteer een categorie.';
+
+  @override
+  String get auftragDetailsAppBar => 'Opdracht details';
+
+  @override
+  String get auftragDetailsHeadline => 'Beschrijf je opdracht';
+
+  @override
+  String get auftragDetailsInfo => 'Wat moet er gebeuren? Hoe meer details, hoe beter!';
+
+  @override
+  String get auftragTerminAppBar => 'Datum & tijd';
+
+  @override
+  String get auftragTerminHeadline => 'Wanneer moet de opdracht worden uitgevoerd?';
+
+  @override
+  String get auftragTerminInfo => 'Stel de datum en tijd in of kies \'zo snel mogelijk\'.';
+
+  @override
+  String get terminLabel => 'Datum';
+
+  @override
+  String get preisLabel => 'Prijs (€) of \'onderhandelbaar\'';
+
+  @override
+  String get preisHint => 'bijv. 60 of \'onderhandelbaar\'';
+
+  @override
+  String get preisValidator => 'Voer een geldige prijs in of \'onderhandelbaar\'.';
+
+  @override
+  String get preisHinweisLabel => 'Prijs-opmerking (optioneel)';
+
+  @override
+  String get preisHinweisHint => 'bijv. uurloon, materiaalkosten, onderhandelbaar, enz.';
+
+  @override
+  String get preisTypLabel => 'Prijsoptie selecteren';
+
+  @override
+  String get preisTypGesamt => 'Totaalprijs';
+
+  @override
+  String get preisTypStunden => 'Uurloon';
+
+  @override
+  String get preisTypVerhandelbar => 'In overleg / onderhandelbaar';
+
+  @override
+  String get preisLabelGesamt => 'Totaalprijs (€)';
+
+  @override
+  String get preisHintGesamt => 'bijv. 120';
+
+  @override
+  String get preisLabelStunden => 'Uurloon (€ per uur)';
+
+  @override
+  String get preisHintStunden => 'bijv. 20';
+
+  @override
+  String get preisHinweisVerhandelbar => 'Prijs in overleg / voorstellen welkom';
+
+  @override
+  String get preisTypGesamtDesc => 'Je geeft de totale prijs voor de opdracht op.';
+
+  @override
+  String get preisTypStundenDesc => 'Je geeft een uurtarief voor de opdracht op.';
+
+  @override
+  String get preisTypVerhandelbarDesc => 'De prijs wordt in overleg met de dienstverlener bepaald.';
+
+  @override
+  String get heimatadresseButtonInfo => 'Klik hier om je opgeslagen thuisadres automatisch in te vullen.';
+
+  @override
+  String get verhandelbarLabel => 'Onderhandelbaar';
+
+  @override
+  String get terminValidierungFehler => 'Selecteer een datum en beide tijdstippen.';
+
+  @override
+  String get wiederkehrendValidierungFehler => 'Selecteer het interval, de weekdag en het aantal herhalingen correct voor terugkerende taken.';
 }

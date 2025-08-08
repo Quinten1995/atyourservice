@@ -1065,4 +1065,151 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trafficScreenAdresseFehler => 'Il tuo indirizzo non può essere convertito in coordinate.';
+
+  @override
+  String get auftragWiederkehrendAppBar => 'Incarico ricorrente';
+
+  @override
+  String get auftragWiederkehrendHeadline => 'Questo incarico deve essere ripetuto regolarmente?';
+
+  @override
+  String get auftragWiederkehrendInfo => 'Scegli se e con quale frequenza l\'incarico deve essere eseguito automaticamente.';
+
+  @override
+  String get auftragReviewAppBar => 'Verifica e invia';
+
+  @override
+  String get auftragReviewHeadline => 'Tutto corretto?';
+
+  @override
+  String get auftragReviewInfo => 'Controlla i tuoi dati prima di inviare l\'incarico.';
+
+  @override
+  String get absendenButton => 'Invia';
+
+  @override
+  String get ja => 'Sì';
+
+  @override
+  String get nein => 'No';
+
+  @override
+  String get wiederholenBisLabelPlain => 'Ripeti fino a';
+
+  @override
+  String get auftragAdresseAppBar => 'Indirizzo e contatto';
+
+  @override
+  String get auftragAdresseHeadline => 'Dove deve essere svolto l\'incarico?';
+
+  @override
+  String get auftragAdresseInfo => 'Inserisci l\'indirizzo e il tuo numero di telefono così il fornitore può contattarti.';
+
+  @override
+  String get adresseHint => 'es. Via Esempio 12, 12345 Roma';
+
+  @override
+  String get telefonnummerHint => 'es. 333 1234567';
+
+  @override
+  String get zurueckButton => 'Indietro';
+
+  @override
+  String get weiterButton => 'Avanti';
+
+  @override
+  String get auftragKategorieAppBar => 'Seleziona categoria';
+
+  @override
+  String get auftragKategorieHeadline => 'Per quale categoria cerchi aiuto?';
+
+  @override
+  String get auftragKategorieInfo => 'Scegli il servizio giusto. Potrai specificare altri dettagli in seguito.';
+
+  @override
+  String get kategorieValidator => 'Seleziona una categoria.';
+
+  @override
+  String get auftragDetailsAppBar => 'Dettagli dell\'incarico';
+
+  @override
+  String get auftragDetailsHeadline => 'Descrivi l\'incarico';
+
+  @override
+  String get auftragDetailsInfo => 'Cosa bisogna fare? Più dettagli, meglio è!';
+
+  @override
+  String get auftragTerminAppBar => 'Data e ora';
+
+  @override
+  String get auftragTerminHeadline => 'Quando deve essere svolto l\'incarico?';
+
+  @override
+  String get auftragTerminInfo => 'Imposta data e ora oppure scegli \'prima possibile\'.';
+
+  @override
+  String get terminLabel => 'Data';
+
+  @override
+  String get preisLabel => 'Prezzo (€) o \'trattabile\'';
+
+  @override
+  String get preisHint => 'es. 60 o \'trattabile\'';
+
+  @override
+  String get preisValidator => 'Inserisci un prezzo valido o \'trattabile\'.';
+
+  @override
+  String get preisHinweisLabel => 'Nota sul prezzo (opzionale)';
+
+  @override
+  String get preisHinweisHint => 'es. tariffa oraria, costi materiali, trattabile, ecc.';
+
+  @override
+  String get preisTypLabel => 'Seleziona l\'opzione di prezzo';
+
+  @override
+  String get preisTypGesamt => 'Prezzo totale';
+
+  @override
+  String get preisTypStunden => 'Tariffa oraria';
+
+  @override
+  String get preisTypVerhandelbar => 'Da concordare / trattabile';
+
+  @override
+  String get preisLabelGesamt => 'Prezzo totale (€)';
+
+  @override
+  String get preisHintGesamt => 'es. 120';
+
+  @override
+  String get preisLabelStunden => 'Tariffa oraria (€ all’ora)';
+
+  @override
+  String get preisHintStunden => 'es. 20';
+
+  @override
+  String get preisHinweisVerhandelbar => 'Prezzo da concordare / offerte benvenute';
+
+  @override
+  String get preisTypGesamtDesc => 'Indichi il prezzo totale per l’incarico.';
+
+  @override
+  String get preisTypStundenDesc => 'Indichi una tariffa oraria per l’incarico.';
+
+  @override
+  String get preisTypVerhandelbarDesc => 'Il prezzo verrà concordato direttamente con il fornitore del servizio.';
+
+  @override
+  String get heimatadresseButtonInfo => 'Tocca qui per compilare automaticamente il tuo indirizzo di casa salvato.';
+
+  @override
+  String get verhandelbarLabel => 'Negoziaibile';
+
+  @override
+  String get terminValidierungFehler => 'Seleziona una data e entrambe le fasce orarie.';
+
+  @override
+  String get wiederkehrendValidierungFehler => 'Seleziona correttamente intervallo, giorno della settimana e numero di ripetizioni per le attività ricorrenti.';
 }

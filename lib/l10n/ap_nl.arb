@@ -332,7 +332,67 @@
 "resetMailSent": "De link is verstuurd. Controleer je inbox!",
 "keineDienstleisterInRegion": "Nog geen dienstverlener gevonden in jouw regio.",
 "trafficScreenKeineAdresse": "Geen adres gevonden in je profiel.",
-"trafficScreenAdresseFehler": "Je adres kon niet worden omgezet in coördinaten."
+"trafficScreenAdresseFehler": "Je adres kon niet worden omgezet in coördinaten.",
+"auftragWiederkehrendAppBar": "Terugkerende opdracht",
+"auftragWiederkehrendHeadline": "Moet deze opdracht regelmatig herhaald worden?",
+"auftragWiederkehrendInfo": "Kies of en hoe vaak de opdracht automatisch moet worden uitgevoerd.",
+"auftragReviewAppBar": "Controleren & verzenden",
+"auftragReviewHeadline": "Alles correct?",
+"auftragReviewInfo": "Controleer je invoer voordat je de opdracht verstuurt.",
+"absendenButton": "Verzenden",
+"ja": "Ja",
+"nein": "Nee",
+"wiederholenBisLabelPlain": "Herhalen tot",
+"auftragAdresseAppBar": "Adres & contact",
+"auftragAdresseHeadline": "Waar moet de opdracht worden uitgevoerd?",
+"auftragAdresseInfo": "Vul het adres en je telefoonnummer in zodat de dienstverlener contact kan opnemen.",
+"adresseHint": "bijv. Voorbeeldstraat 12, 1234 AB Amsterdam",
+"telefonnummerHint": "bijv. 06 12345678",
+"zurueckButton": "Terug",
+"weiterButton": "Volgende",
+"auftragKategorieAppBar": "Categorie kiezen",
+"auftragKategorieHeadline": "Voor welke categorie zoek je hulp?",
+"auftragKategorieInfo": "Kies de juiste dienst. Je kunt later nog details toevoegen.",
+"kategorieValidator": "Selecteer een categorie.",
+
+"auftragDetailsAppBar": "Opdracht details",
+"auftragDetailsHeadline": "Beschrijf je opdracht",
+"auftragDetailsInfo": "Wat moet er gebeuren? Hoe meer details, hoe beter!",
+
+"auftragTerminAppBar": "Datum & tijd",
+"auftragTerminHeadline": "Wanneer moet de opdracht worden uitgevoerd?",
+"auftragTerminInfo": "Stel de datum en tijd in of kies 'zo snel mogelijk'.",
+"terminLabel": "Datum",
+"preisLabel": "Prijs (€) of 'onderhandelbaar'",
+"preisHint": "bijv. 60 of 'onderhandelbaar'",
+"preisValidator": "Voer een geldige prijs in of 'onderhandelbaar'.",
+"preisHinweisLabel": "Prijs-opmerking (optioneel)",
+"preisHinweisHint": "bijv. uurloon, materiaalkosten, onderhandelbaar, enz.",
+"preisTypLabel": "Prijsoptie selecteren",
+  "preisTypGesamt": "Totaalprijs",
+  "preisTypStunden": "Uurloon",
+  "preisTypVerhandelbar": "In overleg / onderhandelbaar",
+  "preisLabelGesamt": "Totaalprijs (€)",
+  "preisHintGesamt": "bijv. 120",
+  "preisLabelStunden": "Uurloon (€ per uur)",
+  "preisHintStunden": "bijv. 20",
+  "preisHinweisVerhandelbar": "Prijs in overleg / voorstellen welkom",
+  "preisTypGesamtDesc": "Je geeft de totale prijs voor de opdracht op.",
+"preisTypStundenDesc": "Je geeft een uurtarief voor de opdracht op.",
+"preisTypVerhandelbarDesc": "De prijs wordt in overleg met de dienstverlener bepaald.",
+"heimatadresseButtonInfo": "Klik hier om je opgeslagen thuisadres automatisch in te vullen.",
+"verhandelbarLabel": "Onderhandelbaar",
+"terminValidierungFehler": "Selecteer een datum en beide tijdstippen.",
+"wiederkehrendValidierungFehler": "Selecteer het interval, de weekdag en het aantal herhalingen correct voor terugkerende taken."
+
+
+
+
+
+
+
+
+
 
 
 

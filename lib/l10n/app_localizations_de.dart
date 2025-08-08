@@ -1065,4 +1065,151 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trafficScreenAdresseFehler => 'Deine Adresse konnte nicht in Koordinaten umgewandelt werden.';
+
+  @override
+  String get auftragWiederkehrendAppBar => 'Wiederkehrender Auftrag';
+
+  @override
+  String get auftragWiederkehrendHeadline => 'Soll der Auftrag regelmäßig wiederholt werden?';
+
+  @override
+  String get auftragWiederkehrendInfo => 'Wähle aus, ob und wie oft der Auftrag automatisch ausgeführt werden soll.';
+
+  @override
+  String get auftragReviewAppBar => 'Überprüfen & Absenden';
+
+  @override
+  String get auftragReviewHeadline => 'Alles korrekt?';
+
+  @override
+  String get auftragReviewInfo => 'Bitte überprüfe deine Eingaben, bevor du den Auftrag absendest.';
+
+  @override
+  String get absendenButton => 'Absenden';
+
+  @override
+  String get ja => 'Ja';
+
+  @override
+  String get nein => 'Nein';
+
+  @override
+  String get wiederholenBisLabelPlain => 'Wiederholen bis';
+
+  @override
+  String get auftragAdresseAppBar => 'Adresse & Kontakt';
+
+  @override
+  String get auftragAdresseHeadline => 'Wo soll der Auftrag ausgeführt werden?';
+
+  @override
+  String get auftragAdresseInfo => 'Bitte gib die Adresse und deine Telefonnummer an, damit der Dienstleister dich erreichen kann.';
+
+  @override
+  String get adresseHint => 'z.B. Musterstraße 12, 12345 Berlin';
+
+  @override
+  String get telefonnummerHint => 'z.B. 0176 12345678';
+
+  @override
+  String get zurueckButton => 'Zurück';
+
+  @override
+  String get weiterButton => 'Weiter';
+
+  @override
+  String get auftragKategorieAppBar => 'Kategorie wählen';
+
+  @override
+  String get auftragKategorieHeadline => 'Für welche Kategorie suchst du Unterstützung?';
+
+  @override
+  String get auftragKategorieInfo => 'Wähle die passende Dienstleistung. Du kannst später noch Details angeben.';
+
+  @override
+  String get kategorieValidator => 'Bitte wähle eine Kategorie aus.';
+
+  @override
+  String get auftragDetailsAppBar => 'Auftragsdetails';
+
+  @override
+  String get auftragDetailsHeadline => 'Beschreibe deinen Auftrag';
+
+  @override
+  String get auftragDetailsInfo => 'Was soll gemacht werden? Je genauer, desto besser!';
+
+  @override
+  String get auftragTerminAppBar => 'Termin & Zeit';
+
+  @override
+  String get auftragTerminHeadline => 'Wann soll der Auftrag erledigt werden?';
+
+  @override
+  String get auftragTerminInfo => 'Lege den Zeitpunkt fest oder wähle „so schnell wie möglich“.';
+
+  @override
+  String get terminLabel => 'Termin';
+
+  @override
+  String get preisLabel => 'Preis (€) oder \'verhandelbar\'';
+
+  @override
+  String get preisHint => 'z.B. 60 oder \'verhandelbar\'';
+
+  @override
+  String get preisValidator => 'Bitte gib einen gültigen Preis an oder \'verhandelbar\'.';
+
+  @override
+  String get preisHinweisLabel => 'Preis-Hinweis (optional)';
+
+  @override
+  String get preisHinweisHint => 'z.B. Stundenlohn, Materialkosten, Verhandlungsbasis etc.';
+
+  @override
+  String get preisTypLabel => 'Preisoption auswählen';
+
+  @override
+  String get preisTypGesamt => 'Gesamtpreis';
+
+  @override
+  String get preisTypStunden => 'Stundenlohn';
+
+  @override
+  String get preisTypVerhandelbar => 'Nach Absprache / verhandelbar';
+
+  @override
+  String get preisLabelGesamt => 'Gesamtpreis (€)';
+
+  @override
+  String get preisHintGesamt => 'z.B. 120';
+
+  @override
+  String get preisLabelStunden => 'Stundenlohn (€ pro Stunde)';
+
+  @override
+  String get preisHintStunden => 'z.B. 20';
+
+  @override
+  String get preisHinweisVerhandelbar => 'Preis nach Absprache / Angebot erwünscht';
+
+  @override
+  String get preisTypGesamtDesc => 'Du gibst den vollständigen Gesamtpreis für den Auftrag an.';
+
+  @override
+  String get preisTypStundenDesc => 'Du gibst einen Stundenlohn für den Auftrag an.';
+
+  @override
+  String get preisTypVerhandelbarDesc => 'Der Preis wird individuell mit dem Dienstleister vereinbart.';
+
+  @override
+  String get heimatadresseButtonInfo => 'Klicke hier, um deine hinterlegte Heimatadresse automatisch einzufügen. (Im Profil einstellbar)';
+
+  @override
+  String get verhandelbarLabel => 'Verhandelbar';
+
+  @override
+  String get terminValidierungFehler => 'Bitte wähle ein Datum und beide Uhrzeiten aus.';
+
+  @override
+  String get wiederkehrendValidierungFehler => 'Bitte wähle für wiederkehrende Aufträge Intervall, Wochentag und Anzahl korrekt aus.';
 }

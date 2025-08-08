@@ -2084,6 +2084,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your address could not be converted to coordinates.'**
   String get trafficScreenAdresseFehler;
+
+  /// No description provided for @auftragWiederkehrendAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring Job'**
+  String get auftragWiederkehrendAppBar;
+
+  /// No description provided for @auftragWiederkehrendHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Should this job be repeated regularly?'**
+  String get auftragWiederkehrendHeadline;
+
+  /// No description provided for @auftragWiederkehrendInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose whether and how often the job should be performed automatically.'**
+  String get auftragWiederkehrendInfo;
+
+  /// No description provided for @auftragReviewAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Review & Submit'**
+  String get auftragReviewAppBar;
+
+  /// No description provided for @auftragReviewHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything correct?'**
+  String get auftragReviewHeadline;
+
+  /// No description provided for @auftragReviewInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Please review your entries before submitting the job.'**
+  String get auftragReviewInfo;
+
+  /// No description provided for @absendenButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get absendenButton;
+
+  /// No description provided for @ja.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get ja;
+
+  /// No description provided for @nein.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get nein;
+
+  /// No description provided for @wiederholenBisLabelPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat until'**
+  String get wiederholenBisLabelPlain;
+
+  /// No description provided for @auftragAdresseAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Address & Contact'**
+  String get auftragAdresseAppBar;
+
+  /// No description provided for @auftragAdresseHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Where should the job be performed?'**
+  String get auftragAdresseHeadline;
+
+  /// No description provided for @auftragAdresseInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the address and your phone number so the provider can contact you.'**
+  String get auftragAdresseInfo;
+
+  /// No description provided for @adresseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Main Street 12, 12345 Berlin'**
+  String get adresseHint;
+
+  /// No description provided for @telefonnummerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 0176 12345678'**
+  String get telefonnummerHint;
+
+  /// No description provided for @zurueckButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get zurueckButton;
+
+  /// No description provided for @weiterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get weiterButton;
+
+  /// No description provided for @auftragKategorieAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Select category'**
+  String get auftragKategorieAppBar;
+
+  /// No description provided for @auftragKategorieHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'For which category do you need help?'**
+  String get auftragKategorieHeadline;
+
+  /// No description provided for @auftragKategorieInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the right service. You can specify more details later.'**
+  String get auftragKategorieInfo;
+
+  /// No description provided for @kategorieValidator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a category.'**
+  String get kategorieValidator;
+
+  /// No description provided for @auftragDetailsAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Job details'**
+  String get auftragDetailsAppBar;
+
+  /// No description provided for @auftragDetailsHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your job'**
+  String get auftragDetailsHeadline;
+
+  /// No description provided for @auftragDetailsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs to be done? The more details, the better!'**
+  String get auftragDetailsInfo;
+
+  /// No description provided for @auftragTerminAppBar.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & Time'**
+  String get auftragTerminAppBar;
+
+  /// No description provided for @auftragTerminHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'When should the job be done?'**
+  String get auftragTerminHeadline;
+
+  /// No description provided for @auftragTerminInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the date and time or choose \'as soon as possible\'.'**
+  String get auftragTerminInfo;
+
+  /// No description provided for @terminLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get terminLabel;
+
+  /// No description provided for @preisLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (€) or \'negotiable\''**
+  String get preisLabel;
+
+  /// No description provided for @preisHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 60 or \'negotiable\''**
+  String get preisHint;
+
+  /// No description provided for @preisValidator.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid price or \'negotiable\'.'**
+  String get preisValidator;
+
+  /// No description provided for @preisHinweisLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price note (optional)'**
+  String get preisHinweisLabel;
+
+  /// No description provided for @preisHinweisHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. hourly rate, material costs, negotiable, etc.'**
+  String get preisHinweisHint;
+
+  /// No description provided for @preisTypLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select price option'**
+  String get preisTypLabel;
+
+  /// No description provided for @preisTypGesamt.
+  ///
+  /// In en, this message translates to:
+  /// **'Total price'**
+  String get preisTypGesamt;
+
+  /// No description provided for @preisTypStunden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hourly rate'**
+  String get preisTypStunden;
+
+  /// No description provided for @preisTypVerhandelbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Negotiable / on request'**
+  String get preisTypVerhandelbar;
+
+  /// No description provided for @preisLabelGesamt.
+  ///
+  /// In en, this message translates to:
+  /// **'Total price (€)'**
+  String get preisLabelGesamt;
+
+  /// No description provided for @preisHintGesamt.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 120'**
+  String get preisHintGesamt;
+
+  /// No description provided for @preisLabelStunden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hourly rate (€ per hour)'**
+  String get preisLabelStunden;
+
+  /// No description provided for @preisHintStunden.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 20'**
+  String get preisHintStunden;
+
+  /// No description provided for @preisHinweisVerhandelbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Price negotiable / offers welcome'**
+  String get preisHinweisVerhandelbar;
+
+  /// No description provided for @preisTypGesamtDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You specify the total price for the job.'**
+  String get preisTypGesamtDesc;
+
+  /// No description provided for @preisTypStundenDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You specify an hourly rate for the job.'**
+  String get preisTypStundenDesc;
+
+  /// No description provided for @preisTypVerhandelbarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The price will be negotiated directly with the service provider.'**
+  String get preisTypVerhandelbarDesc;
+
+  /// No description provided for @heimatadresseButtonInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to auto-fill your saved home address. (Configurable in your profile)'**
+  String get heimatadresseButtonInfo;
+
+  /// No description provided for @verhandelbarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Negotiable'**
+  String get verhandelbarLabel;
+
+  /// No description provided for @terminValidierungFehler.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a date and both time slots.'**
+  String get terminValidierungFehler;
+
+  /// No description provided for @wiederkehrendValidierungFehler.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select interval, weekday, and number of repetitions for recurring tasks correctly.'**
+  String get wiederkehrendValidierungFehler;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/auftrag.dart';
+import '../models/auftrag_form_data.dart';
 import 'auftrag_detail_screen.dart';
-import 'auftrag_erstellen_screen.dart';
+import 'auftrag_erstellen/auftrag_kategorie_screen.dart';
 import 'profil_kunde_screen.dart';
 import 'traffic_screen.dart';
-import 'kunden_achievement_screen.dart'; // <-- ACHIEVEMENT SCREEN!
+import 'kunden_achievement_screen.dart';
 import '../l10n/app_localizations.dart';
-import '../l10n/status_value_extension.dart'; // für statusValue!
+import '../l10n/status_value_extension.dart';
 import '../data/kategorie_icons.dart';
+import 'start_screen.dart'; // Für Logout-Navigation
 
 extension StatusTranslation on AppLocalizations {
   String translateStatus(String? status) {
@@ -48,7 +50,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   List<Auftrag> _abgeschlosseneAuftraege = [];
 
   int _selectedFilter = 0; // 0: Alle, 1: Offen, 2: Laufend, 3: Abgeschlossen
-  int _bottomNavIndex = 0; // 0 = Aufträge, 1 = Achievements, 2 = Profil
+  int _bottomNavIndex = 0;
 
   @override
   void initState() {
@@ -98,7 +100,16 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     }
   }
 
-  // Filterchips für die Filterleiste oben
+  // --- Logout Handler ---
+  Future<void> _logout(BuildContext context) async {
+    await supabase.auth.signOut();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const StartScreen()),
+      (route) => false,
+    );
+  }
+
   Widget _buildFilterChips(AppLocalizations l10n) {
     final labels = [
       l10n.filterAlle,
@@ -107,16 +118,16 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       l10n.filterAbgeschlossen,
     ];
     final chipIcons = [
-      Icons.filter_alt, // Alle
-      Icons.inbox, // Offen
-      Icons.hourglass_bottom, // Laufend
-      Icons.check_circle, // Abgeschlossen
+      Icons.filter_alt,
+      Icons.inbox,
+      Icons.hourglass_bottom,
+      Icons.check_circle,
     ];
     final chipColors = [
-      Colors.grey, // Alle
-      Color(0xFF43A047), // Offen
-      Color(0xFF1E88E5), // Laufend
-      Color(0xFF757575), // Abgeschlossen
+      Colors.grey,
+      Color(0xFF43A047),
+      Color(0xFF1E88E5),
+      Color(0xFF757575),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 10),
@@ -152,11 +163,8 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     );
   }
 
-  // Gefilterte Karten je Status
   Widget _buildFilteredList(AppLocalizations l10n) {
     List<Widget> cards = [];
-
-    // Hinweis bei "Abgeschlossen"-Filter anzeigen
     if (_selectedFilter == 3) {
       cards.add(Padding(
         padding: const EdgeInsets.only(bottom: 8, left: 2),
@@ -178,9 +186,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         ),
       ));
     }
-
     if (_selectedFilter == 0) {
-      // Alle: Laufende → Abgeschlossene → Offene
       if (_laufendeAuftraegeRaw.isNotEmpty) {
         cards.addAll(_buildLaufendeKarten(l10n));
       }
@@ -220,7 +226,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     );
   }
 
-  // Laufende Karten
   List<Widget> _buildLaufendeKarten(AppLocalizations l10n) {
     return _laufendeAuftraegeRaw.map((map) {
       final auftrag = Auftrag.fromJson(map);
@@ -242,7 +247,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     }).toList();
   }
 
-  // Offene Karten
   List<Widget> _buildOffeneKarten(AppLocalizations l10n) {
     return _offeneAuftraege.map((auftrag) {
       return _buildAuftragsKarte(
@@ -260,7 +264,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     }).toList();
   }
 
-  // Abgeschlossene Karten
   List<Widget> _buildAbgeschlosseneKarten(AppLocalizations l10n) {
     return _abgeschlosseneAuftraege.map((auftrag) {
       return _buildAuftragsKarte(
@@ -278,7 +281,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     }).toList();
   }
 
-  // Auftragskarte-Widget (wie beim DL, Status-Badge modern)
   Widget _buildAuftragsKarte({
     required Auftrag auftrag,
     String? dienstleisterEmail,
@@ -286,7 +288,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     VoidCallback? onTap,
   }) {
     final l10n = AppLocalizations.of(context)!;
-    // Status-Design
     final lowerStatus = (status ?? auftrag.status).toLowerCase();
     Color badgeColor;
     IconData badgeIcon;
@@ -369,7 +370,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     );
   }
 
-  // Bottom Navigation Bar – jetzt mit Navigation zum Achievement-Screen!
   Widget _buildBottomNav(AppLocalizations l10n) {
     return BottomNavigationBar(
       currentIndex: _bottomNavIndex,
@@ -382,7 +382,6 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         if (i == _bottomNavIndex) return;
         setState(() => _bottomNavIndex = i);
         if (i == 1) {
-          // ACHIEVEMENT SCREEN!
           await Navigator.push(
             context,
             MaterialPageRoute(
@@ -436,11 +435,17 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.red, size: 28),
+            tooltip: "Logout",
+            onPressed: () async {
+              await _logout(context);
+            },
+          ),
         ],
       ),
       body: Stack(
         children: [
-          // --- Hintergrund: Gradient + Kreise ---
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -500,7 +505,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const AuftragErstellenScreen()),
+            MaterialPageRoute(
+              builder: (_) => AuftragKategorieScreen(formData: AuftragFormData.empty()),
+            ),
           ).then((_) => _ladeAuftraege());
         },
         backgroundColor: KundenDashboardScreen.primaryColor,

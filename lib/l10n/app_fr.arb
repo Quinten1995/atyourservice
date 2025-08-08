@@ -369,7 +369,67 @@
 "resetMailSent": "Le lien a été envoyé. Vérifiez votre boîte de réception !",
 "keineDienstleisterInRegion": "Aucun prestataire de services trouvé dans votre région.",
 "trafficScreenKeineAdresse": "Aucune adresse trouvée dans votre profil.",
-"trafficScreenAdresseFehler": "Votre adresse n’a pas pu être convertie en coordonnées."
+"trafficScreenAdresseFehler": "Votre adresse n’a pas pu être convertie en coordonnées.",
+"auftragWiederkehrendAppBar": "Mission récurrente",
+"auftragWiederkehrendHeadline": "Cette mission doit-elle être répétée régulièrement ?",
+"auftragWiederkehrendInfo": "Choisissez si et à quelle fréquence la mission doit être effectuée automatiquement.",
+"auftragReviewAppBar": "Vérifier et envoyer",
+"auftragReviewHeadline": "Tout est correct ?",
+"auftragReviewInfo": "Veuillez vérifier vos informations avant d'envoyer la mission.",
+"absendenButton": "Envoyer",
+"ja": "Oui",
+"nein": "Non",
+"wiederholenBisLabelPlain": "Répéter jusqu'au",
+"auftragAdresseAppBar": "Adresse & Contact",
+"auftragAdresseHeadline": "Où la mission doit-elle être réalisée ?",
+"auftragAdresseInfo": "Veuillez saisir l'adresse et votre numéro de téléphone pour que le prestataire puisse vous contacter.",
+"adresseHint": "ex. 12 rue Exemple, 12345 Paris",
+"telefonnummerHint": "ex. 06 12 34 56 78",
+"zurueckButton": "Retour",
+"weiterButton": "Suivant",
+"auftragKategorieAppBar": "Choisir une catégorie",
+"auftragKategorieHeadline": "Pour quelle catégorie cherchez-vous de l'aide ?",
+"auftragKategorieInfo": "Choisissez le service approprié. Vous pourrez donner plus de détails ensuite.",
+"kategorieValidator": "Veuillez choisir une catégorie.",
+
+"auftragDetailsAppBar": "Détails de la mission",
+"auftragDetailsHeadline": "Décrivez votre mission",
+"auftragDetailsInfo": "Que doit-on faire ? Plus c'est précis, mieux c'est !",
+
+"auftragTerminAppBar": "Date et heure",
+"auftragTerminHeadline": "Quand la mission doit-elle être effectuée ?",
+"auftragTerminInfo": "Définissez la date et l'heure ou choisissez 'dès que possible'.",
+"terminLabel": "Date",
+"preisLabel": "Prix (€) ou 'négociable'",
+"preisHint": "ex: 60 ou 'négociable'",
+"preisValidator": "Veuillez entrer un prix valide ou 'négociable'.",
+"preisHinweisLabel": "Note sur le prix (optionnel)",
+"preisHinweisHint": "ex: taux horaire, frais de matériel, négociable, etc.",
+"preisTypLabel": "Choisir l’option de prix",
+  "preisTypGesamt": "Prix total",
+  "preisTypStunden": "Tarif horaire",
+  "preisTypVerhandelbar": "À convenir / négociable",
+  "preisLabelGesamt": "Prix total (€)",
+  "preisHintGesamt": "p.ex. 120",
+  "preisLabelStunden": "Tarif horaire (€ par heure)",
+  "preisHintStunden": "p.ex. 20",
+  "preisHinweisVerhandelbar": "Prix à convenir / offres bienvenues",
+  "preisTypGesamtDesc": "Vous indiquez le prix total pour la mission.",
+"preisTypStundenDesc": "Vous indiquez un tarif horaire pour la mission.",
+"preisTypVerhandelbarDesc": "Le prix sera négocié directement avec le prestataire.",
+"heimatadresseButtonInfo": "Clique ici pour remplir automatiquement ton adresse principale enregistrée.",
+"verhandelbarLabel": "Négociable",
+"terminValidierungFehler": "Veuillez sélectionner une date et les deux heures.",
+"wiederkehrendValidierungFehler": "Veuillez sélectionner correctement l’intervalle, le jour de la semaine et le nombre de répétitions pour les tâches récurrentes."
+
+
+
+
+
+
+
+
+
 
 
 

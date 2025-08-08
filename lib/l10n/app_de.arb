@@ -340,7 +340,70 @@
 "resetMailSent": "Link wurde versendet. Prüfe dein Postfach!",
 "keineDienstleisterInRegion": "In deiner Region wurde noch kein Dienstleister gefunden.",
 "trafficScreenKeineAdresse": "Keine Adresse in deinem Profil gefunden.",
-"trafficScreenAdresseFehler": "Deine Adresse konnte nicht in Koordinaten umgewandelt werden."
+"trafficScreenAdresseFehler": "Deine Adresse konnte nicht in Koordinaten umgewandelt werden.",
+"auftragWiederkehrendAppBar": "Wiederkehrender Auftrag",
+"auftragWiederkehrendHeadline": "Soll der Auftrag regelmäßig wiederholt werden?",
+"auftragWiederkehrendInfo": "Wähle aus, ob und wie oft der Auftrag automatisch ausgeführt werden soll.",
+"auftragReviewAppBar": "Überprüfen & Absenden",
+"auftragReviewHeadline": "Alles korrekt?",
+"auftragReviewInfo": "Bitte überprüfe deine Eingaben, bevor du den Auftrag absendest.",
+"absendenButton": "Absenden",
+"ja": "Ja",
+"nein": "Nein",
+"wiederholenBisLabelPlain": "Wiederholen bis",
+"auftragAdresseAppBar": "Adresse & Kontakt",
+"auftragAdresseHeadline": "Wo soll der Auftrag ausgeführt werden?",
+"auftragAdresseInfo": "Bitte gib die Adresse und deine Telefonnummer an, damit der Dienstleister dich erreichen kann.",
+"adresseHint": "z.B. Musterstraße 12, 12345 Berlin",
+"telefonnummerHint": "z.B. 0176 12345678",
+"zurueckButton": "Zurück",
+"weiterButton": "Weiter",
+"auftragKategorieAppBar": "Kategorie wählen",
+"auftragKategorieHeadline": "Für welche Kategorie suchst du Unterstützung?",
+"auftragKategorieInfo": "Wähle die passende Dienstleistung. Du kannst später noch Details angeben.",
+"kategorieValidator": "Bitte wähle eine Kategorie aus.",
+
+"auftragDetailsAppBar": "Auftragsdetails",
+"auftragDetailsHeadline": "Beschreibe deinen Auftrag",
+"auftragDetailsInfo": "Was soll gemacht werden? Je genauer, desto besser!",
+
+"auftragTerminAppBar": "Termin & Zeit",
+"auftragTerminHeadline": "Wann soll der Auftrag erledigt werden?",
+"auftragTerminInfo": "Lege den Zeitpunkt fest oder wähle „so schnell wie möglich“.",
+"terminLabel": "Termin",
+"preisLabel": "Preis (€) oder 'verhandelbar'",
+"preisHint": "z.B. 60 oder 'verhandelbar'",
+"preisValidator": "Bitte gib einen gültigen Preis an oder 'verhandelbar'.",
+"preisHinweisLabel": "Preis-Hinweis (optional)",
+"preisHinweisHint": "z.B. Stundenlohn, Materialkosten, Verhandlungsbasis etc.",
+"preisTypLabel": "Preisoption auswählen",
+  "preisTypGesamt": "Gesamtpreis",
+  "preisTypStunden": "Stundenlohn",
+  "preisTypVerhandelbar": "Nach Absprache / verhandelbar",
+  "preisLabelGesamt": "Gesamtpreis (€)",
+  "preisHintGesamt": "z.B. 120",
+  "preisLabelStunden": "Stundenlohn (€ pro Stunde)",
+  "preisHintStunden": "z.B. 20",
+  "preisHinweisVerhandelbar": "Preis nach Absprache / Angebot erwünscht",
+  "preisTypGesamtDesc": "Du gibst den vollständigen Gesamtpreis für den Auftrag an.",
+"preisTypStundenDesc": "Du gibst einen Stundenlohn für den Auftrag an.",
+"preisTypVerhandelbarDesc": "Der Preis wird individuell mit dem Dienstleister vereinbart.",
+"heimatadresseButtonInfo": "Klicke hier, um deine hinterlegte Heimatadresse automatisch einzufügen. (Im Profil einstellbar)",
+"verhandelbarLabel": "Verhandelbar",
+"terminValidierungFehler": "Bitte wähle ein Datum und beide Uhrzeiten aus.",
+"wiederkehrendValidierungFehler": "Bitte wähle für wiederkehrende Aufträge Intervall, Wochentag und Anzahl korrekt aus."
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

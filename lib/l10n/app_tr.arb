@@ -342,7 +342,67 @@
 "resetMailSent": "Bağlantı gönderildi. Lütfen e-posta kutunuzu kontrol edin!",
 "keineDienstleisterInRegion": "Bölgenizde henüz bir hizmet sağlayıcı bulunamadı.",
 "trafficScreenKeineAdresse": "Profilinizde bir adres bulunamadı.",
-"trafficScreenAdresseFehler": "Adresiniz koordinatlara dönüştürülemedi."
+"trafficScreenAdresseFehler": "Adresiniz koordinatlara dönüştürülemedi.",
+"auftragWiederkehrendAppBar": "Tekrarlayan Görev",
+"auftragWiederkehrendHeadline": "Bu görev düzenli olarak tekrar edilsin mi?",
+"auftragWiederkehrendInfo": "Görevin otomatik olarak ne sıklıkta gerçekleştirileceğini seçin.",
+"auftragReviewAppBar": "Gözden geçir ve gönder",
+"auftragReviewHeadline": "Her şey doğru mu?",
+"auftragReviewInfo": "Görevi göndermeden önce bilgilerinizi gözden geçirin.",
+"absendenButton": "Gönder",
+"ja": "Evet",
+"nein": "Hayır",
+"wiederholenBisLabelPlain": "Şu tarihe kadar tekrarla",
+"auftragAdresseAppBar": "Adres ve iletişim",
+"auftragAdresseHeadline": "Görev nerede yapılmalı?",
+"auftragAdresseInfo": "Hizmet sağlayıcının sizinle iletişime geçebilmesi için adres ve telefon numaranızı girin.",
+"adresseHint": "örn. Örnek Sokak 12, 12345 İstanbul",
+"telefonnummerHint": "örn. 0532 123 45 67",
+"zurueckButton": "Geri",
+"weiterButton": "İleri",
+"auftragKategorieAppBar": "Kategori seç",
+"auftragKategorieHeadline": "Hangi kategori için yardım arıyorsunuz?",
+"auftragKategorieInfo": "Doğru hizmeti seçin. Daha sonra ayrıntıları belirtebilirsiniz.",
+"kategorieValidator": "Lütfen bir kategori seçin.",
+
+"auftragDetailsAppBar": "Görev ayrıntıları",
+"auftragDetailsHeadline": "Görevi açıklayın",
+"auftragDetailsInfo": "Ne yapılmalı? Ne kadar ayrıntılı, o kadar iyi!",
+
+"auftragTerminAppBar": "Tarih ve saat",
+"auftragTerminHeadline": "Görev ne zaman yapılmalı?",
+"auftragTerminInfo": "Tarih ve saati ayarlayın veya 'en kısa sürede'yi seçin.",
+"terminLabel": "Tarih",
+"preisLabel": "Fiyat (€) veya 'pazarlık yapılabilir'",
+"preisHint": "örn. 60 veya 'pazarlık yapılabilir'",
+"preisValidator": "Lütfen geçerli bir fiyat girin veya 'pazarlık yapılabilir' yazın.",
+"preisHinweisLabel": "Fiyat notu (isteğe bağlı)",
+"preisHinweisHint": "örn. saatlik ücret, malzeme maliyeti, pazarlık yapılabilir vb.",
+"preisTypLabel": "Fiyat seçeneği seçin",
+  "preisTypGesamt": "Toplam fiyat",
+  "preisTypStunden": "Saatlik ücret",
+  "preisTypVerhandelbar": "Karşılıklı anlaşma / pazarlık yapılabilir",
+  "preisLabelGesamt": "Toplam fiyat (€)",
+  "preisHintGesamt": "örn. 120",
+  "preisLabelStunden": "Saatlik ücret (€ / saat)",
+  "preisHintStunden": "örn. 20",
+  "preisHinweisVerhandelbar": "Fiyat karşılıklı anlaşmayla / tekliflere açık",
+  "preisTypGesamtDesc": "İş için toplam fiyatı belirtiyorsunuz.",
+"preisTypStundenDesc": "İş için saatlik bir ücret belirtiyorsunuz.",
+"preisTypVerhandelbarDesc": "Fiyat, hizmet sağlayıcı ile doğrudan görüşülerek belirlenir.",
+"heimatadresseButtonInfo": "Kayıtlı ev adresini otomatik doldurmak için buraya tıkla.",
+"verhandelbarLabel": "Pazarlık edilebilir",
+"terminValidierungFehler": "Lütfen bir tarih ve her iki saati seçin.",
+"wiederkehrendValidierungFehler": "Lütfen yinelenen işler için aralığı, haftanın gününü ve tekrar sayısını doğru şekilde seçin."
+
+
+
+
+
+
+
+
+
 
 
 

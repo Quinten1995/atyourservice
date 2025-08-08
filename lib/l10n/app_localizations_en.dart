@@ -1065,4 +1065,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trafficScreenAdresseFehler => 'Your address could not be converted to coordinates.';
+
+  @override
+  String get auftragWiederkehrendAppBar => 'Recurring Job';
+
+  @override
+  String get auftragWiederkehrendHeadline => 'Should this job be repeated regularly?';
+
+  @override
+  String get auftragWiederkehrendInfo => 'Choose whether and how often the job should be performed automatically.';
+
+  @override
+  String get auftragReviewAppBar => 'Review & Submit';
+
+  @override
+  String get auftragReviewHeadline => 'Everything correct?';
+
+  @override
+  String get auftragReviewInfo => 'Please review your entries before submitting the job.';
+
+  @override
+  String get absendenButton => 'Submit';
+
+  @override
+  String get ja => 'Yes';
+
+  @override
+  String get nein => 'No';
+
+  @override
+  String get wiederholenBisLabelPlain => 'Repeat until';
+
+  @override
+  String get auftragAdresseAppBar => 'Address & Contact';
+
+  @override
+  String get auftragAdresseHeadline => 'Where should the job be performed?';
+
+  @override
+  String get auftragAdresseInfo => 'Please enter the address and your phone number so the provider can contact you.';
+
+  @override
+  String get adresseHint => 'e.g. Main Street 12, 12345 Berlin';
+
+  @override
+  String get telefonnummerHint => 'e.g. 0176 12345678';
+
+  @override
+  String get zurueckButton => 'Back';
+
+  @override
+  String get weiterButton => 'Next';
+
+  @override
+  String get auftragKategorieAppBar => 'Select category';
+
+  @override
+  String get auftragKategorieHeadline => 'For which category do you need help?';
+
+  @override
+  String get auftragKategorieInfo => 'Choose the right service. You can specify more details later.';
+
+  @override
+  String get kategorieValidator => 'Please select a category.';
+
+  @override
+  String get auftragDetailsAppBar => 'Job details';
+
+  @override
+  String get auftragDetailsHeadline => 'Describe your job';
+
+  @override
+  String get auftragDetailsInfo => 'What needs to be done? The more details, the better!';
+
+  @override
+  String get auftragTerminAppBar => 'Date & Time';
+
+  @override
+  String get auftragTerminHeadline => 'When should the job be done?';
+
+  @override
+  String get auftragTerminInfo => 'Set the date and time or choose \'as soon as possible\'.';
+
+  @override
+  String get terminLabel => 'Date';
+
+  @override
+  String get preisLabel => 'Price (€) or \'negotiable\'';
+
+  @override
+  String get preisHint => 'e.g. 60 or \'negotiable\'';
+
+  @override
+  String get preisValidator => 'Please enter a valid price or \'negotiable\'.';
+
+  @override
+  String get preisHinweisLabel => 'Price note (optional)';
+
+  @override
+  String get preisHinweisHint => 'e.g. hourly rate, material costs, negotiable, etc.';
+
+  @override
+  String get preisTypLabel => 'Select price option';
+
+  @override
+  String get preisTypGesamt => 'Total price';
+
+  @override
+  String get preisTypStunden => 'Hourly rate';
+
+  @override
+  String get preisTypVerhandelbar => 'Negotiable / on request';
+
+  @override
+  String get preisLabelGesamt => 'Total price (€)';
+
+  @override
+  String get preisHintGesamt => 'e.g. 120';
+
+  @override
+  String get preisLabelStunden => 'Hourly rate (€ per hour)';
+
+  @override
+  String get preisHintStunden => 'e.g. 20';
+
+  @override
+  String get preisHinweisVerhandelbar => 'Price negotiable / offers welcome';
+
+  @override
+  String get preisTypGesamtDesc => 'You specify the total price for the job.';
+
+  @override
+  String get preisTypStundenDesc => 'You specify an hourly rate for the job.';
+
+  @override
+  String get preisTypVerhandelbarDesc => 'The price will be negotiated directly with the service provider.';
+
+  @override
+  String get heimatadresseButtonInfo => 'Tap here to auto-fill your saved home address. (Configurable in your profile)';
+
+  @override
+  String get verhandelbarLabel => 'Negotiable';
+
+  @override
+  String get terminValidierungFehler => 'Please select a date and both time slots.';
+
+  @override
+  String get wiederkehrendValidierungFehler => 'Please select interval, weekday, and number of repetitions for recurring tasks correctly.';
 }

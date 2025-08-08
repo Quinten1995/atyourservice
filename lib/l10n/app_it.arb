@@ -340,7 +340,67 @@
 "resetMailSent": "Il link è stato inviato. Controlla la tua casella di posta!",
 "keineDienstleisterInRegion": "Nessun fornitore di servizi trovato nella tua zona.",
 "trafficScreenKeineAdresse": "Nessun indirizzo trovato nel tuo profilo.",
-"trafficScreenAdresseFehler": "Il tuo indirizzo non può essere convertito in coordinate."
+"trafficScreenAdresseFehler": "Il tuo indirizzo non può essere convertito in coordinate.",
+"auftragWiederkehrendAppBar": "Incarico ricorrente",
+"auftragWiederkehrendHeadline": "Questo incarico deve essere ripetuto regolarmente?",
+"auftragWiederkehrendInfo": "Scegli se e con quale frequenza l'incarico deve essere eseguito automaticamente.",
+"auftragReviewAppBar": "Verifica e invia",
+"auftragReviewHeadline": "Tutto corretto?",
+"auftragReviewInfo": "Controlla i tuoi dati prima di inviare l'incarico.",
+"absendenButton": "Invia",
+"ja": "Sì",
+"nein": "No",
+"wiederholenBisLabelPlain": "Ripeti fino a",
+"auftragAdresseAppBar": "Indirizzo e contatto",
+"auftragAdresseHeadline": "Dove deve essere svolto l'incarico?",
+"auftragAdresseInfo": "Inserisci l'indirizzo e il tuo numero di telefono così il fornitore può contattarti.",
+"adresseHint": "es. Via Esempio 12, 12345 Roma",
+"telefonnummerHint": "es. 333 1234567",
+"zurueckButton": "Indietro",
+"weiterButton": "Avanti",
+"auftragKategorieAppBar": "Seleziona categoria",
+"auftragKategorieHeadline": "Per quale categoria cerchi aiuto?",
+"auftragKategorieInfo": "Scegli il servizio giusto. Potrai specificare altri dettagli in seguito.",
+"kategorieValidator": "Seleziona una categoria.",
+
+"auftragDetailsAppBar": "Dettagli dell'incarico",
+"auftragDetailsHeadline": "Descrivi l'incarico",
+"auftragDetailsInfo": "Cosa bisogna fare? Più dettagli, meglio è!",
+
+"auftragTerminAppBar": "Data e ora",
+"auftragTerminHeadline": "Quando deve essere svolto l'incarico?",
+"auftragTerminInfo": "Imposta data e ora oppure scegli 'prima possibile'.",
+"terminLabel": "Data",
+"preisLabel": "Prezzo (€) o 'trattabile'",
+"preisHint": "es. 60 o 'trattabile'",
+"preisValidator": "Inserisci un prezzo valido o 'trattabile'.",
+"preisHinweisLabel": "Nota sul prezzo (opzionale)",
+"preisHinweisHint": "es. tariffa oraria, costi materiali, trattabile, ecc.",
+"preisTypLabel": "Seleziona l'opzione di prezzo",
+  "preisTypGesamt": "Prezzo totale",
+  "preisTypStunden": "Tariffa oraria",
+  "preisTypVerhandelbar": "Da concordare / trattabile",
+  "preisLabelGesamt": "Prezzo totale (€)",
+  "preisHintGesamt": "es. 120",
+  "preisLabelStunden": "Tariffa oraria (€ all’ora)",
+  "preisHintStunden": "es. 20",
+  "preisHinweisVerhandelbar": "Prezzo da concordare / offerte benvenute",
+  "preisTypGesamtDesc": "Indichi il prezzo totale per l’incarico.",
+"preisTypStundenDesc": "Indichi una tariffa oraria per l’incarico.",
+"preisTypVerhandelbarDesc": "Il prezzo verrà concordato direttamente con il fornitore del servizio.",
+"heimatadresseButtonInfo": "Tocca qui per compilare automaticamente il tuo indirizzo di casa salvato.",
+"verhandelbarLabel": "Negoziaibile",
+"terminValidierungFehler": "Seleziona una data e entrambe le fasce orarie.",
+"wiederkehrendValidierungFehler": "Seleziona correttamente intervallo, giorno della settimana e numero di ripetizioni per le attività ricorrenti."
+
+
+
+
+
+
+
+
+
 
 
 
