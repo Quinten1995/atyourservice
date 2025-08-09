@@ -391,7 +391,12 @@
 "heimatadresseButtonInfo": "Klicke hier, um deine hinterlegte Heimatadresse automatisch einzufügen. (Im Profil einstellbar)",
 "verhandelbarLabel": "Verhandelbar",
 "terminValidierungFehler": "Bitte wähle ein Datum und beide Uhrzeiten aus.",
-"wiederkehrendValidierungFehler": "Bitte wähle für wiederkehrende Aufträge Intervall, Wochentag und Anzahl korrekt aus."
+"wiederkehrendValidierungFehler": "Bitte wähle für wiederkehrende Aufträge Intervall, Wochentag und Anzahl korrekt aus.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Verhandelbar",
+"hourShort": "Std."
+
 
 
 

@@ -383,7 +383,12 @@
 "heimatadresseButtonInfo": "Klik hier om je opgeslagen thuisadres automatisch in te vullen.",
 "verhandelbarLabel": "Onderhandelbaar",
 "terminValidierungFehler": "Selecteer een datum en beide tijdstippen.",
-"wiederkehrendValidierungFehler": "Selecteer het interval, de weekdag en het aantal herhalingen correct voor terugkerende taken."
+"wiederkehrendValidierungFehler": "Selecteer het interval, de weekdag en het aantal herhalingen correct voor terugkerende taken.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Onderhandelbaar",
+"hourShort": "u"
+
 
 
 

@@ -1212,4 +1212,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get wiederkehrendValidierungFehler => 'Lütfen yinelenen işler için aralığı, haftanın gününü ve tekrar sayısını doğru şekilde seçin.';
+
+  @override
+  String priceTotal(Object amount) {
+    return '$amount €';
+  }
+
+  @override
+  String pricePerHour(Object amount, Object hourShort) {
+    return '$amount € / $hourShort';
+  }
+
+  @override
+  String get priceNegotiable => 'Pazarlıklı';
+
+  @override
+  String get hourShort => 'sa';
 }

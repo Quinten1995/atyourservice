@@ -393,7 +393,12 @@
 "heimatadresseButtonInfo": "Toca aquí para rellenar automáticamente tu dirección guardada.",
 "verhandelbarLabel": "Negociable",
 "terminValidierungFehler": "Por favor, selecciona una fecha y ambas horas.",
-"wiederkehrendValidierungFehler": "Por favor, selecciona correctamente el intervalo, el día de la semana y el número de repeticiones para las tareas recurrentes."
+"wiederkehrendValidierungFehler": "Por favor, selecciona correctamente el intervalo, el día de la semana y el número de repeticiones para las tareas recurrentes.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Negociable",
+"hourShort": "h"
+
 
 
 

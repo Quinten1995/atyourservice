@@ -80,14 +80,14 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       final auftraegeMaps = (auftraegeRaw as List).cast<Map<String, dynamic>>();
 
       _laufendeAuftraegeRaw = auftraegeMaps
-          .where((map) => map['status'] == 'in bearbeitung')
+          .where((map) => (map['status'] as String).toLowerCase() == 'in bearbeitung')
           .toList();
       _offeneAuftraege = auftraegeMaps
-          .where((map) => map['status'] == 'offen')
+          .where((map) => (map['status'] as String).toLowerCase() == 'offen')
           .map((map) => Auftrag.fromJson(map))
           .toList();
       _abgeschlosseneAuftraege = auftraegeMaps
-          .where((map) => map['status'] == 'abgeschlossen')
+          .where((map) => (map['status'] as String).toLowerCase() == 'abgeschlossen')
           .map((map) => Auftrag.fromJson(map))
           .toList();
 
@@ -125,9 +125,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     ];
     final chipColors = [
       Colors.grey,
-      Color(0xFF43A047),
-      Color(0xFF1E88E5),
-      Color(0xFF757575),
+      const Color(0xFF43A047),
+      const Color(0xFF1E88E5),
+      const Color(0xFF757575),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 10),
@@ -281,6 +281,48 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     }).toList();
   }
 
+  // -------- Preis-Helpers (l10n-ready) --------
+  String? _formatPrice(Auftrag a, AppLocalizations l10n) {
+    final typ = (a.preisTyp ?? '').toLowerCase();
+    final v = a.preis;
+
+    if (typ == 'verhandelbar') return l10n.verhandelbarLabel;
+
+    // Fallback (alte Datensätze ohne preis_typ): Betrag, wenn vorhanden
+    if (typ.isEmpty) {
+      if (v == null) return null;
+      final amount = _fmtAmount(v);
+      return l10n.priceTotal(amount);
+    }
+
+    if (v == null) return null;
+    final amount = _fmtAmount(v);
+    return (typ == 'stunden')
+        ? l10n.pricePerHour(amount, l10n.hourShort)
+        : l10n.priceTotal(amount);
+  }
+
+  String _fmtAmount(double v) =>
+      (v == v.roundToDouble()) ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
+
+  Widget _buildPricePill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+          color: Colors.black.withOpacity(0.75),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAuftragsKarte({
     required Auftrag auftrag,
     String? dienstleisterEmail,
@@ -293,21 +335,24 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     IconData badgeIcon;
     switch (lowerStatus) {
       case 'offen':
-        badgeColor = Color(0xFF43A047);
+        badgeColor = const Color(0xFF43A047);
         badgeIcon = Icons.inbox;
         break;
       case 'in bearbeitung':
-        badgeColor = Color(0xFF1E88E5);
+        badgeColor = const Color(0xFF1E88E5);
         badgeIcon = Icons.hourglass_bottom;
         break;
       case 'abgeschlossen':
-        badgeColor = Color(0xFF757575);
+        badgeColor = const Color(0xFF757575);
         badgeIcon = Icons.check_circle;
         break;
       default:
         badgeColor = Colors.grey;
         badgeIcon = Icons.info;
     }
+
+    final priceText = _formatPrice(auftrag, l10n);
+
     return Material(
       elevation: 3,
       borderRadius: BorderRadius.circular(18),
@@ -321,14 +366,27 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 6),
-              Text(
-                auftrag.titel,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              // Titel + Preis rechts
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      auftrag.titel,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (priceText != null) ...[
+                    const SizedBox(width: 8),
+                    _buildPricePill(priceText),
+                  ],
+                ],
               ),
-              const SizedBox(height: 7),
+              const SizedBox(height: 8),
+
+              // Status-Badge
               Row(
                 children: [
                   Container(
@@ -355,6 +413,8 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                   ),
                 ],
               ),
+
+              // Dienstleister (falls vorhanden)
               if (dienstleisterEmail != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 6.0),
@@ -401,9 +461,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         }
       },
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: l10n.auftraege),
-        BottomNavigationBarItem(icon: Icon(Icons.emoji_events), label: l10n.achievementTitle),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: l10n.profil),
+        BottomNavigationBarItem(icon: const Icon(Icons.assignment), label: l10n.auftraege),
+        BottomNavigationBarItem(icon: const Icon(Icons.emoji_events), label: l10n.achievementTitle),
+        BottomNavigationBarItem(icon: const Icon(Icons.person), label: l10n.profil),
       ],
     );
   }

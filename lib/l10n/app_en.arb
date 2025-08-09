@@ -393,7 +393,12 @@
 "heimatadresseButtonInfo": "Tap here to auto-fill your saved home address. (Configurable in your profile)",
 "verhandelbarLabel": "Negotiable",
 "terminValidierungFehler": "Please select a date and both time slots.",
-"wiederkehrendValidierungFehler": "Please select interval, weekday, and number of repetitions for recurring tasks correctly."
+"wiederkehrendValidierungFehler": "Please select interval, weekday, and number of repetitions for recurring tasks correctly.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Negotiable",
+"hourShort": "hr"
+
 
 
 

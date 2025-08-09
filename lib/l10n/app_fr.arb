@@ -420,7 +420,12 @@
 "heimatadresseButtonInfo": "Clique ici pour remplir automatiquement ton adresse principale enregistrée.",
 "verhandelbarLabel": "Négociable",
 "terminValidierungFehler": "Veuillez sélectionner une date et les deux heures.",
-"wiederkehrendValidierungFehler": "Veuillez sélectionner correctement l’intervalle, le jour de la semaine et le nombre de répétitions pour les tâches récurrentes."
+"wiederkehrendValidierungFehler": "Veuillez sélectionner correctement l’intervalle, le jour de la semaine et le nombre de répétitions pour les tâches récurrentes.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Négociable",
+"hourShort": "h"
+
 
 
 

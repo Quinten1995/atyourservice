@@ -16,13 +16,18 @@ class AuftragDetailsScreen extends StatefulWidget {
 
 class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
+
   late final _titelController = TextEditingController(text: widget.formData.titel ?? '');
   late final _beschreibungController = TextEditingController(text: widget.formData.beschreibung ?? '');
   late final _preisController = TextEditingController(
-    text: widget.formData.preis != null ? widget.formData.preis.toString() : ''
+    text: widget.formData.preis != null ? widget.formData.preis.toString() : '',
+  );
+  // NEU: Hinweis-Controller
+  late final _preisHinweisController = TextEditingController(
+    text: widget.formData.preisHinweis ?? '',
   );
 
-  String _selectedPreisTyp = "gesamt"; // Default: Gesamtpreis
+  String _selectedPreisTyp = "gesamt"; // Default
 
   @override
   void initState() {
@@ -37,6 +42,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
     _titelController.dispose();
     _beschreibungController.dispose();
     _preisController.dispose();
+    _preisHinweisController.dispose();
     super.dispose();
   }
 
@@ -54,6 +60,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
         setState(() {
           _selectedPreisTyp = preisTyp;
           _preisController.text = '';
+          // Hinweis behalten – ist optional, muss nicht geleert werden
         });
       },
       child: AnimatedContainer(
@@ -68,7 +75,6 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
             color: isSelected ? AuftragDetailsScreen.primaryColor : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
           ),
-          // Dezent: Kein Schatten, keine intensive Farbe!
         ),
         child: Row(
           children: [
@@ -78,7 +84,8 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
+                  Text(
+                    title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.5,
@@ -86,7 +93,8 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                     ),
                   ),
                   const SizedBox(height: 3),
-                  Text(description,
+                  Text(
+                    description,
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 14,
@@ -157,6 +165,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                           style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.8)),
                         ),
                         const SizedBox(height: 26),
+
                         TextFormField(
                           controller: _titelController,
                           decoration: InputDecoration(
@@ -165,9 +174,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
                               borderSide: BorderSide(color: AuftragDetailsScreen.primaryColor, width: 2),
@@ -178,7 +185,9 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 18),
+
                         TextFormField(
                           controller: _beschreibungController,
                           decoration: InputDecoration(
@@ -187,9 +196,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
                               borderSide: BorderSide(color: AuftragDetailsScreen.primaryColor, width: 2),
@@ -197,15 +204,15 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                           ),
                           maxLines: 3,
                         ),
+
                         const SizedBox(height: 18),
+
                         Text(
                           l10n.preisTypLabel,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 17.4,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17.4),
                         ),
                         const SizedBox(height: 5),
+
                         _buildPreisTypCard(
                           preisTyp: "gesamt",
                           title: l10n.preisTypGesamt,
@@ -230,29 +237,24 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                           color: AuftragDetailsScreen.primaryColor,
                           context: context,
                         ),
+
                         if (_selectedPreisTyp != "verhandelbar") ...[
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: _preisController,
                             decoration: InputDecoration(
-                              labelText: _selectedPreisTyp == "gesamt"
-                                  ? l10n.preisLabelGesamt
-                                  : l10n.preisLabelStunden,
-                              hintText: _selectedPreisTyp == "gesamt"
-                                  ? l10n.preisHintGesamt
-                                  : l10n.preisHintStunden,
+                              labelText: _selectedPreisTyp == "gesamt" ? l10n.preisLabelGesamt : l10n.preisLabelStunden,
+                              hintText: _selectedPreisTyp == "gesamt" ? l10n.preisHintGesamt : l10n.preisHintStunden,
                               filled: true,
                               fillColor: Colors.white,
                               contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: BorderSide(color: AuftragDetailsScreen.primaryColor, width: 2),
                               ),
                             ),
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             validator: (value) {
                               if (_selectedPreisTyp == "verhandelbar") return null;
                               if (value == null || value.isEmpty) return l10n.preisValidator;
@@ -267,16 +269,33 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               l10n.preisHinweisVerhandelbar,
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontStyle: FontStyle.italic,
-                                fontSize: 15,
-                              ),
+                              style: TextStyle(color: Colors.grey[700], fontStyle: FontStyle.italic, fontSize: 15),
                             ),
                           ),
                         ],
+
+                        const SizedBox(height: 10),
+
+                        // NEU: Preis-Hinweis (optional, für alle Typen sichtbar)
+                        TextFormField(
+                          controller: _preisHinweisController,
+                          decoration: InputDecoration(
+                            labelText: l10n.preisHinweisLabel,
+                            hintText: l10n.preisHinweisHint,
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(color: AuftragDetailsScreen.primaryColor, width: 2),
+                            ),
+                          ),
+                          maxLines: 2,
+                        ),
+
                         const SizedBox(height: 26),
-                        // ---- Buttons: Gleich groß, klar abgegrenzt ----
+
                         Row(
                           children: [
                             Expanded(
@@ -288,9 +307,7 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AuftragDetailsScreen.primaryColor,
                                     side: BorderSide(color: AuftragDetailsScreen.primaryColor, width: 1.7),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   ),
                                   onPressed: () => Navigator.pop(context),
                                 ),
@@ -306,18 +323,20 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AuftragDetailsScreen.primaryColor,
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                     elevation: 4,
                                     shadowColor: AuftragDetailsScreen.primaryColor.withOpacity(0.20),
                                   ),
                                   onPressed: () {
                                     if (_formKey.currentState?.validate() ?? false) {
+                                      // Grunddaten
                                       widget.formData.titel = _titelController.text.trim();
                                       widget.formData.beschreibung = _beschreibungController.text.trim();
+
+                                      // Preis-Typ
                                       widget.formData.preisTyp = _selectedPreisTyp;
 
+                                      // Preis-Wert (nur bei gesamt/stunden)
                                       final preisText = _preisController.text.trim();
                                       if (_selectedPreisTyp == "gesamt" || _selectedPreisTyp == "stunden") {
                                         widget.formData.preis = double.tryParse(preisText.replaceAll(',', '.'));
@@ -325,11 +344,14 @@ class _AuftragDetailsScreenState extends State<AuftragDetailsScreen> {
                                         widget.formData.preis = null;
                                       }
 
+                                      // NEU: Preis-Hinweis (optional, Trim + Null, wenn leer)
+                                      final hinweis = _preisHinweisController.text.trim();
+                                      widget.formData.preisHinweis = hinweis.isEmpty ? null : hinweis;
+
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              AuftragAdresseScreen(formData: widget.formData),
+                                          builder: (context) => AuftragAdresseScreen(formData: widget.formData),
                                         ),
                                       );
                                     }

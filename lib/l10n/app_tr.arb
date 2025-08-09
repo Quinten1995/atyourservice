@@ -393,7 +393,12 @@
 "heimatadresseButtonInfo": "Kayıtlı ev adresini otomatik doldurmak için buraya tıkla.",
 "verhandelbarLabel": "Pazarlık edilebilir",
 "terminValidierungFehler": "Lütfen bir tarih ve her iki saati seçin.",
-"wiederkehrendValidierungFehler": "Lütfen yinelenen işler için aralığı, haftanın gününü ve tekrar sayısını doğru şekilde seçin."
+"wiederkehrendValidierungFehler": "Lütfen yinelenen işler için aralığı, haftanın gününü ve tekrar sayısını doğru şekilde seçin.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Pazarlıklı",
+"hourShort": "sa"
+
 
 
 

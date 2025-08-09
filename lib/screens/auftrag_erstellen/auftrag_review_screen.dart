@@ -24,18 +24,21 @@ class _AuftragReviewScreenState extends State<AuftragReviewScreen> {
   Future<void> _auftragAbschicken() async {
     final supabase = Supabase.instance.client;
     final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
+
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception(l10n.bitteEinloggen);
 
-      // Geocoding
+      // Geocoding nur, wenn Adresse vorhanden
       double? lat, lon;
-      if ((widget.formData.adresse ?? '').isNotEmpty) {
-        final coords = await GeocodingService().getCoordinates(widget.formData.adresse!);
+      final hasAdresse = (widget.formData.adresse ?? '').trim().isNotEmpty;
+      if (hasAdresse) {
+        final coords = await GeocodingService().getCoordinates(widget.formData.adresse!.trim());
         if (coords == null) throw Exception(l10n.adresseNichtGefunden);
         lat = coords['lat'];
         lon = coords['lng'];
@@ -44,66 +47,79 @@ class _AuftragReviewScreenState extends State<AuftragReviewScreen> {
       final String id = const Uuid().v4();
       final timestamp = DateTime.now().toUtc().toIso8601String();
 
-      final auftragMap = {
+      // Map mit bedingten Einträgen für optionale Felder
+      final auftragMap = <String, dynamic>{
         'id': id,
         'kunde_id': user.id,
         'titel': widget.formData.titel ?? '',
         'beschreibung': widget.formData.beschreibung ?? '',
         'kategorie': widget.formData.kategorie ?? '',
-        'adresse': (widget.formData.adresse ?? '').isEmpty ? null : widget.formData.adresse,
-        'latitude': lat,
-        'longitude': lon,
+        if (hasAdresse) 'adresse': widget.formData.adresse!.trim(),
+        if (lat != null) 'latitude': lat,
+        if (lon != null) 'longitude': lon,
         'status': 'offen',
         'erstellt_am': timestamp,
         'aktualisiert_am': timestamp,
-        'telefon': widget.formData.telefon,
+        if ((widget.formData.telefon ?? '').trim().isNotEmpty)
+          'telefon': widget.formData.telefon!.trim(),
+
+        // Preis & Preis-Typ
         'preis': widget.formData.preis,
+        'preis_typ': widget.formData.preisTyp,
         'so_schnell_wie_moeglich': widget.formData.soSchnellWieMoeglich,
-        'termin_datum': (!widget.formData.soSchnellWieMoeglich && widget.formData.terminDatum != null)
-            ? widget.formData.terminDatum!.toIso8601String().substring(0, 10)
-            : null,
-        'zeit_von': (!widget.formData.soSchnellWieMoeglich && widget.formData.zeitVon != null)
-            ? '${widget.formData.zeitVon!.hour.toString().padLeft(2, '0')}:${widget.formData.zeitVon!.minute.toString().padLeft(2, '0')}'
-            : null,
-        'zeit_bis': (!widget.formData.soSchnellWieMoeglich && widget.formData.zeitBis != null)
-            ? '${widget.formData.zeitBis!.hour.toString().padLeft(2, '0')}:${widget.formData.zeitBis!.minute.toString().padLeft(2, '0')}'
-            : null,
+
+        // Termin-Logik
+        if (!widget.formData.soSchnellWieMoeglich && widget.formData.terminDatum != null)
+          'termin_datum': widget.formData.terminDatum!.toIso8601String().substring(0, 10),
+        if (!widget.formData.soSchnellWieMoeglich && widget.formData.zeitVon != null)
+          'zeit_von':
+              '${widget.formData.zeitVon!.hour.toString().padLeft(2, '0')}:${widget.formData.zeitVon!.minute.toString().padLeft(2, '0')}',
+        if (!widget.formData.soSchnellWieMoeglich && widget.formData.zeitBis != null)
+          'zeit_bis':
+              '${widget.formData.zeitBis!.hour.toString().padLeft(2, '0')}:${widget.formData.zeitBis!.minute.toString().padLeft(2, '0')}',
+
+        // Wiederkehrend
         'wiederkehrend': widget.formData.wiederkehrend,
-        'intervall': widget.formData.wiederkehrend ? widget.formData.intervall : null,
-        'wochentag': widget.formData.wiederkehrend ? widget.formData.wochentag : null,
-        'anzahl_wiederholungen': widget.formData.wiederkehrend ? widget.formData.anzahlWiederholungen : null,
-        'wiederholen_bis': (widget.formData.wiederkehrend && widget.formData.wiederholenBis != null)
-            ? widget.formData.wiederholenBis!.toIso8601String().substring(0, 10)
-            : null,
+        if (widget.formData.wiederkehrend) ...{
+          if (widget.formData.intervall != null) 'intervall': widget.formData.intervall,
+          if (widget.formData.wochentag != null) 'wochentag': widget.formData.wochentag,
+          if (widget.formData.anzahlWiederholungen != null)
+            'anzahl_wiederholungen': widget.formData.anzahlWiederholungen,
+          if (widget.formData.wiederholenBis != null)
+            'wiederholen_bis': widget.formData.wiederholenBis!.toIso8601String().substring(0, 10),
+        },
       };
 
       await supabase.from('auftraege').insert(auftragMap);
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.auftragGespeichert)),
       );
 
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const KundenDashboardScreen()),
-          (route) => false,
-        );
-      }
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const KundenDashboardScreen()),
+        (route) => false,
+      );
     } on Exception catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
-        _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = AppLocalizations.of(context)!.unbekannterFehler(e.toString());
-        _isLoading = false;
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Widget _buildReviewItem(String label, String value, {bool highlight = false}) {
@@ -182,7 +198,6 @@ class _AuftragReviewScreenState extends State<AuftragReviewScreen> {
                       ),
                       const SizedBox(height: 22),
 
-                      // Review fields:
                       _buildReviewItem(l10n.kategorieLabel, getValue(widget.formData.kategorie)),
                       _buildReviewItem(l10n.titelLabel, getValue(widget.formData.titel)),
                       _buildReviewItem(l10n.beschreibungLabel, getValue(widget.formData.beschreibung)),

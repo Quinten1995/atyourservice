@@ -1212,4 +1212,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get wiederkehrendValidierungFehler => 'Seleziona correttamente intervallo, giorno della settimana e numero di ripetizioni per le attività ricorrenti.';
+
+  @override
+  String priceTotal(Object amount) {
+    return '$amount €';
+  }
+
+  @override
+  String pricePerHour(Object amount, Object hourShort) {
+    return '$amount € / $hourShort';
+  }
+
+  @override
+  String get priceNegotiable => 'Negoziale';
+
+  @override
+  String get hourShort => 'h';
 }

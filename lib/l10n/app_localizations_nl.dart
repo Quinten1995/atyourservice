@@ -1212,4 +1212,20 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get wiederkehrendValidierungFehler => 'Selecteer het interval, de weekdag en het aantal herhalingen correct voor terugkerende taken.';
+
+  @override
+  String priceTotal(Object amount) {
+    return '$amount €';
+  }
+
+  @override
+  String pricePerHour(Object amount, Object hourShort) {
+    return '$amount € / $hourShort';
+  }
+
+  @override
+  String get priceNegotiable => 'Onderhandelbaar';
+
+  @override
+  String get hourShort => 'u';
 }

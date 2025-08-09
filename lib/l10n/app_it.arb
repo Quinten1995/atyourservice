@@ -391,7 +391,12 @@
 "heimatadresseButtonInfo": "Tocca qui per compilare automaticamente il tuo indirizzo di casa salvato.",
 "verhandelbarLabel": "Negoziaibile",
 "terminValidierungFehler": "Seleziona una data e entrambe le fasce orarie.",
-"wiederkehrendValidierungFehler": "Seleziona correttamente intervallo, giorno della settimana e numero di ripetizioni per le attività ricorrenti."
+"wiederkehrendValidierungFehler": "Seleziona correttamente intervallo, giorno della settimana e numero di ripetizioni per le attività ricorrenti.",
+"priceTotal": "{amount} €",
+"pricePerHour": "{amount} € / {hourShort}",
+"priceNegotiable": "Negoziale",
+"hourShort": "h"
+
 
 
 

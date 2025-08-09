@@ -16,18 +16,14 @@ class AuftragWiederkehrendScreen extends StatefulWidget {
 
 class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen> {
   final _formKey = GlobalKey<FormState>();
+
   bool _wiederkehrend = false;
   String? _intervall;
   String? _wochentag;
-  int? _anzahlWiederholungen;
   DateTime? _wiederholenBis;
-  String? _errorMessage;
+  final TextEditingController _repsController = TextEditingController();
 
-  final List<String> intervalKeys = [
-    'interval_weekly',
-    'interval_biweekly',
-    'interval_monthly',
-  ];
+  final List<String> intervalKeys = ['interval_weekly', 'interval_biweekly', 'interval_monthly'];
   final List<String> weekdayKeys = [
     'weekday_monday',
     'weekday_tuesday',
@@ -37,6 +33,26 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
     'weekday_saturday',
     'weekday_sunday',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _wiederkehrend = widget.formData.wiederkehrend;
+    _intervall = widget.formData.intervall;
+    _wochentag = widget.formData.wochentag;
+    _wiederholenBis = widget.formData.wiederholenBis;
+
+    final reps = widget.formData.anzahlWiederholungen;
+    if (reps != null && reps > 0) {
+      _repsController.text = reps.toString();
+    }
+  }
+
+  @override
+  void dispose() {
+    _repsController.dispose();
+    super.dispose();
+  }
 
   String getIntervalLabel(String key, AppLocalizations l10n) {
     switch (key) {
@@ -70,31 +86,6 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
       default:
         return key;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _wiederkehrend = widget.formData.wiederkehrend;
-    _intervall = widget.formData.intervall;
-    _wochentag = widget.formData.wochentag;
-    _anzahlWiederholungen = widget.formData.anzahlWiederholungen;
-    _wiederholenBis = widget.formData.wiederholenBis;
-  }
-
-  bool _validateWiederkehrend(AppLocalizations l10n) {
-    if (_wiederkehrend) {
-      if (_intervall == null || _wochentag == null || _anzahlWiederholungen == null || _anzahlWiederholungen! < 1) {
-        setState(() {
-          _errorMessage = l10n.wiederkehrendValidierungFehler;
-        });
-        return false;
-      }
-    }
-    setState(() {
-      _errorMessage = null;
-    });
-    return true;
   }
 
   @override
@@ -147,6 +138,7 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
                           style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.8)),
                         ),
                         const SizedBox(height: 22),
+
                         CheckboxListTile(
                           value: _wiederkehrend,
                           onChanged: (val) {
@@ -157,56 +149,65 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
                           title: Text(l10n.wiederkehrendCheckbox),
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
+
                         if (_wiederkehrend) ...[
                           const SizedBox(height: 10),
+
                           DropdownButtonFormField<String>(
                             value: _intervall,
                             decoration: InputDecoration(
                               labelText: l10n.intervallLabel,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             ),
                             items: intervalKeys
                                 .map((key) => DropdownMenuItem(value: key, child: Text(getIntervalLabel(key, l10n))))
                                 .toList(),
                             onChanged: (val) => setState(() => _intervall = val),
-                            validator: (val) => val == null ? l10n.intervallValidator : null,
+                            validator: (val) => _wiederkehrend && val == null ? l10n.intervallValidator : null,
                             borderRadius: BorderRadius.circular(16),
                           ),
+
                           const SizedBox(height: 10),
+
                           DropdownButtonFormField<String>(
                             value: _wochentag,
                             decoration: InputDecoration(
                               labelText: l10n.wochentagLabel,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                             ),
                             items: weekdayKeys
                                 .map((key) => DropdownMenuItem(value: key, child: Text(getWeekdayLabel(key, l10n))))
                                 .toList(),
                             onChanged: (val) => setState(() => _wochentag = val),
-                            validator: (val) => val == null ? l10n.wochentagValidator : null,
+                            validator: (val) => _wiederkehrend && val == null ? l10n.wochentagValidator : null,
                             borderRadius: BorderRadius.circular(16),
                           ),
+
                           const SizedBox(height: 10),
+
+                          // Optionales Feld, kein Fehler-Return
                           TextFormField(
+                            controller: _repsController,
                             decoration: InputDecoration(labelText: l10n.anzahlWiederholungenLabel),
                             keyboardType: TextInputType.number,
-                            onChanged: (val) {
-                              setState(() {
-                                _anzahlWiederholungen = int.tryParse(val);
-                              });
+                            validator: (val) {
+                              // Leer oder falsche Eingabe wird nicht bemängelt
+                              return null;
                             },
                           ),
+
                           const SizedBox(height: 10),
+
                           Row(
                             children: [
                               Expanded(
-                                child: Text(_wiederholenBis == null
-                                    ? l10n.wiederholenBisNichtGesetzt
-                                    : l10n.wiederholenBisLabel(_wiederholenBis!.toLocal().toString().split(' ')[0])),
+                                child: Text(
+                                  _wiederholenBis == null
+                                      ? l10n.wiederholenBisNichtGesetzt
+                                      : l10n.wiederholenBisLabel(
+                                          _wiederholenBis!.toLocal().toString().split(' ')[0],
+                                        ),
+                                ),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.calendar_today),
@@ -223,11 +224,9 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
                             ],
                           ),
                         ],
-                        if (_errorMessage != null) ...[
-                          const SizedBox(height: 12),
-                          Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-                        ],
+
                         const SizedBox(height: 28),
+
                         Row(
                           children: [
                             Expanded(
@@ -239,9 +238,7 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AuftragWiederkehrendScreen.primaryColor,
                                     side: BorderSide(color: AuftragWiederkehrendScreen.primaryColor, width: 1.5),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   ),
                                   onPressed: () => Navigator.pop(context),
                                 ),
@@ -257,20 +254,26 @@ class _AuftragWiederkehrendScreenState extends State<AuftragWiederkehrendScreen>
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AuftragWiederkehrendScreen.primaryColor,
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                     elevation: 4,
                                     shadowColor: AuftragWiederkehrendScreen.primaryColor.withOpacity(0.20),
                                   ),
                                   onPressed: () {
-                                    // Validate & update FormData
-                                    if (!_validateWiederkehrend(l10n)) return;
+                                    if (_wiederkehrend) {
+                                      if (!_formKey.currentState!.validate()) return;
+                                      if (_intervall == null || _wochentag == null) return;
+                                    }
+
                                     widget.formData.wiederkehrend = _wiederkehrend;
-                                    widget.formData.intervall = _intervall;
-                                    widget.formData.wochentag = _wochentag;
-                                    widget.formData.anzahlWiederholungen = _anzahlWiederholungen;
-                                    widget.formData.wiederholenBis = _wiederholenBis;
+                                    widget.formData.intervall = _wiederkehrend ? _intervall : null;
+                                    widget.formData.wochentag = _wiederkehrend ? _wochentag : null;
+
+                                    final repsText = _repsController.text.trim();
+                                    widget.formData.anzahlWiederholungen =
+                                        _wiederkehrend && repsText.isNotEmpty ? int.tryParse(repsText) : null;
+
+                                    widget.formData.wiederholenBis = _wiederkehrend ? _wiederholenBis : null;
+
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

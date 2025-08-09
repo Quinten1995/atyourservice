@@ -15,8 +15,10 @@ class Auftrag {
   final DateTime aktualisiertAm;
   final String? telefon;
 
-  // Preisfeld NEU
-  final double? preis; // <----- NEU
+  // Preisfelder
+  final double? preis;            // DB: preis (numeric)
+  final String? preisTyp;         // DB: preis_typ (text)
+  final String? preisHinweis;     // DB: preis_hinweis (text)
 
   // Planung und Zeitfenster
   final bool soSchnellWieMoeglich;
@@ -24,7 +26,7 @@ class Auftrag {
   final TimeOfDay? zeitVon;
   final TimeOfDay? zeitBis;
 
-  // Intervall / Wiederkehrend (NEU)
+  // Intervall / Wiederkehrend
   final bool wiederkehrend;
   final String? intervall;
   final String? wochentag;
@@ -45,12 +47,19 @@ class Auftrag {
     required this.erstelltAm,
     required this.aktualisiertAm,
     this.telefon,
-    this.preis, // <----- NEU
+
+    // Preis
+    this.preis,
+    this.preisTyp,
+    this.preisHinweis,
+
+    // Termin
     this.soSchnellWieMoeglich = true,
     this.terminDatum,
     this.zeitVon,
     this.zeitBis,
-    // NEU
+
+    // Wiederkehrend
     this.wiederkehrend = false,
     this.intervall,
     this.wochentag,
@@ -72,25 +81,26 @@ class Auftrag {
         erstelltAm: DateTime.parse(json['erstellt_am'] as String),
         aktualisiertAm: DateTime.parse(json['aktualisiert_am'] as String),
         telefon: json['telefon'] as String?,
-        preis: (json['preis'] as num?)?.toDouble(), // <----- NEU
+
+        // Preis
+        preis: (json['preis'] as num?)?.toDouble(),
+        preisTyp: json['preis_typ'] as String?,
+        preisHinweis: json['preis_hinweis'] as String?,
+
+        // Termin
         soSchnellWieMoeglich: json['so_schnell_wie_moeglich'] as bool? ?? true,
-        terminDatum: json['termin_datum'] != null
-            ? DateTime.tryParse(json['termin_datum'])
-            : null,
-        zeitVon: json['zeit_von'] != null
-            ? _parseTimeOfDay(json['zeit_von'])
-            : null,
-        zeitBis: json['zeit_bis'] != null
-            ? _parseTimeOfDay(json['zeit_bis'])
-            : null,
-        // NEU
+        terminDatum:
+            json['termin_datum'] != null ? DateTime.tryParse(json['termin_datum']) : null,
+        zeitVon: json['zeit_von'] != null ? _parseTimeOfDay(json['zeit_von']) : null,
+        zeitBis: json['zeit_bis'] != null ? _parseTimeOfDay(json['zeit_bis']) : null,
+
+        // Wiederkehrend
         wiederkehrend: json['wiederkehrend'] == true,
         intervall: json['intervall'] as String?,
         wochentag: json['wochentag'] as String?,
         anzahlWiederholungen: json['anzahl_wiederholungen'] as int?,
-        wiederholenBis: json['wiederholen_bis'] != null
-            ? DateTime.tryParse(json['wiederholen_bis'])
-            : null,
+        wiederholenBis:
+            json['wiederholen_bis'] != null ? DateTime.tryParse(json['wiederholen_bis']) : null,
       );
 
   Map<String, dynamic> toJson() {
@@ -106,24 +116,28 @@ class Auftrag {
       'status': status,
       'erstellt_am': erstelltAm.toIso8601String(),
       'aktualisiert_am': aktualisiertAm.toIso8601String(),
+
+      // Preis
+      if (preis != null) 'preis': preis,
+      if (preisTyp != null) 'preis_typ': preisTyp,
+      if ((preisHinweis ?? '').trim().isNotEmpty) 'preis_hinweis': preisHinweis!.trim(),
+
+      // Termin
       'so_schnell_wie_moeglich': soSchnellWieMoeglich,
       if (terminDatum != null) 'termin_datum': terminDatum!.toIso8601String(),
       if (zeitVon != null) 'zeit_von': _timeOfDayToString(zeitVon!),
       if (zeitBis != null) 'zeit_bis': _timeOfDayToString(zeitBis!),
-      // NEU
+
+      // Wiederkehrend
       'wiederkehrend': wiederkehrend,
       if (intervall != null) 'intervall': intervall,
       if (wochentag != null) 'wochentag': wochentag,
       if (anzahlWiederholungen != null) 'anzahl_wiederholungen': anzahlWiederholungen,
-      if (wiederholenBis != null) 'wiederholen_bis': wiederholenBis!.toIso8601String().substring(0, 10),
-      if (preis != null) 'preis': preis, // <----- NEU
+      if (wiederholenBis != null)
+        'wiederholen_bis': wiederholenBis!.toIso8601String().substring(0, 10),
     };
-    if (dienstleisterId != null) {
-      map['dienstleister_id'] = dienstleisterId;
-    }
-    if (telefon != null) {
-      map['telefon'] = telefon;
-    }
+    if (dienstleisterId != null) map['dienstleister_id'] = dienstleisterId;
+    if (telefon != null) map['telefon'] = telefon;
     return map;
   }
 
@@ -138,12 +152,19 @@ class Auftrag {
     String? dienstleisterId,
     DateTime? aktualisiertAm,
     String? telefon,
-    double? preis, // <----- NEU
+
+    // Preis
+    double? preis,
+    String? preisTyp,
+    String? preisHinweis,
+
+    // Termin
     bool? soSchnellWieMoeglich,
     DateTime? terminDatum,
     TimeOfDay? zeitVon,
     TimeOfDay? zeitBis,
-    // NEU
+
+    // Wiederkehrend
     bool? wiederkehrend,
     String? intervall,
     String? wochentag,
@@ -164,12 +185,19 @@ class Auftrag {
       erstelltAm: erstelltAm,
       aktualisiertAm: aktualisiertAm ?? this.aktualisiertAm,
       telefon: telefon ?? this.telefon,
-      preis: preis ?? this.preis, // <----- NEU
+
+      // Preis
+      preis: preis ?? this.preis,
+      preisTyp: preisTyp ?? this.preisTyp,
+      preisHinweis: preisHinweis ?? this.preisHinweis,
+
+      // Termin
       soSchnellWieMoeglich: soSchnellWieMoeglich ?? this.soSchnellWieMoeglich,
       terminDatum: terminDatum ?? this.terminDatum,
       zeitVon: zeitVon ?? this.zeitVon,
       zeitBis: zeitBis ?? this.zeitBis,
-      // NEU
+
+      // Wiederkehrend
       wiederkehrend: wiederkehrend ?? this.wiederkehrend,
       intervall: intervall ?? this.intervall,
       wochentag: wochentag ?? this.wochentag,
@@ -185,7 +213,7 @@ class Auftrag {
       hour: int.parse(parts[0]),
       minute: int.parse(parts[1]),
     );
-  }
+    }
 
   static String _timeOfDayToString(TimeOfDay time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';

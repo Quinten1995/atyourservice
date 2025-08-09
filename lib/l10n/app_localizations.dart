@@ -2378,6 +2378,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select interval, weekday, and number of repetitions for recurring tasks correctly.'**
   String get wiederkehrendValidierungFehler;
+
+  /// No description provided for @priceTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} €'**
+  String priceTotal(Object amount);
+
+  /// No description provided for @pricePerHour.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} € / {hourShort}'**
+  String pricePerHour(Object amount, Object hourShort);
+
+  /// No description provided for @priceNegotiable.
+  ///
+  /// In en, this message translates to:
+  /// **'Negotiable'**
+  String get priceNegotiable;
+
+  /// No description provided for @hourShort.
+  ///
+  /// In en, this message translates to:
+  /// **'hr'**
+  String get hourShort;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
