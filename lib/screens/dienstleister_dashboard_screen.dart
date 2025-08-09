@@ -27,10 +27,12 @@ class DienstleisterDashboardScreen extends StatefulWidget {
   };
 
   @override
-  State<DienstleisterDashboardScreen> createState() => _DienstleisterDashboardScreenState();
+  State<DienstleisterDashboardScreen> createState() =>
+      _DienstleisterDashboardScreenState();
 }
 
-class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScreen> {
+class _DienstleisterDashboardScreenState
+    extends State<DienstleisterDashboardScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
 
   bool _isLoading = true;
@@ -102,12 +104,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .maybeSingle();
       _aboTyp = userData?['abo_typ'] as String? ?? 'free';
 
-      final List<dynamic> rawOffen = await supabase
-          .from('auftraege')
-          .select()
-          .eq('kategorie', kategorie)
-          .eq('status', 'offen');
-      _alleOffenenAuftraegeRaw = rawOffen.cast<Map<String, dynamic>>();
+      if (_meineKategorie != null) {
+        final List<dynamic> rawOffen = await supabase
+            .from('auftraege')
+            .select()
+            .eq('kategorie', _meineKategorie!)
+            .eq('status', 'offen');
+        _alleOffenenAuftraegeRaw = rawOffen.cast<Map<String, dynamic>>();
+      }
 
       final List<dynamic> rawLaufend = await supabase
           .from('auftraege')
@@ -121,7 +125,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .select('*, kunde:users!auftraege_kunde_id_fkey(email)')
           .eq('status', 'abgeschlossen')
           .eq('dienstleister_id', user.id);
-      _alleAbgeschlosseneAuftraegeRaw = rawAbgeschlossen.cast<Map<String, dynamic>>();
+      _alleAbgeschlosseneAuftraegeRaw = rawAbgeschlossen
+          .cast<Map<String, dynamic>>();
 
       _completedJobsCount = _alleAbgeschlosseneAuftraegeRaw.length;
 
@@ -130,7 +135,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           .select('bewertung')
           .eq('dienstleister_id', user.id);
 
-      if (bewertungenData != null && bewertungenData is List && bewertungenData.isNotEmpty) {
+      if (bewertungenData != null &&
+          bewertungenData is List &&
+          bewertungenData.isNotEmpty) {
         double sum = 0.0;
         int count = 0;
         for (var b in bewertungenData) {
@@ -144,17 +151,19 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       }
 
       double radiusKm = 5.0;
-      if (_aboTyp == 'silver')
+      if (_aboTyp == 'silver') {
         radiusKm = 15.0;
-      else if (_aboTyp == 'gold')
+      } else if (_aboTyp == 'gold') {
         radiusKm = 40.0;
+      }
 
       if (_meineLatitude != null && _meineLongitude != null) {
         _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
             .map((map) => Auftrag.fromJson(map))
             .where((auftrag) {
-              if (auftrag.latitude == null || auftrag.longitude == null)
+              if (auftrag.latitude == null || auftrag.longitude == null) {
                 return false;
+              }
               final dist = berechneEntfernung(
                 _meineLatitude!,
                 _meineLongitude!,
@@ -164,12 +173,23 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               return dist <= radiusKm;
             })
             .toList();
+
         _offenePassendeAuftraege.sort((a, b) {
           final distA = (a.latitude != null && a.longitude != null)
-              ? berechneEntfernung(_meineLatitude!, _meineLongitude!, a.latitude!, a.longitude!)
+              ? berechneEntfernung(
+                  _meineLatitude!,
+                  _meineLongitude!,
+                  a.latitude!,
+                  a.longitude!,
+                )
               : double.infinity;
           final distB = (b.latitude != null && b.longitude != null)
-              ? berechneEntfernung(_meineLatitude!, _meineLongitude!, b.latitude!, b.longitude!)
+              ? berechneEntfernung(
+                  _meineLatitude!,
+                  _meineLongitude!,
+                  b.latitude!,
+                  b.longitude!,
+                )
               : double.infinity;
           return distA.compareTo(distB);
         });
@@ -188,9 +208,49 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     }
   }
 
+  // ----- Preis Helpers (l10n-ready, analog Kunden-Dashboard) -----
+  String? _formatPrice(Auftrag a, AppLocalizations l10n) {
+    final typ = (a.preisTyp ?? '').toLowerCase();
+    final v = a.preis;
+
+    if (typ == 'verhandelbar') return l10n.verhandelbarLabel;
+    if (typ.isEmpty) {
+      if (v == null) return null;
+      final amount = _fmtAmount(v);
+      return l10n.priceTotal(amount);
+    }
+    if (v == null) return null;
+    final amount = _fmtAmount(v);
+    return (typ == 'stunden')
+        ? l10n.pricePerHour(amount, l10n.hourShort)
+        : l10n.priceTotal(amount);
+  }
+
+  String _fmtAmount(double v) =>
+      (v == v.roundToDouble()) ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
+
+  Widget _buildPricePill(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+          color: Colors.black.withOpacity(0.75),
+        ),
+      ),
+    );
+  }
+
   Widget buildStatusBadge(String status, AppLocalizations l10n) {
     final lowerStatus = status.toLowerCase();
-    final color = DienstleisterDashboardScreen.statusColors[lowerStatus] ?? Colors.grey;
+    final color =
+        DienstleisterDashboardScreen.statusColors[lowerStatus] ?? Colors.grey;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -219,6 +279,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     );
   }
 
+  // ----- Filterchips: horizontal scrollbar -----
   Widget _buildFilterChips(AppLocalizations l10n) {
     final labels = [
       l10n.filterAlle,
@@ -241,34 +302,41 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
 
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 10),
-      child: Row(
-        children: List.generate(labels.length, (i) {
-          final isSelected = _selectedFilter == i;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: ChoiceChip(
-              label: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(chipIcons[i], size: 17, color: isSelected ? Colors.white : chipColors[i]),
-                  const SizedBox(width: 6),
-                  Text(labels[i]),
-                ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(labels.length, (i) {
+            final isSelected = _selectedFilter == i;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: ChoiceChip(
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      chipIcons[i],
+                      size: 17,
+                      color: isSelected ? Colors.white : chipColors[i],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(labels[i]),
+                  ],
+                ),
+                selected: isSelected,
+                selectedColor: chipColors[i],
+                backgroundColor: Colors.grey[200],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                onSelected: (_) => setState(() => _selectedFilter = i),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              selected: isSelected,
-              selectedColor: chipColors[i],
-              backgroundColor: Colors.grey[200],
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              onSelected: (_) => setState(() => _selectedFilter = i),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -288,10 +356,15 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
           Tooltip(
             message: l10n.rechnungGenerierenButtonLabel,
             child: IconButton(
-              icon: Icon(Icons.picture_as_pdf,
-                  color: isGold ? Colors.indigo : Colors.grey[400], size: 24),
+              icon: Icon(
+                Icons.picture_as_pdf,
+                color: isGold ? Colors.indigo : Colors.grey[400],
+                size: 24,
+              ),
               onPressed: onPdf,
               splashRadius: 22,
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(),
             ),
           ),
         if (showDelete)
@@ -301,6 +374,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               icon: const Icon(Icons.delete, color: Colors.redAccent, size: 24),
               onPressed: onDelete,
               splashRadius: 22,
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(),
             ),
           ),
       ],
@@ -319,66 +394,87 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
     bool isGold = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
-    return Stack(
-      children: [
-        Material(
-          elevation: 3,
-          borderRadius: BorderRadius.circular(18),
-          color: Colors.white,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(18),
-            onTap: onTap,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final priceText = _formatPrice(auftrag, l10n);
+
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(18),
+      color: Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Titel + Preis + (optional) Actions rechts
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 6),
-                  Text(
-                    auftrag.titel,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 7),
-                  Row(
-                    children: [
-                      buildStatusBadge(auftrag.status, l10n),
-                      if (!auftrag.soSchnellWieMoeglich) ...[
-                        const SizedBox(width: 12),
-                        Icon(Icons.access_time_rounded, color: Colors.teal[700], size: 16),
-                      ],
-                    ],
-                  ),
-                  if (kundenEmail != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.kundePrefix(kundenEmail),
-                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                  Expanded(
+                    child: Text(
+                      auftrag.titel,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+                  if (priceText != null) ...[
+                    const SizedBox(width: 8),
+                    _buildPricePill(priceText),
                   ],
-                  if (distText != null) ...[
-                    const SizedBox(height: 4),
-                    Text(distText, style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+                  if (showPdf || showDelete) ...[
+                    const SizedBox(width: 6),
+                    Transform.translate(
+                      offset: const Offset(0, -2), // Icons minimal anheben
+                      child: _buildCardActions(
+                        showPdf: showPdf,
+                        onPdf: onPdf,
+                        showDelete: showDelete,
+                        onDelete: onDelete,
+                        isGold: isGold,
+                      ),
+                    ),
                   ],
                 ],
               ),
-            ),
+              const SizedBox(height: 7),
+              Row(
+                children: [
+                  buildStatusBadge(auftrag.status, l10n),
+                  if (!auftrag.soSchnellWieMoeglich) ...[
+                    const SizedBox(width: 12),
+                    Icon(
+                      Icons.access_time_rounded,
+                      color: Colors.teal[700],
+                      size: 16,
+                    ),
+                  ],
+                ],
+              ),
+              if (kundenEmail != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  l10n.kundePrefix(kundenEmail),
+                  style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                ),
+              ],
+              if (distText != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  distText,
+                  style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                ),
+              ],
+            ],
           ),
         ),
-        Positioned(
-          top: 2,
-          right: 2,
-          child: _buildCardActions(
-            showPdf: showPdf,
-            onPdf: onPdf,
-            showDelete: showDelete,
-            onDelete: onDelete,
-            isGold: isGold,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -501,7 +597,8 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
         onDelete: () {
           setState(() {
             _alleAbgeschlosseneAuftraegeRaw.removeWhere(
-                (element) => element['id'] == auftrag.id);
+              (element) => element['id'] == auftrag.id,
+            );
           });
         },
         onTap: () {
@@ -515,8 +612,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       );
     }).toList();
   }
-
-  // ==== HIER KOMMT DER REST: FILTERED LISTE, NAV & BUILD ====
 
   Widget _buildFilteredList(AppLocalizations l10n) {
     List<Widget> cards = [];
@@ -583,7 +678,7 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               ),
             ),
           );
-          setState(() => _bottomNavIndex = 0); // <--- Reset Index nach Rückkehr!
+          setState(() => _bottomNavIndex = 0);
         } else if (i == 2) {
           await Navigator.push(
             context,
@@ -591,14 +686,23 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               builder: (_) => const ProfilDienstleisterScreen(),
             ),
           );
-          setState(() => _bottomNavIndex = 0); // <--- Reset Index nach Rückkehr!
+          setState(() => _bottomNavIndex = 0);
           _ladeProfilUndAuftraege();
         }
       },
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: l10n.auftraege),
-        BottomNavigationBarItem(icon: Icon(Icons.emoji_events), label: l10n.achievementTitle),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: l10n.profil),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.assignment),
+          label: l10n.auftraege,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.emoji_events),
+          label: l10n.achievementTitle,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.person),
+          label: l10n.profil,
+        ),
       ],
     );
   }
@@ -620,7 +724,6 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
       ),
       body: Stack(
         children: [
-          // Hintergrund-Deko
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -639,7 +742,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               width: 170,
               height: 170,
               decoration: BoxDecoration(
-                color: DienstleisterDashboardScreen.primaryColor.withOpacity(0.12),
+                color: DienstleisterDashboardScreen.primaryColor.withOpacity(
+                  0.12,
+                ),
                 shape: BoxShape.circle,
               ),
             ),
@@ -651,7 +756,9 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: DienstleisterDashboardScreen.accentColor.withOpacity(0.20),
+                color: DienstleisterDashboardScreen.accentColor.withOpacity(
+                  0.20,
+                ),
                 shape: BoxShape.circle,
               ),
             ),
@@ -661,14 +768,14 @@ class _DienstleisterDashboardScreenState extends State<DienstleisterDashboardScr
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
-                    ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildFilterChips(l10n),
-                          _buildFilteredList(l10n),
-                        ],
-                      ),
+                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildFilterChips(l10n),
+                      _buildFilteredList(l10n),
+                    ],
+                  ),
           ),
         ],
       ),

@@ -8,7 +8,8 @@ class AuftragTerminScreen extends StatefulWidget {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
-  const AuftragTerminScreen({Key? key, required this.formData}) : super(key: key);
+  const AuftragTerminScreen({Key? key, required this.formData})
+    : super(key: key);
 
   @override
   State<AuftragTerminScreen> createState() => _AuftragTerminScreenState();
@@ -95,11 +96,19 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
             decoration: InputDecoration(
               labelText: label,
               hintText: label,
-              suffixIcon: Icon(icon, color: enabled ? AuftragTerminScreen.primaryColor : Colors.grey),
+              suffixIcon: Icon(
+                icon,
+                color: enabled ? AuftragTerminScreen.primaryColor : Colors.grey,
+              ),
               filled: true,
               fillColor: enabled ? Colors.white : Colors.grey[100],
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 17, horizontal: 14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 17,
+                horizontal: 14,
+              ),
             ),
             controller: TextEditingController(text: value),
             style: TextStyle(
@@ -114,12 +123,14 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
   }
 
   void _onNextPressed(AppLocalizations l10n) {
-    // Wenn geplant, prüfen ob alle Felder gesetzt sind!
     if (!soSchnellWieMoeglich) {
       if (terminDatum == null || zeitVon == null || zeitBis == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.terminValidierungFehler ?? "Bitte wähle ein Datum und beide Uhrzeiten aus."),
+            content: Text(
+              l10n.terminValidierungFehler ??
+                  "Bitte wähle ein Datum und beide Uhrzeiten aus.",
+            ),
             backgroundColor: Colors.red[600],
           ),
         );
@@ -133,7 +144,8 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AuftragWiederkehrendScreen(formData: widget.formData),
+        builder: (context) =>
+            AuftragWiederkehrendScreen(formData: widget.formData),
       ),
     );
   }
@@ -144,7 +156,10 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.auftragTerminAppBar, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.auftragTerminAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -157,7 +172,10 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AuftragTerminScreen.primaryColor, AuftragTerminScreen.accentColor],
+            colors: [
+              AuftragTerminScreen.primaryColor,
+              AuftragTerminScreen.accentColor,
+            ],
           ),
         ),
         child: Center(
@@ -167,32 +185,54 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
               child: Card(
                 color: Colors.white.withOpacity(0.98),
                 elevation: 8,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 28,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 2),
-                      Icon(Icons.calendar_today_outlined, size: 48, color: AuftragTerminScreen.primaryColor),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 48,
+                        color: AuftragTerminScreen.primaryColor,
+                      ),
                       const SizedBox(height: 14),
                       Text(
                         l10n.auftragTerminHeadline,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.auftragTerminInfo,
-                        style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.8)),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black.withOpacity(0.8),
+                        ),
                       ),
                       const SizedBox(height: 22),
                       const SizedBox(height: 10),
                       Text(
                         l10n.ausfuehrungszeitpunkt,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                        ),
                       ),
                       const SizedBox(height: 9),
-                      Row(
+
+                      // ChoiceChips jetzt mit Wrap statt Row, verhindert Overflow
+                      Wrap(
+                        spacing: 14,
+                        runSpacing: 8,
                         children: [
                           ChoiceChip(
                             label: Text(l10n.soSchnellWieMoeglich),
@@ -205,24 +245,30 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                                 zeitBis = null;
                               });
                             },
-                            selectedColor: AuftragTerminScreen.primaryColor.withOpacity(0.14),
+                            selectedColor: AuftragTerminScreen.primaryColor
+                                .withOpacity(0.14),
                             backgroundColor: Colors.grey[100],
                             labelStyle: TextStyle(
-                              color: soSchnellWieMoeglich ? AuftragTerminScreen.primaryColor : Colors.black87,
+                              color: soSchnellWieMoeglich
+                                  ? AuftragTerminScreen.primaryColor
+                                  : Colors.black87,
                               fontWeight: FontWeight.w600,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
                                 color: soSchnellWieMoeglich
-                                    ? AuftragTerminScreen.primaryColor.withOpacity(0.28)
+                                    ? AuftragTerminScreen.primaryColor
+                                          .withOpacity(0.28)
                                     : Colors.grey[300]!,
                                 width: 1.5,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                           ),
-                          const SizedBox(width: 14),
                           ChoiceChip(
                             label: Text(l10n.geplant),
                             selected: !soSchnellWieMoeglich,
@@ -231,25 +277,33 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                                 soSchnellWieMoeglich = false;
                               });
                             },
-                            selectedColor: AuftragTerminScreen.primaryColor.withOpacity(0.14),
+                            selectedColor: AuftragTerminScreen.primaryColor
+                                .withOpacity(0.14),
                             backgroundColor: Colors.grey[100],
                             labelStyle: TextStyle(
-                              color: !soSchnellWieMoeglich ? AuftragTerminScreen.primaryColor : Colors.black87,
+                              color: !soSchnellWieMoeglich
+                                  ? AuftragTerminScreen.primaryColor
+                                  : Colors.black87,
                               fontWeight: FontWeight.w600,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                               side: BorderSide(
                                 color: !soSchnellWieMoeglich
-                                    ? AuftragTerminScreen.primaryColor.withOpacity(0.28)
+                                    ? AuftragTerminScreen.primaryColor
+                                          .withOpacity(0.28)
                                     : Colors.grey[300]!,
                                 width: 1.5,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                           ),
                         ],
                       ),
+
                       if (!soSchnellWieMoeglich) ...[
                         const SizedBox(height: 20),
                         _buildDateTimeField(
@@ -260,7 +314,8 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                           icon: Icons.calendar_today,
                           onTap: () async {
                             final picked = await _pickDate(context);
-                            if (picked != null) setState(() => terminDatum = picked);
+                            if (picked != null)
+                              setState(() => terminDatum = picked);
                           },
                         ),
                         Row(
@@ -268,11 +323,17 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                             Expanded(
                               child: _buildDateTimeField(
                                 label: l10n.zeitVon,
-                                value: zeitVon == null ? "" : _formatTimeOfDay(zeitVon),
+                                value: zeitVon == null
+                                    ? ""
+                                    : _formatTimeOfDay(zeitVon),
                                 icon: Icons.access_time,
                                 onTap: () async {
-                                  final picked = await _pickTime(context, initial: zeitVon);
-                                  if (picked != null) setState(() => zeitVon = picked);
+                                  final picked = await _pickTime(
+                                    context,
+                                    initial: zeitVon,
+                                  );
+                                  if (picked != null)
+                                    setState(() => zeitVon = picked);
                                 },
                               ),
                             ),
@@ -280,11 +341,17 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                             Expanded(
                               child: _buildDateTimeField(
                                 label: l10n.zeitBis,
-                                value: zeitBis == null ? "" : _formatTimeOfDay(zeitBis),
+                                value: zeitBis == null
+                                    ? ""
+                                    : _formatTimeOfDay(zeitBis),
                                 icon: Icons.access_time,
                                 onTap: () async {
-                                  final picked = await _pickTime(context, initial: zeitBis);
-                                  if (picked != null) setState(() => zeitBis = picked);
+                                  final picked = await _pickTime(
+                                    context,
+                                    initial: zeitBis,
+                                  );
+                                  if (picked != null)
+                                    setState(() => zeitBis = picked);
                                 },
                               ),
                             ),
@@ -301,8 +368,12 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                                 icon: const Icon(Icons.arrow_back_rounded),
                                 label: Text(l10n.zurueckButton),
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: AuftragTerminScreen.primaryColor,
-                                  side: BorderSide(color: AuftragTerminScreen.primaryColor, width: 1.5),
+                                  foregroundColor:
+                                      AuftragTerminScreen.primaryColor,
+                                  side: BorderSide(
+                                    color: AuftragTerminScreen.primaryColor,
+                                    width: 1.5,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
@@ -319,20 +390,22 @@ class _AuftragTerminScreenState extends State<AuftragTerminScreen> {
                                 icon: const Icon(Icons.navigate_next_rounded),
                                 label: Text(l10n.weiterButton),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AuftragTerminScreen.primaryColor,
+                                  backgroundColor:
+                                      AuftragTerminScreen.primaryColor,
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   elevation: 4,
-                                  shadowColor: AuftragTerminScreen.primaryColor.withOpacity(0.20),
+                                  shadowColor: AuftragTerminScreen.primaryColor
+                                      .withOpacity(0.20),
                                 ),
                                 onPressed: () => _onNextPressed(l10n),
                               ),
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),

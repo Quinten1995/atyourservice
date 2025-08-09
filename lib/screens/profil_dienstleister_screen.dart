@@ -14,7 +14,8 @@ class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfilDienstleisterScreenState createState() => _ProfilDienstleisterScreenState();
+  _ProfilDienstleisterScreenState createState() =>
+      _ProfilDienstleisterScreenState();
 }
 
 class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
@@ -66,7 +67,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
+      if (user == null)
+        throw Exception(AppLocalizations.of(context)!.pleaseLogin);
       final data = await _supabase
           .from('dienstleister_details')
           .select()
@@ -75,7 +77,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
-        final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieKeys.first;
+        final gespeicherteKategorie =
+            data['kategorie'] as String? ?? kategorieKeys.first;
         _selectedKategorie = kategorieKeys.contains(gespeicherteKategorie)
             ? gespeicherteKategorie
             : kategorieKeys.first;
@@ -91,10 +94,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
         // Rechnungsdaten
         _invoiceNameController.text = data['invoice_name'] as String? ?? '';
-        _invoiceAddressController.text = data['invoice_address'] as String? ?? '';
-        _invoiceTaxNumberController.text = data['invoice_tax_number'] as String? ?? '';
+        _invoiceAddressController.text =
+            data['invoice_address'] as String? ?? '';
+        _invoiceTaxNumberController.text =
+            data['invoice_tax_number'] as String? ?? '';
         _invoiceIbanController.text = data['invoice_iban'] as String? ?? '';
-        _invoiceLogoUrlController.text = data['invoice_logo_url'] as String? ?? '';
+        _invoiceLogoUrlController.text =
+            data['invoice_logo_url'] as String? ?? '';
       }
 
       final userData = await _supabase
@@ -123,7 +129,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         .eq('dienstleister_id', user.id);
 
     if (res is List && res.isNotEmpty) {
-      final values = res.map((b) => (b['bewertung'] as num?)?.toDouble() ?? 0.0).toList();
+      final values = res
+          .map((b) => (b['bewertung'] as num?)?.toDouble() ?? 0.0)
+          .toList();
       setState(() {
         _durchschnitt = values.reduce((a, b) => a + b) / values.length;
         _anzahlBewertungen = values.length;
@@ -146,7 +154,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
+      if (user == null)
+        throw Exception(AppLocalizations.of(context)!.pleaseLogin);
 
       final isFree = (_aboTyp ?? 'free') == 'free';
 
@@ -154,17 +163,23 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         final now = DateTime.now();
         final diff = now.difference(_lastProfileChange!).inDays;
         if (diff < 20) {
-          final naechstesDatum = _lastProfileChange!.add(const Duration(days: 20));
+          final naechstesDatum = _lastProfileChange!.add(
+            const Duration(days: 20),
+          );
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
               title: Text(AppLocalizations.of(context)!.changeNotAllowedTitle),
-              content: Text(AppLocalizations.of(context)!.changeNotAllowedContent(
-                  naechstesDatum.toLocal().toString().substring(0, 10))),
+              content: Text(
+                AppLocalizations.of(context)!.changeNotAllowedContent(
+                  naechstesDatum.toLocal().toString().substring(0, 10),
+                ),
+              ),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!.ok)),
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppLocalizations.of(context)!.ok),
+                ),
               ],
             ),
           );
@@ -185,14 +200,16 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       double? lon;
       if (adresse.isNotEmpty) {
         final coords = await GeocodingService().getCoordinates(adresse);
-        if (coords == null) throw Exception(AppLocalizations.of(context)!.addressNotFound);
+        if (coords == null)
+          throw Exception(AppLocalizations.of(context)!.addressNotFound);
         lat = coords['lat'];
         lon = coords['lng'];
       }
 
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
-        final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final fileName =
+            '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         await _supabase.storage
             .from('profile-pics')
             .upload(
@@ -213,27 +230,25 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final invoiceIban = _invoiceIbanController.text.trim();
       final invoiceLogoUrl = _invoiceLogoUrlController.text.trim();
 
-      await _supabase
-          .from('dienstleister_details')
-          .upsert({
-            'user_id': user.id,
-            'name': name,
-            'kategorie': kategorie,
-            'adresse': adresse.isEmpty ? null : adresse,
-            'latitude': lat,
-            'longitude': lon,
-            'telefon': telefon,
-            'email': email,
-            'profilbild_url': profilbildUrl,
-            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-            if (isFree) 'last_profile_change': DateTime.now().toUtc().toIso8601String(),
-            'invoice_name': invoiceName,
-            'invoice_address': invoiceAddress,
-            'invoice_tax_number': invoiceTaxNumber,
-            'invoice_iban': invoiceIban,
-            'invoice_logo_url': invoiceLogoUrl,
-          }, onConflict: 'user_id')
-          .select();
+      await _supabase.from('dienstleister_details').upsert({
+        'user_id': user.id,
+        'name': name,
+        'kategorie': kategorie,
+        'adresse': adresse.isEmpty ? null : adresse,
+        'latitude': lat,
+        'longitude': lon,
+        'telefon': telefon,
+        'email': email,
+        'profilbild_url': profilbildUrl,
+        'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
+        if (isFree)
+          'last_profile_change': DateTime.now().toUtc().toIso8601String(),
+        'invoice_name': invoiceName,
+        'invoice_address': invoiceAddress,
+        'invoice_tax_number': invoiceTaxNumber,
+        'invoice_iban': invoiceIban,
+        'invoice_logo_url': invoiceLogoUrl,
+      }, onConflict: 'user_id').select();
 
       setState(() {
         _profilbildUrl = profilbildUrl;
@@ -260,7 +275,10 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   Future<void> _bildWaehlen() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (picked != null) {
       setState(() {
         _neuesProfilbild = File(picked.path);
@@ -308,15 +326,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final session = _supabase.auth.currentSession;
       if (user == null || session == null) throw Exception(l10n.pleaseLogin);
 
-      // ... (deine Delete-Logik wie bisher, gekürzt für Lesbarkeit) ...
-      // [hier bleibt alles gleich, wie du es vorher hattest]
+      // ... deine Delete-Logik ...
 
-      // Am Ende:
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.accountDeleted)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.accountDeleted)));
       }
     } catch (e) {
       setState(() {
@@ -343,19 +359,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     super.dispose();
   }
 
-  InputDecoration _inputDecoration(String label, {IconData? icon}) => InputDecoration(
-    labelText: label,
-    prefixIcon: icon != null ? Icon(icon, color: primaryColor) : null,
-    filled: true,
-    fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: primaryColor, width: 2),
-    ),
-  );
+  InputDecoration _inputDecoration(String label, {IconData? icon}) =>
+      InputDecoration(
+        labelText: label,
+        prefixIcon: icon != null ? Icon(icon, color: primaryColor) : null,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
+        ),
+      );
 
   Widget _profilbildWidget() {
     final double avatarSize = 96;
@@ -387,9 +402,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           onPressed: _bildWaehlen,
           icon: const Icon(Icons.edit, size: 20),
           label: Text(AppLocalizations.of(context)!.changeProfileImage),
-          style: TextButton.styleFrom(
-            foregroundColor: primaryColor,
-          ),
+          style: TextButton.styleFrom(foregroundColor: primaryColor),
         ),
       ],
     );
@@ -406,8 +419,13 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.amber[600],
             foregroundColor: Colors.black87,
-            textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            textStyle: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             elevation: 2,
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -431,9 +449,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       labelText: label,
       filled: true,
       fillColor: isGold ? Colors.white : Colors.grey[200],
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       enabled: isGold,
     );
 
@@ -504,16 +520,21 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             l10n.changeLimitHint(
               naechstesDatum.toLocal().toString().substring(0, 10),
             ),
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
           ),
         );
       }
     }
 
-    final sortedKategorieEntries = (kategorieKeys
-        .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
-        .toList()
-      ..sort((a, b) => a.value.compareTo(b.value)));
+    final sortedKategorieEntries =
+        (kategorieKeys
+            .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
+            .toList()
+          ..sort((a, b) => a.value.compareTo(b.value)));
 
     return Scaffold(
       backgroundColor: accentColor,
@@ -580,7 +601,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.star, color: Colors.amber, size: 28),
+                                      Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 28,
+                                      ),
                                       const SizedBox(width: 6),
                                       Text(
                                         '${_durchschnitt!.toStringAsFixed(2)} / 5',
@@ -592,7 +617,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       ),
                                       const SizedBox(width: 9),
                                       Text(
-                                        l10n.ratingsCount(_anzahlBewertungen.toString()),
+                                        l10n.ratingsCount(
+                                          _anzahlBewertungen.toString(),
+                                        ),
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 15,
@@ -615,7 +642,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(18),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black12,
                                   blurRadius: 12,
@@ -629,20 +656,47 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 children: [
                                   TextFormField(
                                     controller: _nameController,
-                                    decoration: _inputDecoration(l10n.nameLabel, icon: Icons.person),
+                                    decoration: _inputDecoration(
+                                      l10n.nameLabel,
+                                      icon: Icons.person,
+                                    ),
                                     validator: (value) =>
                                         (value == null || value.isEmpty)
-                                            ? l10n.nameValidator
-                                            : null,
+                                        ? l10n.nameValidator
+                                        : null,
                                   ),
                                   const SizedBox(height: 18),
                                   DropdownButtonFormField<String>(
                                     value: _selectedKategorie,
-                                    decoration: _inputDecoration(l10n.categoryLabel, icon: Icons.category),
+                                    isExpanded: true, // <-- nimmt volle Breite
+                                    decoration: _inputDecoration(
+                                      l10n.categoryLabel,
+                                      icon: Icons.category,
+                                    ),
+                                    // Ellipsis für die ausgewählte Anzeige im Feld
+                                    selectedItemBuilder: (context) =>
+                                        sortedKategorieEntries.map((entry) {
+                                          return Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              entry.value,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        }).toList(),
                                     items: sortedKategorieEntries.map((entry) {
                                       return DropdownMenuItem(
                                         value: entry.key,
-                                        child: Text(entry.value),
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Text(
+                                            entry.value,
+                                            maxLines: 1,
+                                            overflow: TextOverflow
+                                                .ellipsis, // <-- Menüeinträge kürzen
+                                          ),
+                                        ),
                                       );
                                     }).toList(),
                                     onChanged: (wert) {
@@ -652,7 +706,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                         });
                                       }
                                     },
-                                    validator: (value) => (value == null || value.isEmpty)
+                                    validator: (value) =>
+                                        (value == null || value.isEmpty)
                                         ? l10n.categoryValidator
                                         : null,
                                     borderRadius: BorderRadius.circular(16),
@@ -660,28 +715,39 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   const SizedBox(height: 18),
                                   TextFormField(
                                     controller: _adresseController,
-                                    decoration: _inputDecoration(l10n.addressLabel, icon: Icons.location_on),
+                                    decoration: _inputDecoration(
+                                      l10n.addressLabel,
+                                      icon: Icons.location_on,
+                                    ),
                                   ),
                                   const SizedBox(height: 18),
                                   TextFormField(
                                     controller: _telefonController,
-                                    decoration: _inputDecoration(l10n.phoneLabel, icon: Icons.phone),
+                                    decoration: _inputDecoration(
+                                      l10n.phoneLabel,
+                                      icon: Icons.phone,
+                                    ),
                                     keyboardType: TextInputType.phone,
                                     validator: (value) =>
                                         (value == null || value.isEmpty)
-                                            ? l10n.phoneValidator
-                                            : null,
+                                        ? l10n.phoneValidator
+                                        : null,
                                   ),
                                   const SizedBox(height: 18),
                                   TextFormField(
                                     controller: _emailController,
-                                    decoration: _inputDecoration(l10n.emailLabel, icon: Icons.email),
+                                    decoration: _inputDecoration(
+                                      l10n.emailLabel,
+                                      icon: Icons.email,
+                                    ),
                                     keyboardType: TextInputType.emailAddress,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return l10n.emailEmptyValidator;
                                       }
-                                      final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                                      final emailRegExp = RegExp(
+                                        r'^[^@]+@[^@]+\.[^@]+',
+                                      );
                                       if (!emailRegExp.hasMatch(value)) {
                                         return l10n.emailInvalidValidator;
                                       }
@@ -692,10 +758,15 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   const SizedBox(height: 24),
                                   if (_errorMessage != null)
                                     Padding(
-                                      padding: const EdgeInsets.only(bottom: 10),
+                                      padding: const EdgeInsets.only(
+                                        bottom: 10,
+                                      ),
                                       child: Text(
                                         "${l10n.errorPrefix(_errorMessage!)}",
-                                        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   SizedBox(
@@ -706,13 +777,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: primaryColor,
                                         foregroundColor: Colors.white,
-                                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(14),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                         ),
                                       ),
-                                      onPressed: _isLoading ? null : _profilSpeichern,
+                                      onPressed: _isLoading
+                                          ? null
+                                          : _profilSpeichern,
                                     ),
                                   ),
                                   const SizedBox(height: 30),
@@ -721,21 +801,34 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       : SizedBox(
                                           width: double.infinity,
                                           child: ElevatedButton.icon(
-                                            icon: const Icon(Icons.delete_forever),
+                                            icon: const Icon(
+                                              Icons.delete_forever,
+                                            ),
                                             label: Text(
                                               l10n.deleteAccountButton,
-                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.red[600],
                                               foregroundColor: Colors.white,
-                                              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                              padding: const EdgeInsets.symmetric(vertical: 13),
+                                              textStyle: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 13,
+                                                  ),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                             ),
-                                            onPressed: _deletingAccount ? null : _kontoLoeschenDialog,
+                                            onPressed: _deletingAccount
+                                                ? null
+                                                : _kontoLoeschenDialog,
                                           ),
                                         ),
                                 ],

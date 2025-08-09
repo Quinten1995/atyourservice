@@ -72,7 +72,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
 
       final auftraegeRaw = await supabase
           .from('auftraege')
-          .select('*, dienstleister:users!auftraege_dienstleister_id_fkey(email)')
+          .select(
+            '*, dienstleister:users!auftraege_dienstleister_id_fkey(email)',
+          )
           .eq('kunde_id', user.id)
           .or('kunde_auftragsstatus.is.null,kunde_auftragsstatus.neq.entfernt')
           .order('erstellt_am', ascending: false);
@@ -80,14 +82,19 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       final auftraegeMaps = (auftraegeRaw as List).cast<Map<String, dynamic>>();
 
       _laufendeAuftraegeRaw = auftraegeMaps
-          .where((map) => (map['status'] as String).toLowerCase() == 'in bearbeitung')
+          .where(
+            (map) =>
+                (map['status'] as String).toLowerCase() == 'in bearbeitung',
+          )
           .toList();
       _offeneAuftraege = auftraegeMaps
           .where((map) => (map['status'] as String).toLowerCase() == 'offen')
           .map((map) => Auftrag.fromJson(map))
           .toList();
       _abgeschlosseneAuftraege = auftraegeMaps
-          .where((map) => (map['status'] as String).toLowerCase() == 'abgeschlossen')
+          .where(
+            (map) => (map['status'] as String).toLowerCase() == 'abgeschlossen',
+          )
           .map((map) => Auftrag.fromJson(map))
           .toList();
 
@@ -129,36 +136,44 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       const Color(0xFF1E88E5),
       const Color(0xFF757575),
     ];
+
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 10),
-      child: Row(
-        children: List.generate(labels.length, (i) {
-          final isSelected = _selectedFilter == i;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: ChoiceChip(
-              label: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(chipIcons[i], size: 17, color: isSelected ? Colors.white : chipColors[i]),
-                  const SizedBox(width: 6),
-                  Text(labels[i]),
-                ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(labels.length, (i) {
+            final isSelected = _selectedFilter == i;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: ChoiceChip(
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      chipIcons[i],
+                      size: 17,
+                      color: isSelected ? Colors.white : chipColors[i],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(labels[i]),
+                  ],
+                ),
+                selected: isSelected,
+                selectedColor: chipColors[i],
+                backgroundColor: Colors.grey[200],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                onSelected: (_) => setState(() => _selectedFilter = i),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              selected: isSelected,
-              selectedColor: chipColors[i],
-              backgroundColor: Colors.grey[200],
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              onSelected: (_) => setState(() => _selectedFilter = i),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
@@ -166,25 +181,27 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
   Widget _buildFilteredList(AppLocalizations l10n) {
     List<Widget> cards = [];
     if (_selectedFilter == 3) {
-      cards.add(Padding(
-        padding: const EdgeInsets.only(bottom: 8, left: 2),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.amber[700], size: 20),
-            const SizedBox(width: 7),
-            Expanded(
-              child: Text(
-                l10n.abgeschlosseneAuftraegeHinweis,
-                style: TextStyle(
-                  color: Colors.amber[900],
-                  fontSize: 13.4,
-                  fontWeight: FontWeight.w500,
+      cards.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8, left: 2),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.amber[700], size: 20),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  l10n.abgeschlosseneAuftraegeHinweis,
+                  style: TextStyle(
+                    color: Colors.amber[900],
+                    fontSize: 13.4,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ));
+      );
     }
     if (_selectedFilter == 0) {
       if (_laufendeAuftraegeRaw.isNotEmpty) {
@@ -230,7 +247,9 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
     return _laufendeAuftraegeRaw.map((map) {
       final auftrag = Auftrag.fromJson(map);
       final dienstleister = map['dienstleister'];
-      final dienstleisterEmail = dienstleister != null ? dienstleister['email'] as String? : null;
+      final dienstleisterEmail = dienstleister != null
+          ? dienstleister['email'] as String?
+          : null;
       return _buildAuftragsKarte(
         auftrag: auftrag,
         dienstleisterEmail: dienstleisterEmail,
@@ -373,7 +392,10 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
                   Expanded(
                     child: Text(
                       auftrag.titel,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -390,7 +412,10 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: badgeColor.withOpacity(0.13),
                       borderRadius: BorderRadius.circular(15),
@@ -444,26 +469,31 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
         if (i == 1) {
           await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const KundenAchievementScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const KundenAchievementScreen()),
           );
           setState(() => _bottomNavIndex = 0);
         } else if (i == 2) {
           await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const ProfilKundeScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const ProfilKundeScreen()),
           );
           setState(() => _bottomNavIndex = 0);
           _ladeAuftraege();
         }
       },
       items: [
-        BottomNavigationBarItem(icon: const Icon(Icons.assignment), label: l10n.auftraege),
-        BottomNavigationBarItem(icon: const Icon(Icons.emoji_events), label: l10n.achievementTitle),
-        BottomNavigationBarItem(icon: const Icon(Icons.person), label: l10n.profil),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.assignment),
+          label: l10n.auftraege,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.emoji_events),
+          label: l10n.achievementTitle,
+        ),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.person),
+          label: l10n.profil,
+        ),
       ],
     );
   }
@@ -489,9 +519,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const TrafficScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const TrafficScreen()),
               );
             },
           ),
@@ -513,10 +541,7 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF3876BF),
-                  Color(0xFFE7ECEF),
-                ],
+                colors: [Color(0xFF3876BF), Color(0xFFE7ECEF)],
               ),
             ),
           ),
@@ -549,14 +574,14 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
-                    ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildFilterChips(l10n),
-                          _buildFilteredList(l10n),
-                        ],
-                      ),
+                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildFilterChips(l10n),
+                      _buildFilteredList(l10n),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -566,7 +591,8 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AuftragKategorieScreen(formData: AuftragFormData.empty()),
+              builder: (_) =>
+                  AuftragKategorieScreen(formData: AuftragFormData.empty()),
             ),
           ).then((_) => _ladeAuftraege());
         },

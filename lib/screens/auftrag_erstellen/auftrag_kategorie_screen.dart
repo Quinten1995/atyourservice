@@ -10,23 +10,28 @@ class AuftragKategorieScreen extends StatelessWidget {
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
-  const AuftragKategorieScreen({Key? key, required this.formData}) : super(key: key);
+  const AuftragKategorieScreen({Key? key, required this.formData})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    final sortedKategorieEntries = (kategorieKeys
-        .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
-        .toList()
-      ..sort((a, b) => a.value.compareTo(b.value)));
+    final sortedKategorieEntries =
+        (kategorieKeys
+            .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
+            .toList()
+          ..sort((a, b) => a.value.compareTo(b.value)));
 
     String? selectedKategorie = formData.kategorie ?? kategorieKeys.first;
-    formData.kategorie ??= selectedKategorie; // <-- Problem behoben: setzt Default-Wert im FormData
+    formData.kategorie ??= selectedKategorie;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.auftragKategorieAppBar, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.auftragKategorieAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -50,45 +55,79 @@ class AuftragKategorieScreen extends StatelessWidget {
                 color: Colors.white.withOpacity(0.96),
                 elevation: 8,
                 shadowColor: primaryColor.withOpacity(0.12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 28,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.category_outlined, size: 48, color: primaryColor),
+                      Icon(
+                        Icons.category_outlined,
+                        size: 48,
+                        color: primaryColor,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         l10n.auftragKategorieHeadline,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.auftragKategorieInfo,
-                        style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.8)),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black.withOpacity(0.8),
+                        ),
                       ),
                       const SizedBox(height: 22),
-                      DropdownButtonFormField<String>(
-                        value: selectedKategorie,
-                        decoration: InputDecoration(
-                          labelText: l10n.kategorieLabel,
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: primaryColor, width: 2),
+
+                      // ✅ Kein Expanded in ScrollView! Breite via SizedBox + isExpanded
+                      SizedBox(
+                        width: double.infinity,
+                        child: DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          value: selectedKategorie,
+                          decoration: InputDecoration(
+                            labelText: l10n.kategorieLabel,
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                color: primaryColor,
+                                width: 2,
+                              ),
+                            ),
                           ),
+                          items: sortedKategorieEntries.map((entry) {
+                            return DropdownMenuItem(
+                              value: entry.key,
+                              child: Text(
+                                entry.value,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            formData.kategorie = val;
+                            selectedKategorie = val;
+                          },
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        items: sortedKategorieEntries.map((entry) {
-                          return DropdownMenuItem(value: entry.key, child: Text(entry.value));
-                        }).toList(),
-                        onChanged: (val) {
-                          formData.kategorie = val;
-                          selectedKategorie = val;
-                        },
-                        borderRadius: BorderRadius.circular(16),
                       ),
+
                       const SizedBox(height: 28),
                       SizedBox(
                         width: double.infinity,
@@ -98,14 +137,17 @@ class AuftragKategorieScreen extends StatelessWidget {
                           onPressed: () {
                             if (formData.kategorie == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.kategorieValidator)),
+                                SnackBar(
+                                  content: Text(l10n.kategorieValidator),
+                                ),
                               );
                               return;
                             }
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AuftragDetailsScreen(formData: formData),
+                                builder: (context) =>
+                                    AuftragDetailsScreen(formData: formData),
                               ),
                             );
                           },
