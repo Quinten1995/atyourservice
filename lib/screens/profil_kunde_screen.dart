@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../l10n/app_localizations.dart';
 
 class ProfilKundeScreen extends StatefulWidget {
@@ -102,6 +100,8 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     }
   }
 
+  /// Konto löschen – identisch zur DL-Variante:
+  /// ruft nur die Edge Function auf, die alles (inkl. Auth) serverseitig löscht.
   Future<void> _kontoLoeschen() async {
     setState(() {
       _deletingAccount = true;
@@ -111,41 +111,24 @@ class _ProfilKundeScreenState extends State<ProfilKundeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final user = supabase.auth.currentUser;
       final session = supabase.auth.currentSession;
-      if (user == null || session == null) throw Exception(l10n.notLoggedIn);
+      if (session == null) throw Exception(l10n.notLoggedIn);
 
-      await supabase.from('bewertungen').delete()
-        .or('kunde_id.eq.${user.id},dienstleister_id.eq.${user.id}');
+      // Edge Function ruft alle nötigen Deletes via Service-Role aus
+      final res = await supabase.functions.invoke('delete_user');
 
-      await supabase.from('auftraege').delete()
-        .or('kunde_id.eq.${user.id},dienstleister_id.eq.${user.id}');
-
-      await supabase.from('users').delete().eq('id', user.id);
-
-      final supabaseFunctionUrl = 'https://npqanssmfxdvwauuaemd.supabase.co/functions/v1/delete_user';
-      final response = await http.post(
-        Uri.parse(supabaseFunctionUrl),
-        headers: {
-          'Authorization': 'Bearer ${session.accessToken}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'user': {'id': user.id}}),
-      );
-
-      if (response.statusCode == 200) {
-        await supabase.auth.signOut();
-        if (mounted) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.accountDeleted), backgroundColor: Colors.green[700]),
-          );
-        }
-      } else {
-        setState(() {
-          _errorMessage = 'Account konnte nicht endgültig gelöscht werden: ${response.body}';
-        });
+      if (res.status < 200 || res.status >= 300) {
+        throw Exception('Delete failed: ${res.status} ${res.data}');
       }
+
+      // Lokale Session beenden
+      await supabase.auth.signOut();
+
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.accountDeleted), backgroundColor: Colors.green[700]),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');

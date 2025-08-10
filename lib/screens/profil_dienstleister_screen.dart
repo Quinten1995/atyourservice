@@ -313,6 +313,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     }
   }
 
+  // >>> HIER IST DIE ANGEPASSTE METHODE <<<
   Future<void> _kontoLoeschen() async {
     setState(() {
       _deletingAccount = true;
@@ -322,18 +323,27 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final user = _supabase.auth.currentUser;
       final session = _supabase.auth.currentSession;
-      if (user == null || session == null) throw Exception(l10n.pleaseLogin);
+      if (session == null) throw Exception(l10n.pleaseLogin);
 
-      // ... deine Delete-Logik ...
+      // Aufruf deiner Edge Function "delete_user"
+      final res = await _supabase.functions.invoke('delete_user');
 
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.accountDeleted)));
+      // 2xx erwarten (z. B. 204 No Content)
+      if (res.status < 200 || res.status >= 300) {
+        throw Exception('Delete failed: ${res.status} ${res.data}');
       }
+
+      // Session lokal beenden
+      await _supabase.auth.signOut();
+
+      if (!mounted) return;
+      // Zurück zum Login
+      Navigator.of(context).popUntil((route) => route.isFirst);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.accountDeleted)),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -668,12 +678,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   const SizedBox(height: 18),
                                   DropdownButtonFormField<String>(
                                     value: _selectedKategorie,
-                                    isExpanded: true, // <-- nimmt volle Breite
+                                    isExpanded: true,
                                     decoration: _inputDecoration(
                                       l10n.categoryLabel,
                                       icon: Icons.category,
                                     ),
-                                    // Ellipsis für die ausgewählte Anzeige im Feld
                                     selectedItemBuilder: (context) =>
                                         sortedKategorieEntries.map((entry) {
                                           return Align(
@@ -693,8 +702,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                           child: Text(
                                             entry.value,
                                             maxLines: 1,
-                                            overflow: TextOverflow
-                                                .ellipsis, // <-- Menüeinträge kürzen
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       );
