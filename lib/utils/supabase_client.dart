@@ -6,7 +6,23 @@ class SupabaseClientManager {
   static Future<void> init() async {
     await Supabase.initialize(
       url: 'https://npqanssmfxdvwauuaemd.supabase.co',
-      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wcWFuc3NtZnhkdndhdXVhZW1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NzU5NTUsImV4cCI6MjA2NDI1MTk1NX0.8EMBALxjSNuygVaEnx1bjzTq73dB3s35xW09-V7AWHc',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wcWFuc3NtZnhkdndhdXVhZW1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2NzU5NTUsImV4cCI6MjA2NDI1MTk1NX0.8EMBALxjSNuygVaEnx1bjzTq73dB3s35xW09-V7AWHc',
+      authOptions: const FlutterAuthClientOptions(
+        authFlowType: AuthFlowType.pkce, // korrektes Feld in v2.9.0
+      ),
+    );
+  }
+
+  /// Registrierung mit Redirect zur App nach E-Mail-Bestätigung
+  static Future<AuthResponse> signUpWithRedirect({
+    required String email,
+    required String password,
+  }) {
+    return client.auth.signUp(
+      email: email,
+      password: password,
+      emailRedirectTo: 'atyourservice://login-callback',
     );
   }
 }

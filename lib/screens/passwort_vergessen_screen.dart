@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_localizations.dart';
 
 class PasswortVergessenScreen extends StatefulWidget {
+  const PasswortVergessenScreen({Key? key}) : super(key: key);
+
   @override
   State<PasswortVergessenScreen> createState() => _PasswortVergessenScreenState();
 }
@@ -24,7 +26,13 @@ class _PasswortVergessenScreenState extends State<PasswortVergessenScreen> {
         setState(() => _feedback = l10n.emailValidatorEmpty);
         return;
       }
-      await Supabase.instance.client.auth.resetPasswordForEmail(email);
+
+      // Wichtig: redirectTo zu deinem App-Deeplink setzen
+      await Supabase.instance.client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'atyourservice://login-callback',
+      );
+
       setState(() => _feedback = l10n.resetMailSent);
     } catch (e) {
       setState(() => _feedback = "${l10n.errorPrefix(e.toString())}");

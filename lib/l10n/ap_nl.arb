@@ -387,7 +387,17 @@
 "priceTotal": "{amount} €",
 "pricePerHour": "{amount} € / {hourShort}",
 "priceNegotiable": "Onderhandelbaar",
-"hourShort": "u"
+"hourShort": "u",
+"setNewPasswordTitle": "Nieuw wachtwoord instellen",
+"setNewPasswordInfo": "Voer je nieuwe wachtwoord twee keer in om te bevestigen.",
+"newPasswordLabel": "Nieuw wachtwoord",
+"confirmNewPasswordLabel": "Bevestig nieuw wachtwoord",
+"saveNewPasswordButton": "Nieuw wachtwoord opslaan",
+"passwordEmptyError": "Wachtwoord mag niet leeg zijn.",
+"passwordsDontMatch": "Wachtwoorden komen niet overeen.",
+"passwordTooShort": "Het wachtwoord moet minstens 8 tekens bevatten.",
+"passwordResetSuccess": "Wachtwoord succesvol gewijzigd. Je kunt nu inloggen."
+
 
 
 

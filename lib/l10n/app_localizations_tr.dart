@@ -45,7 +45,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get passwordEmpty => 'Lütfen şifre girin';
 
   @override
-  String get passwordTooShort => 'Şifre en az 6 karakter olmalıdır';
+  String get passwordTooShort => 'Şifre en az 8 karakter olmalıdır.';
 
   @override
   String get registerButton => 'Kayıt Ol';
@@ -1228,4 +1228,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hourShort => 'sa';
+
+  @override
+  String get setNewPasswordTitle => 'Yeni şifreyi belirle';
+
+  @override
+  String get setNewPasswordInfo => 'Onaylamak için yeni şifreni iki kez gir.';
+
+  @override
+  String get newPasswordLabel => 'Yeni şifre';
+
+  @override
+  String get confirmNewPasswordLabel => 'Yeni şifreyi onayla';
+
+  @override
+  String get saveNewPasswordButton => 'Yeni şifreyi kaydet';
+
+  @override
+  String get passwordEmptyError => 'Şifre boş olamaz.';
+
+  @override
+  String get passwordsDontMatch => 'Şifreler eşleşmiyor.';
+
+  @override
+  String get passwordResetSuccess => 'Şifre başarıyla sıfırlandı. Şimdi giriş yapabilirsiniz.';
 }

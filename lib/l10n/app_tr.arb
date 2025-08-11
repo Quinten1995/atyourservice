@@ -397,7 +397,17 @@
 "priceTotal": "{amount} €",
 "pricePerHour": "{amount} € / {hourShort}",
 "priceNegotiable": "Pazarlıklı",
-"hourShort": "sa"
+"hourShort": "sa",
+"setNewPasswordTitle": "Yeni şifreyi belirle",
+"setNewPasswordInfo": "Onaylamak için yeni şifreni iki kez gir.",
+"newPasswordLabel": "Yeni şifre",
+"confirmNewPasswordLabel": "Yeni şifreyi onayla",
+"saveNewPasswordButton": "Yeni şifreyi kaydet",
+"passwordEmptyError": "Şifre boş olamaz.",
+"passwordsDontMatch": "Şifreler eşleşmiyor.",
+"passwordTooShort": "Şifre en az 8 karakter olmalıdır.",
+"passwordResetSuccess": "Şifre başarıyla sıfırlandı. Şimdi giriş yapabilirsiniz."
+
 
 
 

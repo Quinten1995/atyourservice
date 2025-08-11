@@ -45,7 +45,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get passwordEmpty => 'Voer een wachtwoord in';
 
   @override
-  String get passwordTooShort => 'Het wachtwoord moet minimaal 6 tekens bevatten';
+  String get passwordTooShort => 'Het wachtwoord moet minstens 8 tekens bevatten.';
 
   @override
   String get registerButton => 'Registreren';
@@ -1228,4 +1228,28 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get hourShort => 'u';
+
+  @override
+  String get setNewPasswordTitle => 'Nieuw wachtwoord instellen';
+
+  @override
+  String get setNewPasswordInfo => 'Voer je nieuwe wachtwoord twee keer in om te bevestigen.';
+
+  @override
+  String get newPasswordLabel => 'Nieuw wachtwoord';
+
+  @override
+  String get confirmNewPasswordLabel => 'Bevestig nieuw wachtwoord';
+
+  @override
+  String get saveNewPasswordButton => 'Nieuw wachtwoord opslaan';
+
+  @override
+  String get passwordEmptyError => 'Wachtwoord mag niet leeg zijn.';
+
+  @override
+  String get passwordsDontMatch => 'Wachtwoorden komen niet overeen.';
+
+  @override
+  String get passwordResetSuccess => 'Wachtwoord succesvol gewijzigd. Je kunt nu inloggen.';
 }

@@ -395,7 +395,17 @@
 "priceTotal": "{amount} €",
 "pricePerHour": "{amount} € / {hourShort}",
 "priceNegotiable": "Negoziale",
-"hourShort": "h"
+"hourShort": "h",
+"setNewPasswordTitle": "Imposta nuova password",
+"setNewPasswordInfo": "Inserisci la nuova password due volte per confermare.",
+"newPasswordLabel": "Nuova password",
+"confirmNewPasswordLabel": "Conferma nuova password",
+"saveNewPasswordButton": "Salva nuova password",
+"passwordEmptyError": "La password non può essere vuota.",
+"passwordsDontMatch": "Le password non corrispondono.",
+"passwordTooShort": "La password deve contenere almeno 8 caratteri.",
+"passwordResetSuccess": "Password reimpostata con successo. Ora puoi accedere."
+
 
 
 

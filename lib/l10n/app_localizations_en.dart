@@ -45,7 +45,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordEmpty => 'Please enter a password';
 
   @override
-  String get passwordTooShort => 'Password must be at least 6 characters';
+  String get passwordTooShort => 'Password must be at least 8 characters.';
 
   @override
   String get registerButton => 'Register';
@@ -1228,4 +1228,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hourShort => 'hr';
+
+  @override
+  String get setNewPasswordTitle => 'Set new password';
+
+  @override
+  String get setNewPasswordInfo => 'Enter your new password twice to confirm.';
+
+  @override
+  String get newPasswordLabel => 'New password';
+
+  @override
+  String get confirmNewPasswordLabel => 'Confirm new password';
+
+  @override
+  String get saveNewPasswordButton => 'Save new password';
+
+  @override
+  String get passwordEmptyError => 'Password cannot be empty.';
+
+  @override
+  String get passwordsDontMatch => 'Passwords do not match.';
+
+  @override
+  String get passwordResetSuccess => 'Password reset successful. You can now log in.';
 }

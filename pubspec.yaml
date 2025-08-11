@@ -44,6 +44,9 @@ dependencies:
   google_fonts: ^4.0.4
   blobs: ^2.0.0
 
+  # === Deeplinks (moderne Alternative zu uni_links) ===
+  app_links: ^3.4.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

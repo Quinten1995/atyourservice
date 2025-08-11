@@ -180,7 +180,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordTooShort.
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
+  /// **'Password must be at least 8 characters.'**
   String get passwordTooShort;
 
   /// No description provided for @registerButton.
@@ -2402,6 +2402,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'hr'**
   String get hourShort;
+
+  /// No description provided for @setNewPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set new password'**
+  String get setNewPasswordTitle;
+
+  /// No description provided for @setNewPasswordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new password twice to confirm.'**
+  String get setNewPasswordInfo;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get confirmNewPasswordLabel;
+
+  /// No description provided for @saveNewPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save new password'**
+  String get saveNewPasswordButton;
+
+  /// No description provided for @passwordEmptyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Password cannot be empty.'**
+  String get passwordEmptyError;
+
+  /// No description provided for @passwordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get passwordsDontMatch;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset successful. You can now log in.'**
+  String get passwordResetSuccess;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

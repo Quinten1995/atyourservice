@@ -397,7 +397,17 @@
 "priceTotal": "{amount} €",
 "pricePerHour": "{amount} € / {hourShort}",
 "priceNegotiable": "Negotiable",
-"hourShort": "hr"
+"hourShort": "hr",
+"setNewPasswordTitle": "Set new password",
+"setNewPasswordInfo": "Enter your new password twice to confirm.",
+"newPasswordLabel": "New password",
+"confirmNewPasswordLabel": "Confirm new password",
+"saveNewPasswordButton": "Save new password",
+"passwordEmptyError": "Password cannot be empty.",
+"passwordsDontMatch": "Passwords do not match.",
+"passwordTooShort": "Password must be at least 8 characters.",
+"passwordResetSuccess": "Password reset successful. You can now log in."
+
 
 
 

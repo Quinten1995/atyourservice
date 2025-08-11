@@ -45,7 +45,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passwordEmpty => 'Veuillez saisir un mot de passe';
 
   @override
-  String get passwordTooShort => 'Le mot de passe doit comporter au moins 6 caractères';
+  String get passwordTooShort => 'Le mot de passe doit contenir au moins 8 caractères.';
 
   @override
   String get registerButton => 'S\'inscrire';
@@ -1228,4 +1228,28 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get hourShort => 'h';
+
+  @override
+  String get setNewPasswordTitle => 'Définir un nouveau mot de passe';
+
+  @override
+  String get setNewPasswordInfo => 'Saisissez votre nouveau mot de passe deux fois pour confirmer.';
+
+  @override
+  String get newPasswordLabel => 'Nouveau mot de passe';
+
+  @override
+  String get confirmNewPasswordLabel => 'Confirmer le nouveau mot de passe';
+
+  @override
+  String get saveNewPasswordButton => 'Enregistrer le nouveau mot de passe';
+
+  @override
+  String get passwordEmptyError => 'Le mot de passe ne peut pas être vide.';
+
+  @override
+  String get passwordsDontMatch => 'Les mots de passe ne correspondent pas.';
+
+  @override
+  String get passwordResetSuccess => 'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.';
 }
