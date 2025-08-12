@@ -66,6 +66,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     if (!available) {
       setState(() {
         _storeAvailable = false;
+        _products = [];
       });
       return;
     }
@@ -76,7 +77,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     });
   }
 
-  // Helper, um Produkt anhand der ID zu finden
+  // Produkt anhand der ID
   ProductDetails? _getProduct(String id) {
     try {
       return _products.firstWhere((p) => p.id == id);
@@ -93,11 +94,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
-        // Abo-Typ anhand der Produkt-ID bestimmen
         final typ = _aboTypFromProductId(purchase.productID);
         final user = Supabase.instance.client.auth.currentUser;
 
-        // Wenn sich wirklich etwas ändert
         if (user != null && typ != null && typ != _aboTyp) {
           await Supabase.instance.client
               .from('users')
@@ -108,13 +107,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
             _aboTyp = typ;
           });
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
         }
+
         foundActive = true;
 
-        // Kauf als abgeschlossen markieren!
         if (purchase.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchase);
         }
@@ -129,7 +127,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
       }
     }
 
-    // Wenn KEIN aktives Abo gefunden wurde, zurück auf free!
     if (!foundActive) {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null && _aboTyp != 'free') {
@@ -142,9 +139,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
           _aboTyp = 'free';
         });
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
       }
     }
   }
@@ -159,6 +155,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final silver = _getProduct('atyourservice_silver');
+    final gold = _getProduct('atyourservice_gold');
 
     return Scaffold(
       appBar: AppBar(
@@ -167,6 +165,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.blueAccent,
         elevation: 0.7,
+        actions: [
+          TextButton(
+            onPressed: InAppPurchaseService().restorePurchases,
+            child: Text(
+              l10n.premiumRestorePurchases,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -188,19 +195,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.verified_user,
-                            color: Colors.blueAccent,
-                            size: 23,
-                          ),
+                          const Icon(Icons.verified_user, color: Colors.blueAccent, size: 23),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
                               l10n.premiumCurrentPlan,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -214,8 +214,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 color: _aboTyp == 'gold'
                                     ? Colors.amber[900]
                                     : _aboTyp == 'silver'
-                                    ? Colors.blueGrey[700]
-                                    : Colors.grey[600],
+                                        ? Colors.blueGrey[700]
+                                        : Colors.grey[600],
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.2,
                               ),
@@ -226,13 +226,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         ],
                       ),
                     ),
+
                   // === FREE PLAN CARD ===
                   _planCard(
                     context,
                     title: 'FREE',
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
-                    priceText: l10n.premiumFreePrice,
                     features: [
                       l10n.premiumFreeFeature1,
                       l10n.premiumFreeFeature2,
@@ -244,43 +244,33 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     onTap: () {},
                   ),
                   const SizedBox(height: 14),
+
                   // === SILVER PLAN CARD ===
                   _planCard(
                     context,
                     title: 'SILVER',
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
-                    priceText: _storeAvailable
-                        ? (_getProduct('atyourservice_silver')?.price ?? '...')
-                        : '...',
                     features: [
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
                       l10n.premiumSilverFeature3,
                     ],
                     highlighted: _aboTyp == 'silver',
-                    showButton: true,
+                    showButton: silver != null,
                     onTap: () async {
-                      final product = _getProduct('atyourservice_silver');
-                      if (product != null) {
-                        await InAppPurchaseService().buyProduct(product);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.premiumProductNotFound)),
-                        );
-                      }
+                      if (silver == null) return;
+                      await InAppPurchaseService().buyProduct(silver);
                     },
                   ),
                   const SizedBox(height: 14),
+
                   // === GOLD PLAN CARD ===
                   _planCard(
                     context,
                     title: 'GOLD',
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
-                    priceText: _storeAvailable
-                        ? (_getProduct('atyourservice_gold')?.price ?? '...')
-                        : '...',
                     features: [
                       l10n.premiumGoldFeature1,
                       l10n.premiumGoldFeature2,
@@ -289,31 +279,36 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       l10n.premiumGoldInvoiceFeature,
                     ],
                     highlighted: _aboTyp == 'gold',
-                    showButton: true,
+                    showButton: gold != null,
                     onTap: () async {
-                      final product = _getProduct('atyourservice_gold');
-                      if (product != null) {
-                        await InAppPurchaseService().buyProduct(product);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.premiumProductNotFound)),
-                        );
-                      }
+                      if (gold == null) return;
+                      await InAppPurchaseService().buyProduct(gold);
                     },
                   ),
-                  const SizedBox(height: 34),
+
+                  const SizedBox(height: 20),
+
+                  if (!_storeAvailable || _products.isEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.premiumStoreNotLoaded,
+                          style: TextStyle(color: Colors.red[700], fontSize: 13),
+                        ),
+                        const SizedBox(height: 6),
+                        TextButton(
+                          onPressed: _ladeStoreProdukte,
+                          child: Text(l10n.premiumRetry),
+                        ),
+                      ],
+                    ),
+
+                  const SizedBox(height: 12),
                   Text(
                     l10n.premiumPaymentNote,
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
-                  if (!_storeAvailable)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Text(
-                        l10n.premiumStoreNotLoaded,
-                        style: TextStyle(color: Colors.red[700], fontSize: 13),
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -325,23 +320,18 @@ class _PremiumScreenState extends State<PremiumScreen> {
     required String title,
     required Color color,
     required IconData badge,
-    required String priceText,
     List<String>? features,
     required VoidCallback onTap,
     bool highlighted = false,
     bool showButton = true,
   }) {
-    final l10n = AppLocalizations.of(context)!;
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(18),
-        border: highlighted
-            ? Border.all(color: Colors.blueAccent, width: 2)
-            : null,
+        border: highlighted ? Border.all(color: Colors.blueAccent, width: 2) : null,
         boxShadow: highlighted
             ? [
                 BoxShadow(
@@ -371,18 +361,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                 ),
                 const Spacer(),
-                Flexible(
-                  child: Text(
-                    priceText,
-                    style: TextStyle(
-                      color: Colors.blueGrey[900],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 10),
@@ -391,11 +369,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                      size: 17,
-                    ),
+                    const Icon(Icons.check_circle, color: Colors.green, size: 17),
                     const SizedBox(width: 7),
                     Flexible(
                       child: Text(
@@ -415,16 +389,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onTap,
-                  child: Text(l10n.premiumChooseButton(title)),
+                  child: Text(AppLocalizations.of(context)!.premiumChooseButton(title)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                     padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
                 ),

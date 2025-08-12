@@ -1252,4 +1252,19 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get passwordResetSuccess => 'Wachtwoord succesvol gewijzigd. Je kunt nu inloggen.';
+
+  @override
+  String get premiumRestorePurchases => 'Aankopen herstellen';
+
+  @override
+  String get premiumRetry => 'Opnieuw proberen';
+
+  @override
+  String get wrongRoleCustomer => 'Dit account is geregistreerd als dienstverlener en kan niet worden gebruikt om in te loggen als klant.';
+
+  @override
+  String get accountNotRegistered => 'Geen account gevonden met dit e-mailadres. Registreer u eerst.';
+
+  @override
+  String get wrongCredentials => 'Onjuist e-mailadres of wachtwoord.';
 }

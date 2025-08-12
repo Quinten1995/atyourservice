@@ -406,7 +406,14 @@
 "passwordEmptyError": "Şifre boş olamaz.",
 "passwordsDontMatch": "Şifreler eşleşmiyor.",
 "passwordTooShort": "Şifre en az 8 karakter olmalıdır.",
-"passwordResetSuccess": "Şifre başarıyla sıfırlandı. Şimdi giriş yapabilirsiniz."
+"passwordResetSuccess": "Şifre başarıyla sıfırlandı. Şimdi giriş yapabilirsiniz.",
+ "premiumRestorePurchases": "Satın alımları geri yükle",
+  "premiumRetry": "Tekrar dene",
+  "wrongRoleCustomer": "Bu hesap hizmet sağlayıcı olarak kayıtlıdır ve müşteri girişi için kullanılamaz.",
+  "accountNotRegistered": "Bu e-posta ile kayıtlı bir hesap bulunamadı. Lütfen önce kayıt olun.",
+"wrongCredentials": "Yanlış e-posta veya şifre."
+
+
 
 
 

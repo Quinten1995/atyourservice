@@ -433,7 +433,14 @@
 "passwordEmptyError": "Le mot de passe ne peut pas être vide.",
 "passwordsDontMatch": "Les mots de passe ne correspondent pas.",
 "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
-"passwordResetSuccess": "Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter."
+"passwordResetSuccess": "Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+"premiumRestorePurchases": "Restaurer les achats",
+  "premiumRetry": "Réessayer",
+  "wrongRoleCustomer": "Ce compte est enregistré comme prestataire de services et ne peut pas être utilisé pour la connexion client.",
+  "accountNotRegistered": "Aucun compte trouvé avec cet e-mail. Veuillez vous inscrire d'abord.",
+"wrongCredentials": "E-mail ou mot de passe incorrect."
+
+
 
 
 

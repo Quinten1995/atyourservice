@@ -1252,4 +1252,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get passwordResetSuccess => 'Password reimpostata con successo. Ora puoi accedere.';
+
+  @override
+  String get premiumRestorePurchases => 'Ripristina acquisti';
+
+  @override
+  String get premiumRetry => 'Riprova';
+
+  @override
+  String get wrongRoleCustomer => 'Questo account è registrato come fornitore di servizi e non può essere utilizzato per l\'accesso come cliente.';
+
+  @override
+  String get accountNotRegistered => 'Nessun account trovato con questa e-mail. Registrati prima.';
+
+  @override
+  String get wrongCredentials => 'Email o password errati.';
 }

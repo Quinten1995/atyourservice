@@ -2450,6 +2450,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password reset successful. You can now log in.'**
   String get passwordResetSuccess;
+
+  /// No description provided for @premiumRestorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get premiumRestorePurchases;
+
+  /// No description provided for @premiumRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get premiumRetry;
+
+  /// No description provided for @wrongRoleCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is registered as a service provider and cannot be used to log in as a customer.'**
+  String get wrongRoleCustomer;
+
+  /// No description provided for @accountNotRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found with this email. Please register first.'**
+  String get accountNotRegistered;
+
+  /// No description provided for @wrongCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password.'**
+  String get wrongCredentials;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

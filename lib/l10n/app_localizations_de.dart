@@ -1252,4 +1252,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get passwordResetSuccess => 'Passwort erfolgreich zurückgesetzt. Du kannst dich jetzt anmelden.';
+
+  @override
+  String get premiumRestorePurchases => 'Käufe wiederherstellen';
+
+  @override
+  String get premiumRetry => 'Erneut versuchen';
+
+  @override
+  String get wrongRoleCustomer => 'Dieses Konto ist als Dienstleister registriert und kann nicht für den Kunden-Login verwendet werden.';
+
+  @override
+  String get accountNotRegistered => 'Kein Konto mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.';
+
+  @override
+  String get wrongCredentials => 'Falsche E-Mail oder falsches Passwort.';
 }

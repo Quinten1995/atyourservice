@@ -1252,4 +1252,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get passwordResetSuccess => 'Contraseña restablecida correctamente. Ahora puedes iniciar sesión.';
+
+  @override
+  String get premiumRestorePurchases => 'Restaurar compras';
+
+  @override
+  String get premiumRetry => 'Volver a intentar';
+
+  @override
+  String get wrongRoleCustomer => 'Esta cuenta está registrada como proveedor de servicios y no puede usarse para iniciar sesión como cliente.';
+
+  @override
+  String get accountNotRegistered => 'No se encontró ninguna cuenta con este correo electrónico. Regístrese primero.';
+
+  @override
+  String get wrongCredentials => 'Correo electrónico o contraseña incorrectos.';
 }

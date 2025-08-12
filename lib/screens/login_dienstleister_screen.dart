@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
 import 'registrierung_screen.dart';
-import 'passwort_vergessen_screen.dart'; // <-- HINZUGEFÜGT
+import 'passwort_vergessen_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class LoginDienstleisterScreen extends StatefulWidget {
@@ -29,15 +29,18 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // 1) Versuch: normal einloggen
       final AuthResponse authRes = await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwortController.text,
       );
+
       final user = authRes.user;
       if (user == null) {
-        throw AuthException(l10n.loginFailedDetailsDL);
+        throw const AuthException('Invalid login credentials');
       }
 
+      // 2) Rolle prüfen/nachziehen
       final fetched = await supabase
           .from('users')
           .select('rolle')
@@ -45,6 +48,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
           .maybeSingle();
 
       if (fetched == null) {
+        // Ersteintrag für DL
         try {
           await supabase.from('users').insert({
             'id': user.id,
@@ -53,7 +57,8 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
             'erstellt_am': DateTime.now().toIso8601String(),
           });
         } catch (e) {
-          print('[DEBUG] Insert in users schlug fehl: $e');
+          // ignore: avoid_print
+          print('[DEBUG] Insert in users (dienstleister) schlug fehl: $e');
         }
       } else if (fetched['rolle'] != 'dienstleister') {
         await supabase.auth.signOut();
@@ -66,6 +71,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         return;
       }
 
+      // 3) Erfolg
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginSuccess)),
       );
@@ -73,9 +79,34 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         context,
         MaterialPageRoute(builder: (context) => const DienstleisterDashboardScreen()),
       );
+
     } on AuthException catch (error) {
+      // Unterscheide "Account existiert nicht" vs. "falsches Passwort"
+      bool showNotRegistered = false;
+
+      try {
+        final email = _emailController.text.trim();
+        // Achtung: funktioniert nur, wenn SELECT auf users ohne Login erlaubt ist.
+        final exists = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle();
+
+        showNotRegistered = (exists == null);
+      } catch (_) {
+        // Falls RLS blockt, versuche es über Fehlermeldung zu erkennen
+        final msg = (error.message ?? '').toLowerCase();
+        if (msg.contains('user not found') || msg.contains('no user') || msg.contains('not registered')) {
+          showNotRegistered = true;
+        }
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.loginFailedPrefix(error.message))),
+        SnackBar(
+          content: Text(showNotRegistered ? l10n.accountNotRegistered : l10n.wrongCredentials),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -124,10 +155,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF3876BF),
-              Color(0xFFE7ECEF),
-            ],
+            colors: [Color(0xFF3876BF), Color(0xFFE7ECEF)],
           ),
         ),
         child: Stack(
@@ -164,9 +192,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                     color: Colors.white.withOpacity(0.96),
                     elevation: 8,
                     shadowColor: primaryColor.withOpacity(0.12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
                       child: Form(
@@ -183,18 +209,10 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
                                 letterSpacing: 1.2,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 2,
-                                    color: Colors.white.withOpacity(0.13),
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
+                                shadows: [Shadow(blurRadius: 2, color: Colors.white54, offset: Offset(0, 1))],
                               ),
                             ),
                             const SizedBox(height: 32),
-
-                            // E-Mail
                             TextFormField(
                               controller: _emailController,
                               decoration: InputDecoration(
@@ -202,9 +220,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 filled: true,
                                 fillColor: Colors.white,
                                 contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(color: primaryColor, width: 2),
@@ -214,8 +230,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                               validator: _validateEmail,
                             ),
                             const SizedBox(height: 20),
-
-                            // Passwort
                             TextFormField(
                               controller: _passwortController,
                               decoration: InputDecoration(
@@ -223,9 +237,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 filled: true,
                                 fillColor: Colors.white,
                                 contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(color: primaryColor, width: 2),
@@ -234,8 +246,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                               obscureText: true,
                               validator: _validatePasswort,
                             ),
-
-                            // Passwort vergessen-Button (wie beim Kunden)
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -252,9 +262,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 child: Text(l10n.forgotPasswordButton),
                               ),
                             ),
-
                             const SizedBox(height: 24),
-
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : SizedBox(
@@ -264,9 +272,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: primaryColor,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         elevation: 4,
                                         shadowColor: primaryColor.withOpacity(0.20),
                                       ),

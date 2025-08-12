@@ -1252,4 +1252,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get passwordResetSuccess => 'Şifre başarıyla sıfırlandı. Şimdi giriş yapabilirsiniz.';
+
+  @override
+  String get premiumRestorePurchases => 'Satın alımları geri yükle';
+
+  @override
+  String get premiumRetry => 'Tekrar dene';
+
+  @override
+  String get wrongRoleCustomer => 'Bu hesap hizmet sağlayıcı olarak kayıtlıdır ve müşteri girişi için kullanılamaz.';
+
+  @override
+  String get accountNotRegistered => 'Bu e-posta ile kayıtlı bir hesap bulunamadı. Lütfen önce kayıt olun.';
+
+  @override
+  String get wrongCredentials => 'Yanlış e-posta veya şifre.';
 }

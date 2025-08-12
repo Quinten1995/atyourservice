@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'kunden_dashboard_screen.dart';
 import 'registrierung_screen.dart';
-import 'passwort_vergessen_screen.dart'; // <-- NEU: Passwort vergessen Screen importieren!
+import 'passwort_vergessen_screen.dart';
 import '../l10n/app_localizations.dart';
 
 class LoginKundeScreen extends StatefulWidget {
@@ -29,26 +29,49 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // 1) Einloggen
       final AuthResponse response = await supabase.auth.signInWithPassword(
         email: _emailController.text.trim(),
         password: _passwortController.text,
       );
+
       final user = response.user;
       if (user == null) {
-        throw AuthException(l10n.loginFailedDetails);
+        throw const AuthException('Invalid login credentials');
       }
 
-      try {
-        await supabase.from('users').upsert({
-          'id': user.id,
-          'email': user.email,
-          'rolle': 'kunde',
-          'erstellt_am': DateTime.now().toIso8601String(),
-        });
-      } catch (e) {
-        print('[DEBUG] Upsert in users schlug fehl: $e');
+      // 2) Rolle aus users lesen (falls vorhanden)
+      final existing = await supabase
+          .from('users')
+          .select('rolle')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      // 3) DL-Account blocken
+      if (existing != null && existing['rolle'] == 'dienstleister') {
+        await supabase.auth.signOut();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.wrongRoleCustomer), backgroundColor: Colors.redAccent),
+        );
+        return;
       }
 
+      // 4) Wenn es noch keinen Eintrag gibt -> als Kunde anlegen
+      if (existing == null) {
+        try {
+          await supabase.from('users').insert({
+            'id': user.id,
+            'email': user.email,
+            'rolle': 'kunde',
+            'erstellt_am': DateTime.now().toIso8601String(),
+          });
+        } catch (e) {
+          // ignore: avoid_print
+          print('[DEBUG] Insert in users (kunde) schlug fehl: $e');
+        }
+      }
+
+      // 5) Erfolg
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginSuccess)),
       );
@@ -56,9 +79,31 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         context,
         MaterialPageRoute(builder: (context) => const KundenDashboardScreen()),
       );
+
     } on AuthException catch (error) {
+      // "Account nicht registriert" vs. "falsche Daten" unterscheiden
+      bool showNotRegistered = false;
+
+      try {
+        final email = _emailController.text.trim();
+        final exists = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle();
+        showNotRegistered = (exists == null);
+      } catch (_) {
+        final msg = (error.message ?? '').toLowerCase();
+        if (msg.contains('user not found') || msg.contains('no user') || msg.contains('not registered')) {
+          showNotRegistered = true;
+        }
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.loginFailedPrefix(error.message))),
+        SnackBar(
+          content: Text(showNotRegistered ? l10n.accountNotRegistered : l10n.wrongCredentials),
+          backgroundColor: Colors.redAccent,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,10 +136,7 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.loginKundeAppBar,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(l10n.loginKundeAppBar, style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -107,39 +149,18 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF3876BF),
-              Color(0xFFE7ECEF),
-            ],
+            colors: [Color(0xFF3876BF), Color(0xFFE7ECEF)],
           ),
         ),
         child: Stack(
           children: [
-            // Deko-Kreis oben links
             Positioned(
-              top: -60,
-              left: -60,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.13),
-                  shape: BoxShape.circle,
-                ),
-              ),
+              top: -60, left: -60,
+              child: Container(width: 160, height: 160, decoration: BoxDecoration(color: primaryColor.withOpacity(0.13), shape: BoxShape.circle)),
             ),
-            // Deko-Kreis unten rechts
             Positioned(
-              bottom: -40,
-              right: -40,
-              child: Container(
-                width: 110,
-                height: 110,
-                decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.21),
-                  shape: BoxShape.circle,
-                ),
-              ),
+              bottom: -40, right: -40,
+              child: Container(width: 110, height: 110, decoration: BoxDecoration(color: accentColor.withOpacity(0.21), shape: BoxShape.circle)),
             ),
             Center(
               child: SingleChildScrollView(
@@ -149,9 +170,7 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                     color: Colors.white.withOpacity(0.96),
                     elevation: 8,
                     shadowColor: primaryColor.withOpacity(0.12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
                       child: Form(
@@ -164,31 +183,18 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                             Text(
                               l10n.loginKundeHeadline,
                               style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                                letterSpacing: 1.2,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 2,
-                                    color: Colors.white.withOpacity(0.13),
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
+                                fontSize: 26, fontWeight: FontWeight.bold, color: textColor, letterSpacing: 1.2,
+                                shadows: [Shadow(blurRadius: 2, color: Colors.white54, offset: Offset(0, 1))],
                               ),
                             ),
                             const SizedBox(height: 32),
-                            // E-Mail
                             TextFormField(
                               controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: l10n.emailLabel,
-                                filled: true,
-                                fillColor: Colors.white,
+                                filled: true, fillColor: Colors.white,
                                 contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(color: primaryColor, width: 2),
@@ -198,17 +204,13 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               validator: _validateEmail,
                             ),
                             const SizedBox(height: 20),
-                            // Passwort
                             TextFormField(
                               controller: _passwortController,
                               decoration: InputDecoration(
                                 labelText: l10n.passwordLabel,
-                                filled: true,
-                                fillColor: Colors.white,
+                                filled: true, fillColor: Colors.white,
                                 contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(color: primaryColor, width: 2),
@@ -217,15 +219,11 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               obscureText: true,
                               validator: _validatePasswort,
                             ),
-                            // Passwort vergessen? Button
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => PasswortVergessenScreen()),
-                                  );
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PasswortVergessenScreen()));
                                 },
                                 style: TextButton.styleFrom(
                                   foregroundColor: primaryColor,
@@ -244,25 +242,17 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: primaryColor,
                                         padding: const EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         elevation: 4,
                                         shadowColor: primaryColor.withOpacity(0.20),
                                       ),
-                                      child: Text(
-                                        l10n.loginButton,
-                                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                                      ),
+                                      child: Text(l10n.loginButton, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                                     ),
                                   ),
                             const SizedBox(height: 14),
                             TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const RegistrierungScreen()),
-                                );
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrierungScreen()));
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: primaryColor,

@@ -406,7 +406,14 @@
 "passwordEmptyError": "La contraseña no puede estar vacía.",
 "passwordsDontMatch": "Las contraseñas no coinciden.",
 "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
-"passwordResetSuccess": "Contraseña restablecida correctamente. Ahora puedes iniciar sesión."
+"passwordResetSuccess": "Contraseña restablecida correctamente. Ahora puedes iniciar sesión.",
+ "premiumRestorePurchases": "Restaurar compras",
+  "premiumRetry": "Volver a intentar",
+  "wrongRoleCustomer": "Esta cuenta está registrada como proveedor de servicios y no puede usarse para iniciar sesión como cliente.",
+  "accountNotRegistered": "No se encontró ninguna cuenta con este correo electrónico. Regístrese primero.",
+"wrongCredentials": "Correo electrónico o contraseña incorrectos."
+
+
 
 
 

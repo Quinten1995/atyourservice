@@ -406,7 +406,14 @@
 "passwordEmptyError": "Password cannot be empty.",
 "passwordsDontMatch": "Passwords do not match.",
 "passwordTooShort": "Password must be at least 8 characters.",
-"passwordResetSuccess": "Password reset successful. You can now log in."
+"passwordResetSuccess": "Password reset successful. You can now log in.",
+"premiumRestorePurchases": "Restore purchases",
+  "premiumRetry": "Try again",
+  "wrongRoleCustomer": "This account is registered as a service provider and cannot be used to log in as a customer.",
+  "accountNotRegistered": "No account found with this email. Please register first.",
+"wrongCredentials": "Incorrect email or password."
+
+
 
 
 

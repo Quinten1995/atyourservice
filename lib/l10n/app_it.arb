@@ -404,7 +404,14 @@
 "passwordEmptyError": "La password non può essere vuota.",
 "passwordsDontMatch": "Le password non corrispondono.",
 "passwordTooShort": "La password deve contenere almeno 8 caratteri.",
-"passwordResetSuccess": "Password reimpostata con successo. Ora puoi accedere."
+"passwordResetSuccess": "Password reimpostata con successo. Ora puoi accedere.",
+"premiumRestorePurchases": "Ripristina acquisti",
+  "premiumRetry": "Riprova",
+  "wrongRoleCustomer": "Questo account è registrato come fornitore di servizi e non può essere utilizzato per l'accesso come cliente.",
+  "accountNotRegistered": "Nessun account trovato con questa e-mail. Registrati prima.",
+"wrongCredentials": "Email o password errati."
+
+
 
 
 

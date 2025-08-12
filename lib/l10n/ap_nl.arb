@@ -396,7 +396,13 @@
 "passwordEmptyError": "Wachtwoord mag niet leeg zijn.",
 "passwordsDontMatch": "Wachtwoorden komen niet overeen.",
 "passwordTooShort": "Het wachtwoord moet minstens 8 tekens bevatten.",
-"passwordResetSuccess": "Wachtwoord succesvol gewijzigd. Je kunt nu inloggen."
+"passwordResetSuccess": "Wachtwoord succesvol gewijzigd. Je kunt nu inloggen.",
+ "premiumRestorePurchases": "Aankopen herstellen",
+  "premiumRetry": "Opnieuw proberen",
+  "wrongRoleCustomer": "Dit account is geregistreerd als dienstverlener en kan niet worden gebruikt om in te loggen als klant.",
+  "accountNotRegistered": "Geen account gevonden met dit e-mailadres. Registreer u eerst.",
+"wrongCredentials": "Onjuist e-mailadres of wachtwoord."
+
 
 
 
