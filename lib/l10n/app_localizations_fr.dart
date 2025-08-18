@@ -1267,4 +1267,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get wrongCredentials => 'E-mail ou mot de passe incorrect.';
+
+  @override
+  String get premiumPushDelayFree => 'Notifications push : délai de 1 h';
+
+  @override
+  String get premiumPushDelaySilver => 'Notifications push : délai de 30 min';
+
+  @override
+  String get premiumPushDelayGold => 'Notifications push : immédiates pour les nouvelles missions';
 }

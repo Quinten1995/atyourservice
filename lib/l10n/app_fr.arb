@@ -438,7 +438,10 @@
   "premiumRetry": "Réessayer",
   "wrongRoleCustomer": "Ce compte est enregistré comme prestataire de services et ne peut pas être utilisé pour la connexion client.",
   "accountNotRegistered": "Aucun compte trouvé avec cet e-mail. Veuillez vous inscrire d'abord.",
-"wrongCredentials": "E-mail ou mot de passe incorrect."
+"wrongCredentials": "E-mail ou mot de passe incorrect.",
+"premiumPushDelayFree": "Notifications push\u00a0: d\u00e9lai de 1\u00a0h",
+  "premiumPushDelaySilver": "Notifications push\u00a0: d\u00e9lai de 30\u00a0min",
+  "premiumPushDelayGold": "Notifications push\u00a0: imm\u00e9diates pour les nouvelles missions"
 
 
 

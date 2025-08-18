@@ -411,7 +411,10 @@
   "premiumRetry": "Try again",
   "wrongRoleCustomer": "This account is registered as a service provider and cannot be used to log in as a customer.",
   "accountNotRegistered": "No account found with this email. Please register first.",
-"wrongCredentials": "Incorrect email or password."
+"wrongCredentials": "Incorrect email or password.",
+"premiumPushDelayFree": "Push notifications: 1h delay",
+  "premiumPushDelaySilver": "Push notifications: 30 min delay",
+  "premiumPushDelayGold": "Push notifications: instant on new jobs"
 
 
 

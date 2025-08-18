@@ -411,7 +411,10 @@
   "premiumRetry": "Tekrar dene",
   "wrongRoleCustomer": "Bu hesap hizmet sağlayıcı olarak kayıtlıdır ve müşteri girişi için kullanılamaz.",
   "accountNotRegistered": "Bu e-posta ile kayıtlı bir hesap bulunamadı. Lütfen önce kayıt olun.",
-"wrongCredentials": "Yanlış e-posta veya şifre."
+"wrongCredentials": "Yanlış e-posta veya şifre.",
+"premiumPushDelayFree": "Push bildirimleri: 1 saat gecikme",
+  "premiumPushDelaySilver": "Push bildirimleri: 30 dk gecikme",
+  "premiumPushDelayGold": "Push bildirimleri: yeni i\u015flerde an\u0131nda"
 
 
 

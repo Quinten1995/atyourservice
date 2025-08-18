@@ -411,7 +411,10 @@
   "premiumRetry": "Volver a intentar",
   "wrongRoleCustomer": "Esta cuenta está registrada como proveedor de servicios y no puede usarse para iniciar sesión como cliente.",
   "accountNotRegistered": "No se encontró ninguna cuenta con este correo electrónico. Regístrese primero.",
-"wrongCredentials": "Correo electrónico o contraseña incorrectos."
+"wrongCredentials": "Correo electrónico o contraseña incorrectos.",
+"premiumPushDelayFree": "Notificaciones push: retraso de 1 h",
+  "premiumPushDelaySilver": "Notificaciones push: retraso de 30 min",
+  "premiumPushDelayGold": "Notificaciones push: instant\u00e1neas para nuevos trabajos"
 
 
 

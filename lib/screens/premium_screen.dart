@@ -27,9 +27,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
     super.initState();
     _ladeAboTyp();
     _ladeStoreProdukte();
-    _purchaseSubscription = InAppPurchaseService().listenToPurchases().listen(
-      _handlePurchases,
-    );
+    _purchaseSubscription =
+        InAppPurchaseService().listenToPurchases().listen(_handlePurchases);
   }
 
   @override
@@ -195,12 +194,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
-                          const Icon(Icons.verified_user, color: Colors.blueAccent, size: 23),
+                          const Icon(Icons.verified_user,
+                              color: Colors.blueAccent, size: 23),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
                               l10n.premiumCurrentPlan,
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -234,6 +235,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
                     features: [
+                      // Neu: Push-Verhalten für FREE (1h Delay)
+                      l10n.premiumPushDelayFree,
                       l10n.premiumFreeFeature1,
                       l10n.premiumFreeFeature2,
                       l10n.premiumFreeFeature3,
@@ -252,6 +255,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
                     features: [
+                      // Neu: Push-Verhalten für SILVER (30 min Delay)
+                      l10n.premiumPushDelaySilver,
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
                       l10n.premiumSilverFeature3,
@@ -272,6 +277,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
                     features: [
+                      // Neu: Push-Verhalten für GOLD (sofort)
+                      l10n.premiumPushDelayGold,
                       l10n.premiumGoldFeature1,
                       l10n.premiumGoldFeature2,
                       l10n.premiumGoldFeature3,
@@ -294,7 +301,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       children: [
                         Text(
                           l10n.premiumStoreNotLoaded,
-                          style: TextStyle(color: Colors.red[700], fontSize: 13),
+                          style: TextStyle(
+                              color: Colors.red[700], fontSize: 13),
                         ),
                         const SizedBox(height: 6),
                         TextButton(
@@ -331,7 +339,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(18),
-        border: highlighted ? Border.all(color: Colors.blueAccent, width: 2) : null,
+        border:
+            highlighted ? Border.all(color: Colors.blueAccent, width: 2) : null,
         boxShadow: highlighted
             ? [
                 BoxShadow(
@@ -389,11 +398,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onTap,
-                  child: Text(AppLocalizations.of(context)!.premiumChooseButton(title)),
+                  child: Text(
+                    AppLocalizations.of(context)!.premiumChooseButton(title),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    textStyle: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w600),
                     padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
                 ),

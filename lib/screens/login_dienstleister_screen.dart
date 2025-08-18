@@ -1,9 +1,45 @@
+// login_dienstleister_screen.dart
+import 'dart:ui'; // <— NEU
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
 import 'registrierung_screen.dart';
 import 'passwort_vergessen_screen.dart';
 import '../l10n/app_localizations.dart';
+
+// ===== Push-Lang (nur für Server-Push, UI bleibt unberührt) ==================
+String _normalizeLangCode(Locale locale) {
+  final lc = locale.languageCode.toLowerCase();
+  if (lc.startsWith('de')) return 'de';
+  if (lc.startsWith('en')) return 'en';
+  if (lc.startsWith('nl')) return 'nl';
+  if (lc.startsWith('fr')) return 'fr';
+  if (lc.startsWith('tr')) return 'tr';
+  if (lc.startsWith('es')) return 'es';
+  if (lc.startsWith('it')) return 'it';
+  return 'en';
+}
+
+Future<void> _updateUserLangForPushOnly(SupabaseClient supabase) async {
+  final user = supabase.auth.currentUser;
+  if (user == null) return;
+
+  final lang = _normalizeLangCode(PlatformDispatcher.instance.locale);
+
+  final current = await supabase
+      .from('users')
+      .select('lang')
+      .eq('id', user.id)
+      .maybeSingle();
+
+  if ((current?['lang'] as String?) == lang) return;
+
+  await supabase
+      .from('users')
+      .update({'lang': lang})
+      .eq('id', user.id);
+}
+// ============================================================================
 
 class LoginDienstleisterScreen extends StatefulWidget {
   const LoginDienstleisterScreen({Key? key}) : super(key: key);
@@ -71,6 +107,9 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         return;
       }
 
+      // 2b) Push-Sprache einmalig setzen (kein Einfluss auf UI/l10n)
+      await _updateUserLangForPushOnly(supabase);
+
       // 3) Erfolg
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginSuccess)),
@@ -81,12 +120,10 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       );
 
     } on AuthException catch (error) {
-      // Unterscheide "Account existiert nicht" vs. "falsches Passwort"
       bool showNotRegistered = false;
 
       try {
         final email = _emailController.text.trim();
-        // Achtung: funktioniert nur, wenn SELECT auf users ohne Login erlaubt ist.
         final exists = await supabase
             .from('users')
             .select('id')
@@ -95,7 +132,6 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
 
         showNotRegistered = (exists == null);
       } catch (_) {
-        // Falls RLS blockt, versuche es über Fehlermeldung zu erkennen
         final msg = (error.message ?? '').toLowerCase();
         if (msg.contains('user not found') || msg.contains('no user') || msg.contains('not registered')) {
           showNotRegistered = true;

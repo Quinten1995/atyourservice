@@ -2480,6 +2480,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Incorrect email or password.'**
   String get wrongCredentials;
+
+  /// No description provided for @premiumPushDelayFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications: 1h delay'**
+  String get premiumPushDelayFree;
+
+  /// No description provided for @premiumPushDelaySilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications: 30 min delay'**
+  String get premiumPushDelaySilver;
+
+  /// No description provided for @premiumPushDelayGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications: instant on new jobs'**
+  String get premiumPushDelayGold;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

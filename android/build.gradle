@@ -4,9 +4,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        // Android Gradle Plugin – deine Version ist ok
         classpath 'com.android.tools.build:gradle:8.2.0'
-        classpath 'com.google.gms:google-services:4.4.1'
-        // weitere classpath-Einträge falls benötigt ...
+        // Google Services Plugin für Firebase (für google-services.json)
+        classpath 'com.google.gms:google-services:4.4.2'
     }
 }
 
@@ -17,7 +18,7 @@ allprojects {
     }
 }
 
-// Clean-Task (Standard, optional)
+// Optionaler Clean-Task
 tasks.register("clean", Delete) {
     delete rootProject.layout.buildDirectory
 }

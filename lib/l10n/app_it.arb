@@ -409,7 +409,10 @@
   "premiumRetry": "Riprova",
   "wrongRoleCustomer": "Questo account è registrato come fornitore di servizi e non può essere utilizzato per l'accesso come cliente.",
   "accountNotRegistered": "Nessun account trovato con questa e-mail. Registrati prima.",
-"wrongCredentials": "Email o password errati."
+"wrongCredentials": "Email o password errati.",
+"premiumPushDelayFree": "Notifiche push: ritardo di 1 h",
+  "premiumPushDelaySilver": "Notifiche push: ritardo di 30 min",
+  "premiumPushDelayGold": "Notifiche push: immediate per i nuovi lavori"
 
 
 

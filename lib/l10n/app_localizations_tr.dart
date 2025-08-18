@@ -1267,4 +1267,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get wrongCredentials => 'Yanlış e-posta veya şifre.';
+
+  @override
+  String get premiumPushDelayFree => 'Push bildirimleri: 1 saat gecikme';
+
+  @override
+  String get premiumPushDelaySilver => 'Push bildirimleri: 30 dk gecikme';
+
+  @override
+  String get premiumPushDelayGold => 'Push bildirimleri: yeni işlerde anında';
 }

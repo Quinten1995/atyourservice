@@ -1267,4 +1267,13 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get wrongCredentials => 'Onjuist e-mailadres of wachtwoord.';
+
+  @override
+  String get premiumPushDelayFree => 'Pushmeldingen: 1 u vertraging';
+
+  @override
+  String get premiumPushDelaySilver => 'Pushmeldingen: 30 min vertraging';
+
+  @override
+  String get premiumPushDelayGold => 'Pushmeldingen: direct bij nieuwe opdrachten';
 }

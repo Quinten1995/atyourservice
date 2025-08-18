@@ -1267,4 +1267,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get wrongCredentials => 'Correo electrónico o contraseña incorrectos.';
+
+  @override
+  String get premiumPushDelayFree => 'Notificaciones push: retraso de 1 h';
+
+  @override
+  String get premiumPushDelaySilver => 'Notificaciones push: retraso de 30 min';
+
+  @override
+  String get premiumPushDelayGold => 'Notificaciones push: instantáneas para nuevos trabajos';
 }

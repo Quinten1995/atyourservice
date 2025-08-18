@@ -1,9 +1,43 @@
+// login_kunde_screen.dart
+import 'dart:ui'; // zum Auslesen der aktuellen App/Device-Sprache
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'kunden_dashboard_screen.dart';
 import 'registrierung_screen.dart';
 import 'passwort_vergessen_screen.dart';
 import '../l10n/app_localizations.dart';
+
+// ===== Push-Lang (nur für Server-Push, UI bleibt unberührt) ==================
+String _normalizeLangCode(Locale locale) {
+  final lc = locale.languageCode.toLowerCase();
+  if (lc.startsWith('de')) return 'de';
+  if (lc.startsWith('en')) return 'en';
+  if (lc.startsWith('nl')) return 'nl';
+  if (lc.startsWith('fr')) return 'fr';
+  if (lc.startsWith('tr')) return 'tr';
+  if (lc.startsWith('es')) return 'es';
+  if (lc.startsWith('it')) return 'it';
+  return 'en';
+}
+
+Future<void> _updateUserLangForPushOnly(SupabaseClient supabase) async {
+  final user = supabase.auth.currentUser;
+  if (user == null) return;
+
+  final lang = _normalizeLangCode(PlatformDispatcher.instance.locale);
+
+  // Optional: nur updaten, wenn sich's wirklich geändert hat
+  final current = await supabase
+      .from('users')
+      .select('lang')
+      .eq('id', user.id)
+      .maybeSingle();
+
+  if ((current?['lang'] as String?) == lang) return;
+
+  await supabase.from('users').update({'lang': lang}).eq('id', user.id);
+}
+// ============================================================================
 
 class LoginKundeScreen extends StatefulWidget {
   const LoginKundeScreen({Key? key}) : super(key: key);
@@ -13,7 +47,8 @@ class LoginKundeScreen extends StatefulWidget {
 }
 
 class _LoginKundeScreenState extends State<LoginKundeScreen> {
-  final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
+  final _emailController =
+      TextEditingController(text: 'quintenhessmann1995@yahoo.com');
   final _passwortController = TextEditingController(text: 'password1234');
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -51,7 +86,9 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
       if (existing != null && existing['rolle'] == 'dienstleister') {
         await supabase.auth.signOut();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.wrongRoleCustomer), backgroundColor: Colors.redAccent),
+          SnackBar(
+              content: Text(l10n.wrongRoleCustomer),
+              backgroundColor: Colors.redAccent),
         );
         return;
       }
@@ -71,17 +108,19 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         }
       }
 
+      // 4b) Push-Sprache einmalig setzen (hat keinen Einfluss auf UI/l10n)
+      await _updateUserLangForPushOnly(supabase);
+
       // 5) Erfolg
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginSuccess)),
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const KundenDashboardScreen()),
+        MaterialPageRoute(
+            builder: (context) => const KundenDashboardScreen()),
       );
-
     } on AuthException catch (error) {
-      // "Account nicht registriert" vs. "falsche Daten" unterscheiden
       bool showNotRegistered = false;
 
       try {
@@ -94,14 +133,18 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         showNotRegistered = (exists == null);
       } catch (_) {
         final msg = (error.message ?? '').toLowerCase();
-        if (msg.contains('user not found') || msg.contains('no user') || msg.contains('not registered')) {
+        if (msg.contains('user not found') ||
+            msg.contains('no user') ||
+            msg.contains('not registered')) {
           showNotRegistered = true;
         }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(showNotRegistered ? l10n.accountNotRegistered : l10n.wrongCredentials),
+          content: Text(showNotRegistered
+              ? l10n.accountNotRegistered
+              : l10n.wrongCredentials),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -136,7 +179,8 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.loginKundeAppBar, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.loginKundeAppBar,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -155,36 +199,65 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         child: Stack(
           children: [
             Positioned(
-              top: -60, left: -60,
-              child: Container(width: 160, height: 160, decoration: BoxDecoration(color: primaryColor.withOpacity(0.13), shape: BoxShape.circle)),
+              top: -60,
+              left: -60,
+              child: Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.13),
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
             Positioned(
-              bottom: -40, right: -40,
-              child: Container(width: 110, height: 110, decoration: BoxDecoration(color: accentColor.withOpacity(0.21), shape: BoxShape.circle)),
+              bottom: -40,
+              right: -40,
+              child: Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.21),
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
             Center(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 22.0, vertical: 12),
                   child: Card(
                     color: Colors.white.withOpacity(0.96),
                     elevation: 8,
                     shadowColor: primaryColor.withOpacity(0.12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22)),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 22, vertical: 28),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.account_circle_rounded, size: 56, color: primaryColor),
+                            Icon(Icons.account_circle_rounded,
+                                size: 56, color: primaryColor),
                             const SizedBox(height: 18),
                             Text(
                               l10n.loginKundeHeadline,
                               style: TextStyle(
-                                fontSize: 26, fontWeight: FontWeight.bold, color: textColor, letterSpacing: 1.2,
-                                shadows: [Shadow(blurRadius: 2, color: Colors.white54, offset: Offset(0, 1))],
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                                letterSpacing: 1.2,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 2,
+                                    color: Colors.white54,
+                                    offset: Offset(0, 1),
+                                  )
+                                ],
                               ),
                             ),
                             const SizedBox(height: 32),
@@ -192,12 +265,17 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: l10n.emailLabel,
-                                filled: true, fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 14),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(color: primaryColor, width: 2),
+                                  borderSide: BorderSide(
+                                      color: primaryColor, width: 2),
                                 ),
                               ),
                               keyboardType: TextInputType.emailAddress,
@@ -208,12 +286,17 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               controller: _passwortController,
                               decoration: InputDecoration(
                                 labelText: l10n.passwordLabel,
-                                filled: true, fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 14),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(color: primaryColor, width: 2),
+                                  borderSide: BorderSide(
+                                      color: primaryColor, width: 2),
                                 ),
                               ),
                               obscureText: true,
@@ -223,16 +306,26 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => PasswortVergessenScreen()));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PasswortVergessenScreen(),
+                                    ),
+                                  );
                                 },
                                 style: TextButton.styleFrom(
                                   foregroundColor: primaryColor,
-                                  textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                  textStyle: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 child: Text(l10n.forgotPasswordButton),
                               ),
                             ),
                             const SizedBox(height: 18),
+
+                            // Login-Button
                             _isLoading
                                 ? const CircularProgressIndicator()
                                 : SizedBox(
@@ -241,22 +334,41 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
                                       onPressed: _login,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: primaryColor,
-                                        padding: const EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
                                         elevation: 4,
-                                        shadowColor: primaryColor.withOpacity(0.20),
+                                        shadowColor:
+                                            primaryColor.withOpacity(0.20),
                                       ),
-                                      child: Text(l10n.loginButton, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                                      child: Text(l10n.loginButton,
+                                          style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600)),
                                     ),
                                   ),
+
+                            // Debug-Button ENTFERNT
+
                             const SizedBox(height: 14),
                             TextButton(
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrierungScreen()));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RegistrierungScreen(),
+                                  ),
+                                );
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: primaryColor,
-                                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                textStyle: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
                               ),
                               child: Text(l10n.noAccountYet),
                             ),
