@@ -1626,7 +1626,7 @@ abstract class AppLocalizations {
   /// No description provided for @invoiceGoldInfo.
   ///
   /// In en, this message translates to:
-  /// **'These details will appear on your PDF invoice (Gold feature).'**
+  /// **'Invoice data can be edited in the GOLD plan.'**
   String get invoiceGoldInfo;
 
   /// No description provided for @rechnungGenerierenButtonLabel.
@@ -2498,6 +2498,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Push notifications: instant on new jobs'**
   String get premiumPushDelayGold;
+
+  /// No description provided for @companyNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Company name (optional)'**
+  String get companyNameOptional;
+
+  /// No description provided for @vatIdOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'VAT ID (optional)'**
+  String get vatIdOptional;
+
+  /// No description provided for @bicOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'BIC (optional)'**
+  String get bicOptional;
+
+  /// No description provided for @smallBusinessLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Small business according to §19 UStG'**
+  String get smallBusinessLabel;
+
+  /// No description provided for @defaultVatRateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard VAT rate (%)'**
+  String get defaultVatRateLabel;
+
+  /// No description provided for @invalidVatRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid VAT rate'**
+  String get invalidVatRate;
+
+  /// No description provided for @profileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get profileNameLabel;
+
+  /// No description provided for @invoiceNoShort.
+  ///
+  /// In en, this message translates to:
+  /// **'No:'**
+  String get invoiceNoShort;
+
+  /// No description provided for @netAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get netAmountLabel;
+
+  /// No description provided for @vatLabelWithPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'VAT ({percent}%)'**
+  String vatLabelWithPercent(Object percent);
+
+  /// No description provided for @totalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalLabel;
+
+  /// No description provided for @dueOnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due on:'**
+  String get dueOnLabel;
+
+  /// No description provided for @vatIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'VAT ID:'**
+  String get vatIdLabel;
+
+  /// No description provided for @bicLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'BIC:'**
+  String get bicLabel;
+
+  /// No description provided for @paymentTermsDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Payable within {days} days without deduction.'**
+  String paymentTermsDefault(Object days);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

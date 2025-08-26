@@ -414,7 +414,25 @@
 "wrongCredentials": "Correo electrónico o contraseña incorrectos.",
 "premiumPushDelayFree": "Notificaciones push: retraso de 1 h",
   "premiumPushDelaySilver": "Notificaciones push: retraso de 30 min",
-  "premiumPushDelayGold": "Notificaciones push: instant\u00e1neas para nuevos trabajos"
+  "premiumPushDelayGold": "Notificaciones push: instant\u00e1neas para nuevos trabajos",
+   "companyNameOptional": "Nombre de la empresa (opcional)",
+  "vatIdOptional": "NIF IVA (opcional)",
+  "bicOptional": "BIC (opcional)",
+  "smallBusinessLabel": "Pequeña empresa según §19 UStG",
+  "defaultVatRateLabel": "Tipo de IVA estándar (%)",
+  "invalidVatRate": "Tipo de IVA no válido",
+  "invoiceGoldInfo": "Los datos de facturación se pueden editar con el plan GOLD.",
+  "profileNameLabel": "Nombre completo",
+  "invoiceNoShort": "N.º:",
+  "netAmountLabel": "Neto",
+  "vatLabelWithPercent": "IVA ({percent}%)",
+  "totalLabel": "Total",
+  "dueOnLabel": "Vence el:",
+  "vatIdLabel": "NIF-IVA:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "Pagadero dentro de {days} días sin deducciones.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 

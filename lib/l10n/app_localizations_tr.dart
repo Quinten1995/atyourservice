@@ -812,7 +812,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get invoiceLogoUrlLabel => 'Logo URL\'si (isteğe bağlı)';
 
   @override
-  String get invoiceGoldInfo => 'Bu bilgiler PDF faturanızda görünecektir (Gold özelliği).';
+  String get invoiceGoldInfo => 'Fatura verileri yalnızca GOLD aboneliğinde düzenlenebilir.';
 
   @override
   String get rechnungGenerierenButtonLabel => 'Fatura oluştur';
@@ -1276,4 +1276,53 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get premiumPushDelayGold => 'Push bildirimleri: yeni işlerde anında';
+
+  @override
+  String get companyNameOptional => 'Şirket adı (opsiyonel)';
+
+  @override
+  String get vatIdOptional => 'KDV Numarası (opsiyonel)';
+
+  @override
+  String get bicOptional => 'BIC (opsiyonel)';
+
+  @override
+  String get smallBusinessLabel => 'Küçük işletme §19 UStG’ye göre';
+
+  @override
+  String get defaultVatRateLabel => 'Standart KDV oranı (%)';
+
+  @override
+  String get invalidVatRate => 'Geçersiz KDV oranı';
+
+  @override
+  String get profileNameLabel => 'Tam ad';
+
+  @override
+  String get invoiceNoShort => 'No:';
+
+  @override
+  String get netAmountLabel => 'Net';
+
+  @override
+  String vatLabelWithPercent(Object percent) {
+    return 'KDV ($percent%)';
+  }
+
+  @override
+  String get totalLabel => 'Toplam';
+
+  @override
+  String get dueOnLabel => 'Vade tarihi:';
+
+  @override
+  String get vatIdLabel => 'KDV No:';
+
+  @override
+  String get bicLabel => 'BIC:';
+
+  @override
+  String paymentTermsDefault(Object days) {
+    return '$days gün içinde kesinti olmadan ödenir.';
+  }
 }

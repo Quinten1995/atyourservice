@@ -404,7 +404,25 @@
 "wrongCredentials": "Onjuist e-mailadres of wachtwoord.",
 "premiumPushDelayFree": "Pushmeldingen: 1 u vertraging",
   "premiumPushDelaySilver": "Pushmeldingen: 30 min vertraging",
-  "premiumPushDelayGold": "Pushmeldingen: direct bij nieuwe opdrachten"
+  "premiumPushDelayGold": "Pushmeldingen: direct bij nieuwe opdrachten",
+  "companyNameOptional": "Bedrijfsnaam (optioneel)",
+  "vatIdOptional": "Btw-nummer (optioneel)",
+  "bicOptional": "BIC (optioneel)",
+  "smallBusinessLabel": "Kleineondernemer volgens §19 UStG",
+  "defaultVatRateLabel": "Standaard btw-tarief (%)",
+  "invalidVatRate": "Ongeldig btw-tarief",
+  "invoiceGoldInfo": "Factuurgegevens zijn alleen bewerkbaar met het GOLD-abonnement.",
+  "profileNameLabel": "Volledige naam",
+  "invoiceNoShort": "Nr:",
+  "netAmountLabel": "Netto",
+  "vatLabelWithPercent": "Btw ({percent}%)",
+  "totalLabel": "Totaal",
+  "dueOnLabel": "Vervaldatum:",
+  "vatIdLabel": "Btw-nr.:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "Betaalbaar binnen {days} dagen zonder aftrek.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 

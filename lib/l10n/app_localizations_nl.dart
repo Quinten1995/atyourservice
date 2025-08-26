@@ -812,7 +812,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get invoiceLogoUrlLabel => 'Logo-URL (optioneel)';
 
   @override
-  String get invoiceGoldInfo => 'Deze gegevens verschijnen op je PDF-factuur (Gold-functie).';
+  String get invoiceGoldInfo => 'Factuurgegevens zijn alleen bewerkbaar met het GOLD-abonnement.';
 
   @override
   String get rechnungGenerierenButtonLabel => 'Factuur genereren';
@@ -1276,4 +1276,53 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get premiumPushDelayGold => 'Pushmeldingen: direct bij nieuwe opdrachten';
+
+  @override
+  String get companyNameOptional => 'Bedrijfsnaam (optioneel)';
+
+  @override
+  String get vatIdOptional => 'Btw-nummer (optioneel)';
+
+  @override
+  String get bicOptional => 'BIC (optioneel)';
+
+  @override
+  String get smallBusinessLabel => 'Kleineondernemer volgens §19 UStG';
+
+  @override
+  String get defaultVatRateLabel => 'Standaard btw-tarief (%)';
+
+  @override
+  String get invalidVatRate => 'Ongeldig btw-tarief';
+
+  @override
+  String get profileNameLabel => 'Volledige naam';
+
+  @override
+  String get invoiceNoShort => 'Nr:';
+
+  @override
+  String get netAmountLabel => 'Netto';
+
+  @override
+  String vatLabelWithPercent(Object percent) {
+    return 'Btw ($percent%)';
+  }
+
+  @override
+  String get totalLabel => 'Totaal';
+
+  @override
+  String get dueOnLabel => 'Vervaldatum:';
+
+  @override
+  String get vatIdLabel => 'Btw-nr.:';
+
+  @override
+  String get bicLabel => 'BIC:';
+
+  @override
+  String paymentTermsDefault(Object days) {
+    return 'Betaalbaar binnen $days dagen zonder aftrek.';
+  }
 }

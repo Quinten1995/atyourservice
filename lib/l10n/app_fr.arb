@@ -441,7 +441,25 @@
 "wrongCredentials": "E-mail ou mot de passe incorrect.",
 "premiumPushDelayFree": "Notifications push\u00a0: d\u00e9lai de 1\u00a0h",
   "premiumPushDelaySilver": "Notifications push\u00a0: d\u00e9lai de 30\u00a0min",
-  "premiumPushDelayGold": "Notifications push\u00a0: imm\u00e9diates pour les nouvelles missions"
+  "premiumPushDelayGold": "Notifications push\u00a0: imm\u00e9diates pour les nouvelles missions",
+  "companyNameOptional": "Nom de l’entreprise (optionnel)",
+  "vatIdOptional": "N° TVA (optionnel)",
+  "bicOptional": "BIC (optionnel)",
+  "smallBusinessLabel": "Petit entrepreneur selon §19 UStG",
+  "defaultVatRateLabel": "Taux de TVA standard (%)",
+  "invalidVatRate": "Taux de TVA invalide",
+  "invoiceGoldInfo": "Les données de facturation sont modifiables avec l’abonnement GOLD.",
+  "profileNameLabel": "Nom complet",
+  "invoiceNoShort": "N° :",
+  "netAmountLabel": "Net",
+  "vatLabelWithPercent": "TVA ({percent}%)",
+  "totalLabel": "Total",
+  "dueOnLabel": "Échéance :",
+  "vatIdLabel": "N° TVA :",
+  "bicLabel": "BIC :",
+  "paymentTermsDefault": "Payable sous {days} jours sans déduction.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 

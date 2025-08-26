@@ -409,7 +409,26 @@
   "premiumRetry": "Erneut versuchen",
   "wrongRoleCustomer": "Dieses Konto ist als Dienstleister registriert und kann nicht für den Kunden-Login verwendet werden.",
   "accountNotRegistered": "Kein Konto mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.",
-"wrongCredentials": "Falsche E-Mail oder falsches Passwort."
+"wrongCredentials": "Falsche E-Mail oder falsches Passwort.",
+"companyNameOptional": "Firmenname (optional)",
+  "vatIdOptional": "USt-IdNr. (optional)",
+  "bicOptional": "BIC (optional)",
+  "smallBusinessLabel": "Kleinunternehmer gem. § 19 UStG",
+  "defaultVatRateLabel": "Standard-USt-Satz (%)",
+  "invalidVatRate": "Ungültiger USt-Satz",
+  "invoiceGoldInfo": "Rechnungsdaten sind im GOLD-Abo bearbeitbar.",
+  "profileNameLabel": "Voller Name",
+  "invoiceNoShort": "Nr:",
+  "netAmountLabel": "Netto",
+  "vatLabelWithPercent": "USt ({percent}%)",
+  "totalLabel": "Gesamt",
+  "dueOnLabel": "Fällig am:",
+  "vatIdLabel": "USt-IdNr.:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "Zahlbar innerhalb von {days} Tagen ohne Abzug.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
+
 
 
 

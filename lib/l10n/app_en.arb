@@ -414,7 +414,25 @@
 "wrongCredentials": "Incorrect email or password.",
 "premiumPushDelayFree": "Push notifications: 1h delay",
   "premiumPushDelaySilver": "Push notifications: 30 min delay",
-  "premiumPushDelayGold": "Push notifications: instant on new jobs"
+  "premiumPushDelayGold": "Push notifications: instant on new jobs",
+  "companyNameOptional": "Company name (optional)",
+  "vatIdOptional": "VAT ID (optional)",
+  "bicOptional": "BIC (optional)",
+  "smallBusinessLabel": "Small business according to §19 UStG",
+  "defaultVatRateLabel": "Standard VAT rate (%)",
+  "invalidVatRate": "Invalid VAT rate",
+  "invoiceGoldInfo": "Invoice data can be edited in the GOLD plan.",
+  "profileNameLabel": "Full name",
+  "invoiceNoShort": "No:",
+  "netAmountLabel": "Net",
+  "vatLabelWithPercent": "VAT ({percent}%)",
+  "totalLabel": "Total",
+  "dueOnLabel": "Due on:",
+  "vatIdLabel": "VAT ID:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "Payable within {days} days without deduction.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 

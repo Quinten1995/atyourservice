@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:http/http.dart' as http; // optional, falls anderswo genutzt
+import 'dart:convert'; // optional, falls anderswo genutzt
 import 'package:atyourservice/utils/geocoding_service.dart';
 import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart';
@@ -14,26 +14,33 @@ class ProfilDienstleisterScreen extends StatefulWidget {
   const ProfilDienstleisterScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfilDienstleisterScreenState createState() =>
-      _ProfilDienstleisterScreenState();
+  _ProfilDienstleisterScreenState createState() => _ProfilDienstleisterScreenState();
 }
 
 class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _supabase = Supabase.instance.client;
   final _formKey = GlobalKey<FormState>();
 
+  // Basis-Profil
   final _nameController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
   String _selectedKategorie = kategorieKeys.first;
   final _adresseController = TextEditingController();
 
-  // Rechnungsdaten-Controller
-  final _invoiceNameController = TextEditingController();
-  final _invoiceAddressController = TextEditingController();
-  final _invoiceTaxNumberController = TextEditingController();
+  // Rechnungs-/Firmen-/Steuerdaten
+  final _invoiceNameController = TextEditingController();       // Absender-Name auf Rechnung
+  final _invoiceAddressController = TextEditingController();    // Rechnungsadresse
+  final _invoiceTaxNumberController = TextEditingController();  // Steuernummer (oder USt)
   final _invoiceIbanController = TextEditingController();
+  final _invoiceBicController = TextEditingController();
   final _invoiceLogoUrlController = TextEditingController();
+
+  final _companyNameController = TextEditingController();       // Firmenname (optional)
+  final _ustIdController = TextEditingController();             // USt-ID (optional)
+  final _vatRateController = TextEditingController(text: '19'); // Standard-USt-Satz
+
+  bool _isSmallBusiness = false;                                // §19 UStG
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -67,18 +74,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null)
-        throw Exception(AppLocalizations.of(context)!.pleaseLogin);
+      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
+
       final data = await _supabase
           .from('dienstleister_details')
-          .select()
+          .select('''
+            name, kategorie, adresse, telefon, email, profilbild_url,
+            last_profile_change, aktualisiert_am,
+            invoice_name, invoice_address, invoice_tax_number, invoice_iban, invoice_bic, invoice_logo_url,
+            is_small_business, default_vat_rate, company_name, ust_id
+          ''')
           .eq('user_id', user.id)
           .maybeSingle();
 
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
-        final gespeicherteKategorie =
-            data['kategorie'] as String? ?? kategorieKeys.first;
+        final gespeicherteKategorie = data['kategorie'] as String? ?? kategorieKeys.first;
         _selectedKategorie = kategorieKeys.contains(gespeicherteKategorie)
             ? gespeicherteKategorie
             : kategorieKeys.first;
@@ -89,18 +100,23 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             : _emailController.text;
         _profilbildUrl = data['profilbild_url'] as String?;
         _lastProfileChange = data['last_profile_change'] != null
-            ? DateTime.parse(data['last_profile_change'])
+            ? DateTime.tryParse(data['last_profile_change'])
             : null;
 
-        // Rechnungsdaten
+        // Rechnungs-/Steuer-/Firmen-Daten
         _invoiceNameController.text = data['invoice_name'] as String? ?? '';
-        _invoiceAddressController.text =
-            data['invoice_address'] as String? ?? '';
-        _invoiceTaxNumberController.text =
-            data['invoice_tax_number'] as String? ?? '';
+        _invoiceAddressController.text = data['invoice_address'] as String? ?? '';
+        _invoiceTaxNumberController.text = data['invoice_tax_number'] as String? ?? '';
         _invoiceIbanController.text = data['invoice_iban'] as String? ?? '';
-        _invoiceLogoUrlController.text =
-            data['invoice_logo_url'] as String? ?? '';
+        _invoiceBicController.text = data['invoice_bic'] as String? ?? '';
+        _invoiceLogoUrlController.text = data['invoice_logo_url'] as String? ?? '';
+
+        _companyNameController.text = data['company_name'] as String? ?? '';
+        _ustIdController.text = data['ust_id'] as String? ?? '';
+        _isSmallBusiness = (data['is_small_business'] as bool?) ?? false;
+
+        final vatNum = (data['default_vat_rate'] as num?)?.toDouble();
+        _vatRateController.text = vatNum != null ? vatNum.toString() : '19';
       }
 
       final userData = await _supabase
@@ -129,9 +145,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         .eq('dienstleister_id', user.id);
 
     if (res is List && res.isNotEmpty) {
-      final values = res
-          .map((b) => (b['bewertung'] as num?)?.toDouble() ?? 0.0)
-          .toList();
+      final values = res.map((b) => (b['bewertung'] as num?)?.toDouble() ?? 0.0).toList();
       setState(() {
         _durchschnitt = values.reduce((a, b) => a + b) / values.length;
         _anzahlBewertungen = values.length;
@@ -154,8 +168,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null)
-        throw Exception(AppLocalizations.of(context)!.pleaseLogin);
+      if (user == null) throw Exception(AppLocalizations.of(context)!.pleaseLogin);
 
       final isFree = (_aboTyp ?? 'free') == 'free';
 
@@ -163,9 +176,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         final now = DateTime.now();
         final diff = now.difference(_lastProfileChange!).inDays;
         if (diff < 20) {
-          final naechstesDatum = _lastProfileChange!.add(
-            const Duration(days: 20),
-          );
+          final naechstesDatum = _lastProfileChange!.add(const Duration(days: 20));
+          if (!mounted) return;
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -200,16 +212,16 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       double? lon;
       if (adresse.isNotEmpty) {
         final coords = await GeocodingService().getCoordinates(adresse);
-        if (coords == null)
+        if (coords == null) {
           throw Exception(AppLocalizations.of(context)!.addressNotFound);
+        }
         lat = coords['lat'];
         lon = coords['lng'];
       }
 
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
-        final fileName =
-            '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         await _supabase.storage
             .from('profile-pics')
             .upload(
@@ -217,18 +229,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
               _neuesProfilbild!,
               fileOptions: const FileOptions(upsert: true),
             );
-        final String publicUrl = _supabase.storage
-            .from('profile-pics')
-            .getPublicUrl(fileName);
+        final String publicUrl = _supabase.storage.from('profile-pics').getPublicUrl(fileName);
         profilbildUrl = publicUrl;
       }
 
-      // Rechnungsdaten
+      // Rechnungs-/Steuer-/Firmen-Daten
       final invoiceName = _invoiceNameController.text.trim();
       final invoiceAddress = _invoiceAddressController.text.trim();
       final invoiceTaxNumber = _invoiceTaxNumberController.text.trim();
       final invoiceIban = _invoiceIbanController.text.trim();
+      final invoiceBic = _invoiceBicController.text.trim();
       final invoiceLogoUrl = _invoiceLogoUrlController.text.trim();
+
+      final companyName = _companyNameController.text.trim();
+      final ustId = _ustIdController.text.trim();
+      final parsedVat = double.tryParse(_vatRateController.text.replaceAll(',', '.')) ?? 19.0;
+      final defaultVatRate = parsedVat < 0 ? 0.0 : parsedVat;
 
       await _supabase.from('dienstleister_details').upsert({
         'user_id': user.id,
@@ -241,13 +257,20 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         'email': email,
         'profilbild_url': profilbildUrl,
         'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-        if (isFree)
-          'last_profile_change': DateTime.now().toUtc().toIso8601String(),
+        if (isFree) 'last_profile_change': DateTime.now().toUtc().toIso8601String(),
+
+        // Rechnungs-/Steuer-/Firmen-Daten
         'invoice_name': invoiceName,
         'invoice_address': invoiceAddress,
         'invoice_tax_number': invoiceTaxNumber,
         'invoice_iban': invoiceIban,
+        'invoice_bic': invoiceBic,
         'invoice_logo_url': invoiceLogoUrl,
+
+        'company_name': companyName,
+        'ust_id': ustId,
+        'is_small_business': _isSmallBusiness,
+        'default_vat_rate': _isSmallBusiness ? 0.0 : defaultVatRate,
       }, onConflict: 'user_id').select();
 
       setState(() {
@@ -258,6 +281,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         }
       });
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.profileSaved)),
       );
@@ -313,7 +337,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     }
   }
 
-  // >>> HIER IST DIE ANGEPASSTE METHODE <<<
   Future<void> _kontoLoeschen() async {
     setState(() {
       _deletingAccount = true;
@@ -326,19 +349,14 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final session = _supabase.auth.currentSession;
       if (session == null) throw Exception(l10n.pleaseLogin);
 
-      // Aufruf deiner Edge Function "delete_user"
       final res = await _supabase.functions.invoke('delete_user');
-
-      // 2xx erwarten (z. B. 204 No Content)
       if (res.status < 200 || res.status >= 300) {
         throw Exception('Delete failed: ${res.status} ${res.data}');
       }
 
-      // Session lokal beenden
       await _supabase.auth.signOut();
 
       if (!mounted) return;
-      // Zurück zum Login
       Navigator.of(context).popUntil((route) => route.isFirst);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -361,16 +379,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     _adresseController.dispose();
     _telefonController.dispose();
     _emailController.dispose();
+
     _invoiceNameController.dispose();
     _invoiceAddressController.dispose();
     _invoiceTaxNumberController.dispose();
     _invoiceIbanController.dispose();
+    _invoiceBicController.dispose();
     _invoiceLogoUrlController.dispose();
+
+    _companyNameController.dispose();
+    _ustIdController.dispose();
+    _vatRateController.dispose();
+
     super.dispose();
   }
 
-  InputDecoration _inputDecoration(String label, {IconData? icon}) =>
-      InputDecoration(
+  InputDecoration _inputDecoration(String label, {IconData? icon}) => InputDecoration(
         labelText: label,
         prefixIcon: icon != null ? Icon(icon, color: primaryColor) : null,
         filled: true,
@@ -429,13 +453,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.amber[600],
             foregroundColor: Colors.black87,
-            textStyle: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+            textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 2,
             padding: const EdgeInsets.symmetric(vertical: 14),
           ),
@@ -450,18 +469,18 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     );
   }
 
-  /// Rechnungsdaten: Immer sichtbar, aber bei Free/Silver ausgegraut
+  /// Rechnungs-/Steuerdaten: Immer sichtbar, aber bei Free/Silver ausgegraut
   Widget _rechnungsdatenWidget(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isGold = (_aboTyp ?? 'free') == 'gold';
 
     InputDecoration invoiceDecoration(String label) => InputDecoration(
-      labelText: label,
-      filled: true,
-      fillColor: isGold ? Colors.white : Colors.grey[200],
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-      enabled: isGold,
-    );
+          labelText: label,
+          filled: true,
+          fillColor: isGold ? Colors.white : Colors.grey[200],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          enabled: isGold,
+        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,6 +495,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           ),
         ),
         const SizedBox(height: 6),
+
+        // Firma & USt-ID (optional)
+        TextFormField(
+          controller: _companyNameController,
+          decoration: invoiceDecoration(l10n.companyNameOptional),
+          enabled: isGold,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _ustIdController,
+          decoration: invoiceDecoration(l10n.vatIdOptional),
+          enabled: isGold,
+        ),
+        const SizedBox(height: 12),
+
+        // Rechnungsabsender
         TextFormField(
           controller: _invoiceNameController,
           decoration: invoiceDecoration(l10n.invoiceNameLabel),
@@ -494,6 +529,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           enabled: isGold,
         ),
         const SizedBox(height: 12),
+
+        // Bankdaten
         TextFormField(
           controller: _invoiceIbanController,
           decoration: invoiceDecoration(l10n.invoiceIbanLabel),
@@ -501,14 +538,58 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         ),
         const SizedBox(height: 12),
         TextFormField(
+          controller: _invoiceBicController,
+          decoration: invoiceDecoration(l10n.bicOptional),
+          enabled: isGold,
+        ),
+        const SizedBox(height: 12),
+
+        // Logo-URL
+        TextFormField(
           controller: _invoiceLogoUrlController,
           decoration: invoiceDecoration(l10n.invoiceLogoUrlLabel),
           enabled: isGold,
         ),
+        const SizedBox(height: 16),
+
+        // Kleinunternehmer / USt-Satz
+        Opacity(
+          opacity: isGold ? 1.0 : 0.6,
+          child: IgnorePointer(
+            ignoring: !isGold,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SwitchListTile(
+                  title: Text(l10n.smallBusinessLabel),
+                  value: _isSmallBusiness,
+                  onChanged: (v) => setState(() => _isSmallBusiness = v),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _vatRateController,
+                  decoration: invoiceDecoration(l10n.defaultVatRateLabel),
+                  enabled: isGold && !_isSmallBusiness,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  validator: (val) {
+                    if (_isSmallBusiness) return null;
+                    if (!isGold) return null;
+                    if (val == null || val.trim().isEmpty) return null;
+                    final v = double.tryParse(val.replaceAll(',', '.'));
+                    if (v == null || v < 0 || v > 100) return l10n.invalidVatRate;
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+
         const SizedBox(height: 10),
         if (!isGold)
           Text(
-            l10n.invoiceGoldInfo,
+            l10n.invoiceGoldInfo, // „Rechnungsdaten sind im GOLD-Abo bearbeitbar.“
             style: const TextStyle(fontSize: 13, color: Colors.red),
           ),
       ],
@@ -540,8 +621,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       }
     }
 
-    final sortedKategorieEntries =
-        (kategorieKeys
+    final sortedKategorieEntries = (kategorieKeys
             .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
             .toList()
           ..sort((a, b) => a.value.compareTo(b.value)));
@@ -556,7 +636,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       ),
       body: Stack(
         children: [
-          // Hintergrund wie Dashboard
+          // Hintergrund
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -611,15 +691,11 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 28,
-                                      ),
+                                      const Icon(Icons.star, color: Colors.amber, size: 28),
                                       const SizedBox(width: 6),
                                       Text(
                                         '${_durchschnitt!.toStringAsFixed(2)} / 5',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
                                           color: primaryColor,
@@ -627,9 +703,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       ),
                                       const SizedBox(width: 9),
                                       Text(
-                                        l10n.ratingsCount(
-                                          _anzahlBewertungen.toString(),
-                                        ),
+                                        l10n.ratingsCount(_anzahlBewertungen.toString()),
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 15,
@@ -639,7 +713,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                   )
                                 : Text(
                                     l10n.noRatingsYet,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.black54,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
@@ -671,9 +745,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       icon: Icons.person,
                                     ),
                                     validator: (value) =>
-                                        (value == null || value.isEmpty)
-                                        ? l10n.nameValidator
-                                        : null,
+                                        (value == null || value.isEmpty) ? l10n.nameValidator : null,
                                   ),
                                   const SizedBox(height: 18),
                                   DropdownButtonFormField<String>(
@@ -716,8 +788,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     },
                                     validator: (value) =>
                                         (value == null || value.isEmpty)
-                                        ? l10n.categoryValidator
-                                        : null,
+                                            ? l10n.categoryValidator
+                                            : null,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   const SizedBox(height: 18),
@@ -738,8 +810,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     keyboardType: TextInputType.phone,
                                     validator: (value) =>
                                         (value == null || value.isEmpty)
-                                        ? l10n.phoneValidator
-                                        : null,
+                                            ? l10n.phoneValidator
+                                            : null,
                                   ),
                                   const SizedBox(height: 18),
                                   TextFormField(
@@ -753,22 +825,21 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       if (value == null || value.isEmpty) {
                                         return l10n.emailEmptyValidator;
                                       }
-                                      final emailRegExp = RegExp(
-                                        r'^[^@]+@[^@]+\.[^@]+',
-                                      );
+                                      final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                                       if (!emailRegExp.hasMatch(value)) {
                                         return l10n.emailInvalidValidator;
                                       }
                                       return null;
                                     },
                                   ),
+
+                                  // Rechnungs-/Steuer-Bereich
                                   _rechnungsdatenWidget(context),
+
                                   const SizedBox(height: 24),
                                   if (_errorMessage != null)
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 10,
-                                      ),
+                                      padding: const EdgeInsets.only(bottom: 10),
                                       child: Text(
                                         "${l10n.errorPrefix(_errorMessage!)}",
                                         style: const TextStyle(
@@ -789,18 +860,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
+                                        padding: const EdgeInsets.symmetric(vertical: 14),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            14,
-                                          ),
+                                          borderRadius: BorderRadius.circular(14),
                                         ),
                                       ),
-                                      onPressed: _isLoading
-                                          ? null
-                                          : _profilSpeichern,
+                                      onPressed: _isLoading ? null : _profilSpeichern,
                                     ),
                                   ),
                                   const SizedBox(height: 30),
@@ -809,14 +874,10 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                       : SizedBox(
                                           width: double.infinity,
                                           child: ElevatedButton.icon(
-                                            icon: const Icon(
-                                              Icons.delete_forever,
-                                            ),
+                                            icon: const Icon(Icons.delete_forever),
                                             label: Text(
                                               l10n.deleteAccountButton,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.red[600],
@@ -825,18 +886,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                               ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 13,
-                                                  ),
+                                              padding: const EdgeInsets.symmetric(vertical: 13),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
+                                                borderRadius: BorderRadius.circular(12),
                                               ),
                                             ),
-                                            onPressed: _deletingAccount
-                                                ? null
-                                                : _kontoLoeschenDialog,
+                                            onPressed: _deletingAccount ? null : _kontoLoeschenDialog,
                                           ),
                                         ),
                                 ],

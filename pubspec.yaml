@@ -2,7 +2,7 @@ name: atyourservice
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.3+23
+version: 1.0.5+26
 
 environment:
   sdk: ^3.8.0
@@ -53,6 +53,9 @@ dependencies:
 
   # === Heads-Up Banner im Vordergrund ===
   flutter_local_notifications: ^17.2.1
+
+  # === Hashing für PDF (SHA-256) ===
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:

@@ -812,7 +812,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invoiceLogoUrlLabel => 'Logo URL (optional)';
 
   @override
-  String get invoiceGoldInfo => 'These details will appear on your PDF invoice (Gold feature).';
+  String get invoiceGoldInfo => 'Invoice data can be edited in the GOLD plan.';
 
   @override
   String get rechnungGenerierenButtonLabel => 'Generate Invoice';
@@ -1276,4 +1276,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumPushDelayGold => 'Push notifications: instant on new jobs';
+
+  @override
+  String get companyNameOptional => 'Company name (optional)';
+
+  @override
+  String get vatIdOptional => 'VAT ID (optional)';
+
+  @override
+  String get bicOptional => 'BIC (optional)';
+
+  @override
+  String get smallBusinessLabel => 'Small business according to §19 UStG';
+
+  @override
+  String get defaultVatRateLabel => 'Standard VAT rate (%)';
+
+  @override
+  String get invalidVatRate => 'Invalid VAT rate';
+
+  @override
+  String get profileNameLabel => 'Full name';
+
+  @override
+  String get invoiceNoShort => 'No:';
+
+  @override
+  String get netAmountLabel => 'Net';
+
+  @override
+  String vatLabelWithPercent(Object percent) {
+    return 'VAT ($percent%)';
+  }
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get dueOnLabel => 'Due on:';
+
+  @override
+  String get vatIdLabel => 'VAT ID:';
+
+  @override
+  String get bicLabel => 'BIC:';
+
+  @override
+  String paymentTermsDefault(Object days) {
+    return 'Payable within $days days without deduction.';
+  }
 }

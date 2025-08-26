@@ -812,7 +812,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get invoiceLogoUrlLabel => 'Logo-URL (optional)';
 
   @override
-  String get invoiceGoldInfo => 'Diese Angaben werden auf deiner PDF-Rechnung erscheinen (Gold-Feature).';
+  String get invoiceGoldInfo => 'Rechnungsdaten sind im GOLD-Abo bearbeitbar.';
 
   @override
   String get rechnungGenerierenButtonLabel => 'Rechnung generieren';
@@ -1276,4 +1276,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get premiumPushDelayGold => 'Push notifications: instant on new jobs';
+
+  @override
+  String get companyNameOptional => 'Firmenname (optional)';
+
+  @override
+  String get vatIdOptional => 'USt-IdNr. (optional)';
+
+  @override
+  String get bicOptional => 'BIC (optional)';
+
+  @override
+  String get smallBusinessLabel => 'Kleinunternehmer gem. § 19 UStG';
+
+  @override
+  String get defaultVatRateLabel => 'Standard-USt-Satz (%)';
+
+  @override
+  String get invalidVatRate => 'Ungültiger USt-Satz';
+
+  @override
+  String get profileNameLabel => 'Voller Name';
+
+  @override
+  String get invoiceNoShort => 'Nr:';
+
+  @override
+  String get netAmountLabel => 'Netto';
+
+  @override
+  String vatLabelWithPercent(Object percent) {
+    return 'USt ($percent%)';
+  }
+
+  @override
+  String get totalLabel => 'Gesamt';
+
+  @override
+  String get dueOnLabel => 'Fällig am:';
+
+  @override
+  String get vatIdLabel => 'USt-IdNr.:';
+
+  @override
+  String get bicLabel => 'BIC:';
+
+  @override
+  String paymentTermsDefault(Object days) {
+    return 'Zahlbar innerhalb von $days Tagen ohne Abzug.';
+  }
 }

@@ -412,7 +412,25 @@
 "wrongCredentials": "Email o password errati.",
 "premiumPushDelayFree": "Notifiche push: ritardo di 1 h",
   "premiumPushDelaySilver": "Notifiche push: ritardo di 30 min",
-  "premiumPushDelayGold": "Notifiche push: immediate per i nuovi lavori"
+  "premiumPushDelayGold": "Notifiche push: immediate per i nuovi lavori",
+  "companyNameOptional": "Nome azienda (opzionale)",
+  "vatIdOptional": "P. IVA (opzionale)",
+  "bicOptional": "BIC (opzionale)",
+  "smallBusinessLabel": "Regime forfettario ai sensi §19 UStG",
+  "defaultVatRateLabel": "Aliquota IVA standard (%)",
+  "invalidVatRate": "Aliquota IVA non valida",
+  "invoiceGoldInfo": "I dati di fatturazione sono modificabili solo con l’abbonamento GOLD.",
+  "profileNameLabel": "Nome completo",
+  "invoiceNoShort": "N.",
+  "netAmountLabel": "Netto",
+  "vatLabelWithPercent": "IVA ({percent}%)",
+  "totalLabel": "Totale",
+  "dueOnLabel": "Scadenza:",
+  "vatIdLabel": "P. IVA:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "Pagabile entro {days} giorni senza detrazioni.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 

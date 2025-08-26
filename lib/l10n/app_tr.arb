@@ -414,7 +414,25 @@
 "wrongCredentials": "Yanlış e-posta veya şifre.",
 "premiumPushDelayFree": "Push bildirimleri: 1 saat gecikme",
   "premiumPushDelaySilver": "Push bildirimleri: 30 dk gecikme",
-  "premiumPushDelayGold": "Push bildirimleri: yeni i\u015flerde an\u0131nda"
+  "premiumPushDelayGold": "Push bildirimleri: yeni i\u015flerde an\u0131nda",
+  "companyNameOptional": "Şirket adı (opsiyonel)",
+  "vatIdOptional": "KDV Numarası (opsiyonel)",
+  "bicOptional": "BIC (opsiyonel)",
+  "smallBusinessLabel": "Küçük işletme §19 UStG’ye göre",
+  "defaultVatRateLabel": "Standart KDV oranı (%)",
+  "invalidVatRate": "Geçersiz KDV oranı",
+  "invoiceGoldInfo": "Fatura verileri yalnızca GOLD aboneliğinde düzenlenebilir.",
+  "profileNameLabel": "Tam ad",
+  "invoiceNoShort": "No:",
+  "netAmountLabel": "Net",
+  "vatLabelWithPercent": "KDV ({percent}%)",
+  "totalLabel": "Toplam",
+  "dueOnLabel": "Vade tarihi:",
+  "vatIdLabel": "KDV No:",
+  "bicLabel": "BIC:",
+  "paymentTermsDefault": "{days} gün içinde kesinti olmadan ödenir.",
+  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+
 
 
 
