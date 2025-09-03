@@ -1,11 +1,14 @@
-// login_dienstleister_screen.dart
-import 'dart:ui'; // <— NEU
+// lib/screens/login_dienstleister_screen.dart
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dienstleister_dashboard_screen.dart';
 import 'registrierung_screen.dart';
 import 'passwort_vergessen_screen.dart';
 import '../l10n/app_localizations.dart';
+
+// ⬇️ NEU: Push-Token Helper
+import '../utils/push_tokens.dart';
 
 // ===== Push-Lang (nur für Server-Push, UI bleibt unberührt) ==================
 String _normalizeLangCode(Locale locale) {
@@ -34,10 +37,7 @@ Future<void> _updateUserLangForPushOnly(SupabaseClient supabase) async {
 
   if ((current?['lang'] as String?) == lang) return;
 
-  await supabase
-      .from('users')
-      .update({'lang': lang})
-      .eq('id', user.id);
+  await supabase.from('users').update({'lang': lang}).eq('id', user.id);
 }
 // ============================================================================
 
@@ -45,11 +45,14 @@ class LoginDienstleisterScreen extends StatefulWidget {
   const LoginDienstleisterScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginDienstleisterScreenState createState() => _LoginDienstleisterScreenState();
+  _LoginDienstleisterScreenState createState() =>
+      _LoginDienstleisterScreenState();
 }
 
 class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
-  final _emailController = TextEditingController(text: 'walterlangengries@gmail.com');
+  final _emailController = TextEditingController(
+    text: 'walterlangengries@gmail.com',
+  );
   final _passwortController = TextEditingController(text: 'password1234');
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -98,6 +101,7 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         }
       } else if (fetched['rolle'] != 'dienstleister') {
         await supabase.auth.signOut();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.wrongRoleDL),
@@ -110,15 +114,20 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
       // 2b) Push-Sprache einmalig setzen (kein Einfluss auf UI/l10n)
       await _updateUserLangForPushOnly(supabase);
 
+      // 2c) ⬇️ NEU: Aktuelles Geräte-Token in users.push_token speichern
+      await upsertPushToken(supabase);
+
       // 3) Erfolg
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.loginSuccess)),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.loginSuccess)));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DienstleisterDashboardScreen()),
+        MaterialPageRoute(
+          builder: (context) => const DienstleisterDashboardScreen(),
+        ),
       );
-
     } on AuthException catch (error) {
       bool showNotRegistered = false;
 
@@ -133,23 +142,31 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         showNotRegistered = (exists == null);
       } catch (_) {
         final msg = (error.message ?? '').toLowerCase();
-        if (msg.contains('user not found') || msg.contains('no user') || msg.contains('not registered')) {
+        if (msg.contains('user not found') ||
+            msg.contains('no user') ||
+            msg.contains('not registered')) {
           showNotRegistered = true;
         }
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(showNotRegistered ? l10n.accountNotRegistered : l10n.wrongCredentials),
+          content: Text(
+            showNotRegistered
+                ? l10n.accountNotRegistered
+                : l10n.wrongCredentials,
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginUnknownError(e.toString()))),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -223,20 +240,32 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
             Center(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22.0,
+                    vertical: 12,
+                  ),
                   child: Card(
                     color: Colors.white.withOpacity(0.96),
                     elevation: 8,
                     shadowColor: primaryColor.withOpacity(0.12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 22,
+                        vertical: 28,
+                      ),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.business_center_rounded, size: 56, color: primaryColor),
+                            Icon(
+                              Icons.business_center_rounded,
+                              size: 56,
+                              color: primaryColor,
+                            ),
                             const SizedBox(height: 18),
                             Text(
                               l10n.loginDLHeadline,
@@ -245,7 +274,13 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
                                 letterSpacing: 1.2,
-                                shadows: [Shadow(blurRadius: 2, color: Colors.white54, offset: Offset(0, 1))],
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 2,
+                                    color: Colors.white54,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 32),
@@ -255,11 +290,19 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 labelText: l10n.emailLabel,
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 14,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(color: primaryColor, width: 2),
+                                  borderSide: BorderSide(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                               keyboardType: TextInputType.emailAddress,
@@ -272,11 +315,19 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 labelText: l10n.passwordLabel,
                                 filled: true,
                                 fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                  horizontal: 14,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(color: primaryColor, width: 2),
+                                  borderSide: BorderSide(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                               obscureText: true,
@@ -288,12 +339,18 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => PasswortVergessenScreen()),
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PasswortVergessenScreen(),
+                                    ),
                                   );
                                 },
                                 style: TextButton.styleFrom(
                                   foregroundColor: primaryColor,
-                                  textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                  textStyle: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 child: Text(l10n.forgotPasswordButton),
                               ),
@@ -307,14 +364,25 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                                       onPressed: _login,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: primaryColor,
-                                        padding: const EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
                                         elevation: 4,
-                                        shadowColor: primaryColor.withOpacity(0.20),
+                                        shadowColor: primaryColor.withOpacity(
+                                          0.20,
+                                        ),
                                       ),
                                       child: Text(
                                         l10n.loginButton,
-                                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -323,12 +391,18 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => const RegistrierungScreen()),
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RegistrierungScreen(),
+                                  ),
                                 );
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: primaryColor,
-                                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               child: Text(l10n.noAccountYet),
                             ),

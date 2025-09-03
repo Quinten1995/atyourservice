@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 // Supabase + Screens
 import 'utils/supabase_client.dart';
-import 'utils/notification_service.dart'; // High-Importance Channel + Permission
+import 'utils/notification_service.dart';
 import 'screens/start_screen.dart';
 import 'screens/new_password_screen.dart';
 
@@ -29,13 +30,28 @@ Future<void> main() async {
   // 1) Supabase starten
   await SupabaseClientManager.init();
 
-  // 2) Firebase (für FCM) starten
+  // 2) Firebase starten (nutzt automatisch JSON/PLIST der Plattform)
   await Firebase.initializeApp();
 
+  // iOS: Foreground-Benachrichtigungen sichtbar machen (auf Android ignoriert)
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
   // 3) Notification-Service initialisieren
-  //    - legt High-Importance Channel an
-  //    - fragt auf Android 13+ die Push-Permission an
-  await NotificationService.init();
+  try {
+    await NotificationService.init();
+  } catch (e) {
+    // ignore: avoid_print
+    print(
+      '⚠️ NotificationService.init() Fehler (ignoriere, App läuft weiter): $e',
+    );
+  }
+
+  // 3b) Debug-Ausgabe: APNS- & FCM-Token prüfen (nur iOS relevant)
+  await _debugPrintIosPushState();
 
   // 4) Token holen und in Supabase speichern (falls eingeloggt)
   await _saveFcmTokenToSupabase();
@@ -57,9 +73,10 @@ Future<void> main() async {
   // 7) Foreground-Handler für Heads-Up Banner
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     final title =
-        message.notification?.title ?? message.data['title'] ?? 'Benachrichtigung';
-    final body =
-        message.notification?.body ?? message.data['body'] ?? '';
+        message.notification?.title ??
+        message.data['title'] ??
+        'Benachrichtigung';
+    final body = message.notification?.body ?? message.data['body'] ?? '';
     NotificationService.showForegroundNotification(
       title: title,
       body: body,
@@ -68,6 +85,51 @@ Future<void> main() async {
   });
 
   runApp(const MyApp());
+}
+
+/// Wartet auf iOS auf den APNS-Token und holt dann den FCM-Token.
+/// Auf Android wird sofort der FCM-Token zurückgegeben.
+Future<String?> _getFcmTokenWhenReady() async {
+  final fm = FirebaseMessaging.instance;
+
+  if (!Platform.isIOS) {
+    // Android / andere Plattformen: direkt den FCM-Token holen
+    return await fm.getToken();
+  }
+
+  // iOS: bis zu 10 Sekunden auf APNS warten
+  for (var i = 0; i < 10; i++) {
+    final apns = await fm.getAPNSToken();
+    if (apns != null && apns.isNotEmpty) {
+      return await fm.getToken();
+    }
+    print('⏳ Warte auf APNS-Token... Versuch ${i + 1}/10');
+    await Future.delayed(const Duration(seconds: 1));
+  }
+  print('❌ Kein APNS-Token nach 10s erhalten');
+  return null;
+}
+
+/// Debug: Druckt APNS- und FCM-Token (hilft bei der iOS-Fehlersuche).
+Future<void> _debugPrintIosPushState() async {
+  if (!Platform.isIOS) {
+    print('🔎 DebugPush: Nicht iOS, überspringe APNS-Check.');
+    return;
+  }
+
+  final fm = FirebaseMessaging.instance;
+
+  final apns = await fm.getAPNSToken();
+  print('🔎 DebugPush: APNS token = ${apns ?? 'NULL'}');
+
+  final fcm = await _getFcmTokenWhenReady();
+  print('🔎 DebugPush: FCM token  = ${fcm ?? 'NULL'}');
+
+  if (apns == null) {
+    print(
+      '❗ DebugPush: Kein APNS-Token. Prüfe in Xcode: Push Notifications & Background Modes → Remote notifications, Team/Signing/Provisioning Profile, und APNs-Key in Firebase (Cloud Messaging).',
+    );
+  }
 }
 
 // === Helper-Funktionen für Token <-> Supabase ===============================
@@ -85,7 +147,9 @@ Future<void> _ensureUserRow() async {
         .upsert({'id': user.id}, onConflict: 'id')
         .select()
         .maybeSingle();
-    print('✅ ensureUserRow: ${resp != null ? 'Row vorhanden/angelegt' : 'keine Row'}');
+    print(
+      '✅ ensureUserRow: ${resp != null ? 'Row vorhanden/angelegt' : 'keine Row'}',
+    );
   } catch (e) {
     print('❌ ensureUserRow Fehler: $e');
   }
@@ -103,7 +167,9 @@ Future<void> _saveFcmTokenToSupabase([String? token]) async {
   // optional, falls der users-Datensatz noch nicht existiert
   await _ensureUserRow();
 
-  final t = token ?? await FirebaseMessaging.instance.getToken();
+  // statt direkt getToken() → wartende Helper-Funktion
+  final t = token ?? await _getFcmTokenWhenReady();
+
   print('🧪 Debug: currentUser.id=${user.id}, fcmToken=$t');
   if (t == null || t.isEmpty) {
     print('⚠️ Kein FCM-Token verfügbar.');
@@ -111,14 +177,15 @@ Future<void> _saveFcmTokenToSupabase([String? token]) async {
   }
 
   try {
-    await Supabase.instance.client.rpc('set_user_push_token', params: {
-      'p_user': user.id,
-      'p_token': t,
-    });
+    await Supabase.instance.client.rpc(
+      'set_user_push_token',
+      params: {'p_user': user.id, 'p_token': t},
+    );
     print('✅ push_token via RPC gesetzt (unique bind).');
   } catch (e) {
-    // Fallback: direkter Update (nicht ideal, aber verhindert Stillstand)
-    print('❌ RPC set_user_push_token Fehler: $e — Fallback auf direktes Update.');
+    print(
+      '❌ RPC set_user_push_token Fehler: $e — Fallback auf direktes Update.',
+    );
     try {
       final updated = await Supabase.instance.client
           .from('users')
@@ -138,10 +205,10 @@ Future<void> _clearFcmTokenInSupabase() async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return;
   try {
-    await Supabase.instance.client.rpc('set_user_push_token', params: {
-      'p_user': user.id,
-      'p_token': null,
-    });
+    await Supabase.instance.client.rpc(
+      'set_user_push_token',
+      params: {'p_user': user.id, 'p_token': null},
+    );
     print('✅ push_token via RPC gelöscht.');
   } catch (e) {
     print('❌ RPC clear Fehler: $e — Fallback auf direktes Update.');
@@ -185,19 +252,22 @@ class _MyAppState extends State<MyApp> {
     }, onError: (_) {});
 
     // 3) Persistenter Auth-State-Listener (Password Recovery)
-    _authSubPersistent =
-        Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.passwordRecovery) {
-        _goToReset();
-      }
-    });
+    _authSubPersistent = Supabase.instance.client.auth.onAuthStateChange.listen(
+      (data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          _goToReset();
+        }
+      },
+    );
   }
 
   Future<void> _handleInitialUri() async {
     try {
       final uri = await _appLinks.getInitialAppLink();
       await _handleIncomingUri(uri);
-    } catch (_) {/* ignore */}
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   bool _isOurCallback(Uri? uri) =>
@@ -229,8 +299,10 @@ class _MyAppState extends State<MyApp> {
     final incoming = uri!;
 
     try {
-      await Supabase.instance.client.auth
-          .getSessionFromUrl(incoming, storeSession: true);
+      await Supabase.instance.client.auth.getSessionFromUrl(
+        incoming,
+        storeSession: true,
+      );
     } catch (_) {}
 
     final t = _supabaseType(incoming);
@@ -300,17 +372,16 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           elevation: 2,
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
-            textStyle:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
             minimumSize: const Size(250, 55),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -322,9 +393,7 @@ class _MyAppState extends State<MyApp> {
           headlineSmall: TextStyle(fontWeight: FontWeight.bold),
         ),
         inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.deepPurple),
             borderRadius: BorderRadius.circular(10),
