@@ -5,9 +5,6 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/in_app_purchase_service.dart';
 
-// IDs wie im Play Store/App Store angelegt!
-const Set<String> _kProductIds = {'atyourservice_silver', 'atyourservice_gold'};
-
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
 
@@ -19,6 +16,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
   String? _aboTyp;
   bool _isLoading = true;
   bool _storeAvailable = false;
+  String? _storeError;
+  List<String> _notFound = [];
   List<ProductDetails> _products = [];
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
@@ -27,8 +26,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
     super.initState();
     _ladeAboTyp();
     _ladeStoreProdukte();
-    _purchaseSubscription =
-        InAppPurchaseService().listenToPurchases().listen(_handlePurchases);
+    _purchaseSubscription = InAppPurchaseService().listenToPurchases().listen(
+      _handlePurchases,
+    );
   }
 
   @override
@@ -53,7 +53,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         });
       }
     } catch (_) {
-      // Fehler ignorieren
+      // bewusst still
     } finally {
       setState(() => _isLoading = false);
     }
@@ -66,6 +66,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
       setState(() {
         _storeAvailable = false;
         _products = [];
+        _storeError = 'Store not available';
+        _notFound = [];
       });
       return;
     }
@@ -73,13 +75,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
     setState(() {
       _storeAvailable = true;
       _products = resp.productDetails.toList();
+      _notFound = resp.notFoundIDs.toList();
+      _storeError = resp.error?.message;
     });
   }
 
-  // Produkt anhand der ID
-  ProductDetails? _getProduct(String id) {
+  // Produkt anhand Stichwort (macht iOS/Android-ID-Differenzen robust)
+  ProductDetails? _getProductByKeyword(String keyword) {
     try {
-      return _products.firstWhere((p) => p.id == id);
+      return _products.firstWhere(
+        (p) => p.id.toLowerCase().contains(keyword.toLowerCase()),
+      );
     } catch (_) {
       return null;
     }
@@ -102,12 +108,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
               .update({'abo_typ': typ})
               .eq('id', user.id);
 
-          setState(() {
-            _aboTyp = typ;
-          });
-
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
+          setState(() => _aboTyp = typ);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
         }
 
         foundActive = true;
@@ -133,29 +137,29 @@ class _PremiumScreenState extends State<PremiumScreen> {
             .from('users')
             .update({'abo_typ': 'free'})
             .eq('id', user.id);
-
-        setState(() {
-          _aboTyp = 'free';
-        });
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
+        setState(() => _aboTyp = 'free');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
       }
     }
   }
 
   // Produkt-ID → Abo-Typ
   String? _aboTypFromProductId(String productId) {
-    if (productId.contains('gold')) return 'gold';
-    if (productId.contains('silver')) return 'silver';
+    final id = productId.toLowerCase();
+    if (id.contains('gold')) return 'gold';
+    if (id.contains('silver')) return 'silver';
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final silver = _getProduct('atyourservice_silver');
-    final gold = _getProduct('atyourservice_gold');
+
+    // per Keyword robust für iOS (…_v2) und Android (… ohne _v2)
+    final silver = _getProductByKeyword('silver');
+    final gold = _getProductByKeyword('gold');
 
     return Scaffold(
       appBar: AppBar(
@@ -189,19 +193,25 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+
                   if (_aboTyp != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
-                          const Icon(Icons.verified_user,
-                              color: Colors.blueAccent, size: 23),
+                          const Icon(
+                            Icons.verified_user,
+                            color: Colors.blueAccent,
+                            size: 23,
+                          ),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
                               l10n.premiumCurrentPlan,
                               style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -215,8 +225,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 color: _aboTyp == 'gold'
                                     ? Colors.amber[900]
                                     : _aboTyp == 'silver'
-                                        ? Colors.blueGrey[700]
-                                        : Colors.grey[600],
+                                    ? Colors.blueGrey[700]
+                                    : Colors.grey[600],
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.2,
                               ),
@@ -228,17 +238,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                     ),
 
-                  // === FREE PLAN CARD ===
+                  // FREE
                   _planCard(
                     context,
                     title: 'FREE',
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
                     features: [
-                      // Neu: Push-Verhalten für FREE (1h Delay)
-                      l10n.premiumPushDelayFree,
-                      l10n.premiumFreeFeature1,
-                      l10n.premiumFreeFeature2,
+                      l10n.premiumFreeFeature1, // 1 Auftrag/Woche
+                      l10n.premiumFreeFeature2, // 5 km Radius
                       l10n.premiumFreeFeature3,
                       l10n.premiumFreeFeature4,
                     ],
@@ -248,17 +256,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // === SILVER PLAN CARD ===
+                  // SILVER
                   _planCard(
                     context,
                     title: 'SILVER',
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
                     features: [
-                      // Neu: Push-Verhalten für SILVER (30 min Delay)
-                      l10n.premiumPushDelaySilver,
-                      l10n.premiumSilverFeature1,
-                      l10n.premiumSilverFeature2,
+                      // <- Du änderst den Text des Keys in den ARBs auf "{price} / Monat"
+                      l10n.premiumYearlySuffix(silver?.price ?? '—'),
+                      l10n.premiumSilverFeature1, // 2 Aufträge/Woche
+                      l10n.premiumSilverFeature2, // 15 km
                       l10n.premiumSilverFeature3,
                     ],
                     highlighted: _aboTyp == 'silver',
@@ -270,17 +278,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // === GOLD PLAN CARD ===
+                  // GOLD
                   _planCard(
                     context,
                     title: 'GOLD',
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
                     features: [
-                      // Neu: Push-Verhalten für GOLD (sofort)
-                      l10n.premiumPushDelayGold,
-                      l10n.premiumGoldFeature1,
-                      l10n.premiumGoldFeature2,
+                      // <- ebenfalls denselben Key verwenden (in ARB umbenannt auf Monatsanzeige)
+                      l10n.premiumYearlySuffix(gold?.price ?? '—'),
+                      l10n.premiumGoldFeature1, // 5 Aufträge/Woche
+                      l10n.premiumGoldFeature2, // 30 km
                       l10n.premiumGoldFeature3,
                       l10n.premiumGoldFeature4,
                       l10n.premiumGoldInvoiceFeature,
@@ -295,15 +303,34 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                   const SizedBox(height: 20),
 
-                  if (!_storeAvailable || _products.isEmpty)
+                  if (!_storeAvailable ||
+                      _products.isEmpty ||
+                      _storeError != null ||
+                      _notFound.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           l10n.premiumStoreNotLoaded,
                           style: TextStyle(
-                              color: Colors.red[700], fontSize: 13),
+                            color: Colors.red[700],
+                            fontSize: 13,
+                          ),
                         ),
+                        if (_storeError != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            _storeError!,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                        if (_notFound.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            'Not found: ${_notFound.join(", ")}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
                         const SizedBox(height: 6),
                         TextButton(
                           onPressed: _ladeStoreProdukte,
@@ -339,8 +366,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(18),
-        border:
-            highlighted ? Border.all(color: Colors.blueAccent, width: 2) : null,
+        border: highlighted
+            ? Border.all(color: Colors.blueAccent, width: 2)
+            : null,
         boxShadow: highlighted
             ? [
                 BoxShadow(
@@ -378,7 +406,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 17),
+                    const Icon(Icons.check_circle, size: 17),
                     const SizedBox(width: 7),
                     Flexible(
                       child: Text(
@@ -398,16 +426,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onTap,
-                  child: Text(
-                    AppLocalizations.of(context)!.premiumChooseButton(title),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     textStyle: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.w600),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.premiumChooseButton(title),
                   ),
                 ),
               ),

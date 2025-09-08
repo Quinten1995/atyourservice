@@ -199,7 +199,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get premiumFreeFeature4 => 'Cambio categoria solo ogni 20 giorni';
 
   @override
-  String get premiumSilverFeature1 => '3 incarichi a settimana';
+  String get premiumSilverFeature1 => '2 incarichi a settimana';
 
   @override
   String get premiumSilverFeature2 => 'Incarichi nel raggio di 15 km';
@@ -208,10 +208,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get premiumSilverFeature3 => 'Tutte le categorie disponibili';
 
   @override
-  String get premiumGoldFeature1 => 'Incarichi illimitati';
+  String get premiumGoldFeature1 => '5 incarichi a settimana';
 
   @override
-  String get premiumGoldFeature2 => 'Incarichi nel raggio di 40 km';
+  String get premiumGoldFeature2 => 'Incarichi nel raggio di 30 km';
 
   @override
   String get premiumGoldFeature3 => 'Tutte le categorie disponibili';
@@ -902,12 +902,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String premiumYearlySuffix(Object price) {
-    return 'Annuale: $price';
+    return '$price / mese';
   }
 
   @override
   String premiumYearlyButton(Object plan) {
-    return '$plan (Annuale)';
+    return '$plan (Mensile)';
   }
 
   @override

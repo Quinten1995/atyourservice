@@ -199,7 +199,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumFreeFeature4 => 'Kategori değişimi sadece 20 günde bir';
 
   @override
-  String get premiumSilverFeature1 => 'Haftada 3 iş kabul et';
+  String get premiumSilverFeature1 => 'Haftada 2 iş kabul et';
 
   @override
   String get premiumSilverFeature2 => '15 km çapında işler';
@@ -211,7 +211,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get premiumGoldFeature1 => 'Sınırsız iş kabul et';
 
   @override
-  String get premiumGoldFeature2 => '40 km çapında işler';
+  String get premiumGoldFeature2 => '30 km çapında işler';
 
   @override
   String get premiumGoldFeature3 => 'Tüm kategorilere erişim';
@@ -902,12 +902,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String premiumYearlySuffix(Object price) {
-    return 'Yıllık: $price';
+    return '$price / ay';
   }
 
   @override
   String premiumYearlyButton(Object plan) {
-    return '$plan (Yıllık)';
+    return '$plan (Aylık)';
   }
 
   @override

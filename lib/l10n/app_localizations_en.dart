@@ -199,7 +199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumFreeFeature4 => 'Category change only every 20 days';
 
   @override
-  String get premiumSilverFeature1 => 'Accept 3 jobs per week';
+  String get premiumSilverFeature1 => 'Accept 2 jobs per week';
 
   @override
   String get premiumSilverFeature2 => 'Jobs within a 15 km radius';
@@ -208,10 +208,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumSilverFeature3 => 'All categories available';
 
   @override
-  String get premiumGoldFeature1 => 'Unlimited job acceptance';
+  String get premiumGoldFeature1 => 'Accept 5 jobs per week';
 
   @override
-  String get premiumGoldFeature2 => 'Jobs within a 40 km radius';
+  String get premiumGoldFeature2 => 'Jobs within a 30 km radius';
 
   @override
   String get premiumGoldFeature3 => 'All categories available';
@@ -902,12 +902,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String premiumYearlySuffix(Object price) {
-    return 'Yearly: $price';
+    return '$price / month';
   }
 
   @override
   String premiumYearlyButton(Object plan) {
-    return '$plan (Yearly)';
+    return '$plan (Monthly)';
   }
 
   @override

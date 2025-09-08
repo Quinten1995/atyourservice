@@ -456,7 +456,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumSilverFeature1.
   ///
   /// In en, this message translates to:
-  /// **'Accept 3 jobs per week'**
+  /// **'Accept 2 jobs per week'**
   String get premiumSilverFeature1;
 
   /// No description provided for @premiumSilverFeature2.
@@ -474,13 +474,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumGoldFeature1.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited job acceptance'**
+  /// **'Accept 5 jobs per week'**
   String get premiumGoldFeature1;
 
   /// No description provided for @premiumGoldFeature2.
   ///
   /// In en, this message translates to:
-  /// **'Jobs within a 40 km radius'**
+  /// **'Jobs within a 30 km radius'**
   String get premiumGoldFeature2;
 
   /// No description provided for @premiumGoldFeature3.
@@ -1800,13 +1800,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumYearlySuffix.
   ///
   /// In en, this message translates to:
-  /// **'Yearly: {price}'**
+  /// **'{price} / month'**
   String premiumYearlySuffix(Object price);
 
   /// No description provided for @premiumYearlyButton.
   ///
   /// In en, this message translates to:
-  /// **'{plan} (Yearly)'**
+  /// **'{plan} (Monthly)'**
   String premiumYearlyButton(Object plan);
 
   /// No description provided for @deleteAccountTitle.

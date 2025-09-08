@@ -154,7 +154,7 @@ class _DienstleisterDashboardScreenState
       if (_aboTyp == 'silver') {
         radiusKm = 15.0;
       } else if (_aboTyp == 'gold') {
-        radiusKm = 40.0;
+        radiusKm = 30.0;
       }
 
       if (_meineLatitude != null && _meineLongitude != null) {

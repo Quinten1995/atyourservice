@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/kategorien.dart';
-import '../l10n/app_localizations.dart'; // Lokalisation importieren
+import '../l10n/app_localizations.dart';
 
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
@@ -12,44 +13,68 @@ class RegistrierungScreen extends StatefulWidget {
 
 class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
+  final _emailController = TextEditingController(
+    text: 'quintenhessmann1995@yahoo.com',
+  );
   final _passwordController = TextEditingController(text: 'password123');
   String _rolle = 'kunde';
   String? _selectedKategorie;
   bool _isLoading = false;
 
   final supabase = Supabase.instance.client;
+  static const _redirectUrl = 'atyourservice://login-callback';
+
+  StreamSubscription<AuthState>? _authSub;
 
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
 
+  @override
+  void initState() {
+    super.initState();
+    // Wenn der Nutzer nach E-Mail-Bestätigung via Deeplink wiederkommt,
+    // triggert Supabase ein signedIn-Event → wir schließen den Screen.
+    _authSub = supabase.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn && mounted) {
+        // Optional: Snack, dann zurück (z. B. zum Login/Dashboard-Flow)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.registerSuccess),
+          ),
+        );
+        Navigator.of(context).pop(); // oder pushReplacement zu deinem Dashboard
+      }
+    });
+  }
+
   Future<void> _registrieren() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     try {
-      final response = await supabase.auth.signUp(email: email, password: password);
+      final response = await supabase.auth.signUp(
+        email: email,
+        password: password,
+        emailRedirectTo: _redirectUrl, // <-- Wichtig für iOS & Android
+      );
 
       final identities = response.user?.identities;
       if (identities != null && identities.isNotEmpty) {
+        // User angelegt — jetzt muss der Nutzer die E-Mail bestätigen.
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.registerSuccess),
           ),
         );
-        Navigator.of(context).pop();
+        // Kein sofortiges Pop — wir warten auf den Deeplink (siehe onAuthStateChange)
       } else {
+        // Falls Supabase meldet, dass die Mail existiert etc.
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.registerExists),
-          ),
+          SnackBar(content: Text(AppLocalizations.of(context)!.registerExists)),
         );
-        // KEIN pop im Fehlerfall!
       }
     } on AuthException catch (authError) {
       final err = authError.message.toLowerCase();
@@ -63,32 +88,37 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       } else if (err.contains('password')) {
         userMessage = AppLocalizations.of(context)!.registerPasswordShort;
       } else {
-        userMessage = AppLocalizations.of(context)!.registerFailed(authError.message);
+        userMessage = AppLocalizations.of(
+          context,
+        )!.registerFailed(authError.message);
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(userMessage)),
-      );
-      // KEIN pop im Fehlerfall!
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(userMessage)));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.registerUnknownError(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.registerUnknownError(e.toString()),
+          ),
+        ),
       );
-      // KEIN pop im Fehlerfall!
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   void dispose() {
+    _authSub?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   /// Helper zum Anzeigen der übersetzten Kategorie
-  String getKategorieLabel(String kategorieKey, AppLocalizations l10n) {
-    switch (kategorieKey) {
+  String getKategorieLabel(String k, AppLocalizations l10n) {
+    switch (k) {
       case 'category_babysitter':
         return l10n.category_babysitter;
       case 'category_catering':
@@ -192,7 +222,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       case 'category_haustierbetreuung':
         return l10n.category_haustierbetreuung;
       default:
-        return kategorieKey;
+        return k;
     }
   }
 
@@ -221,7 +251,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                 children: [
                   Text(
                     l10n.registerTitle,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: primaryColor,
@@ -230,23 +260,29 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Rollenwahl (Kunde / Dienstleister)
+                  // Rollenwahl
                   DropdownButtonFormField<String>(
                     value: _rolle,
                     decoration: InputDecoration(
                       labelText: l10n.roleLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor, width: 2),
+                        borderSide: const BorderSide(
+                          color: primaryColor,
+                          width: 2,
+                        ),
                       ),
                     ),
-                    borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
+                    borderRadius: BorderRadius.circular(22),
                     items: [
                       DropdownMenuItem(
                         value: 'kunde',
@@ -261,13 +297,14 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       if (value != null) {
                         setState(() {
                           _rolle = value;
-                          if (_rolle != 'dienstleister') _selectedKategorie = null;
+                          if (_rolle != 'dienstleister')
+                            _selectedKategorie = null;
                         });
                       }
                     },
                   ),
 
-                  // Kategorie-Auswahl nur bei Dienstleister!
+                  // Kategorie (nur Dienstleister)
                   if (_rolle == 'dienstleister') ...[
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
@@ -276,26 +313,33 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         labelText: l10n.categoryLabel,
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 14,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: primaryColor, width: 2),
+                          borderSide: const BorderSide(
+                            color: primaryColor,
+                            width: 2,
+                          ),
                         ),
                       ),
-                      borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
-                      items: kategorieKeys.map((kategorie) {
+                      borderRadius: BorderRadius.circular(22),
+                      items: kategorieKeys.map((k) {
                         return DropdownMenuItem(
-                          value: kategorie,
-                          child: Text(getKategorieLabel(kategorie, l10n)),
+                          value: k,
+                          child: Text(getKategorieLabel(k, l10n)),
                         );
                       }).toList(),
-                      onChanged: (value) {
-                        setState(() => _selectedKategorie = value);
-                      },
-                      validator: (value) => (_rolle == 'dienstleister' && (value == null || value.isEmpty))
+                      onChanged: (value) =>
+                          setState(() => _selectedKategorie = value),
+                      validator: (value) =>
+                          (_rolle == 'dienstleister' &&
+                              (value == null || value.isEmpty))
                           ? l10n.categoryValidator
                           : null,
                     ),
@@ -303,53 +347,66 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
 
                   const SizedBox(height: 20),
 
-                  // E-Mail-Feld
+                  // E-Mail
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: l10n.emailLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor, width: 2),
+                        borderSide: const BorderSide(
+                          color: primaryColor,
+                          width: 2,
+                        ),
                       ),
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return l10n.emailEmpty;
-                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                      if (value == null || value.isEmpty)
+                        return l10n.emailEmpty;
+                      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value))
                         return l10n.emailInvalid;
-                      }
                       return null;
                     },
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Passwort-Feld
+                  // Passwort
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: l10n.passwordLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: primaryColor, width: 2),
+                        borderSide: const BorderSide(
+                          color: primaryColor,
+                          width: 2,
+                        ),
                       ),
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return l10n.passwordEmpty;
+                      if (value == null || value.isEmpty)
+                        return l10n.passwordEmpty;
                       if (value.length < 6) return l10n.passwordTooShort;
                       return null;
                     },
@@ -374,7 +431,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                             ),
                             child: Text(
                               l10n.registerButton,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
