@@ -199,7 +199,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get premiumFreeFeature4 => 'Changement de catégorie seulement tous les 20 jours';
 
   @override
-  String get premiumSilverFeature1 => 'Accepter 3 missions par semaine';
+  String get premiumSilverFeature1 => 'Accepter 2 missions par semaine';
 
   @override
   String get premiumSilverFeature2 => 'Missions dans un rayon de 15 km';
@@ -208,10 +208,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get premiumSilverFeature3 => 'Toutes les catégories disponibles';
 
   @override
-  String get premiumGoldFeature1 => 'Missions illimitées';
+  String get premiumGoldFeature1 => 'Accepter 5 missions par semaine';
 
   @override
-  String get premiumGoldFeature2 => 'Missions dans un rayon de 40 km';
+  String get premiumGoldFeature2 => 'Missions dans un rayon de 30 km';
 
   @override
   String get premiumGoldFeature3 => 'Toutes les catégories disponibles';

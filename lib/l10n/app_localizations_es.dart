@@ -199,7 +199,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get premiumFreeFeature4 => 'Cambio de categoría solo cada 20 días';
 
   @override
-  String get premiumSilverFeature1 => 'Aceptar 3 encargos por semana';
+  String get premiumSilverFeature1 => 'Aceptar 2 encargos por semana';
 
   @override
   String get premiumSilverFeature2 => 'Trabajos en un radio de 15 km';
@@ -208,10 +208,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get premiumSilverFeature3 => 'Todas las categorías disponibles';
 
   @override
-  String get premiumGoldFeature1 => 'Aceptar trabajos ilimitados';
+  String get premiumGoldFeature1 => 'Aceptar 5 encargos por semana';
 
   @override
-  String get premiumGoldFeature2 => 'Trabajos en un radio de 40 km';
+  String get premiumGoldFeature2 => 'Trabajos en un radio de 30 km';
 
   @override
   String get premiumGoldFeature3 => 'Todas las categorías disponibles';

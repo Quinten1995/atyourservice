@@ -13,16 +13,17 @@ class NotificationService {
 
   /// Initialisiert Local Notifications & legt den Channel an
   static Future<void> init() async {
-    // Android Init Settings (Notification-Icon muss in res/drawable liegen)
+    // ✅ Fallback: Nutze das Launcher-Icon, damit nichts blockiert,
+    // falls @drawable/ic_stat_notification nicht existiert.
     const AndroidInitializationSettings androidInit =
-        AndroidInitializationSettings('@drawable/ic_stat_notification');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
     const InitializationSettings settings =
         InitializationSettings(android: androidInit);
 
     await _fln.initialize(settings);
 
-    // High-Importance Channel erstellen
+    // High-Importance Channel erstellen (muss existieren, wenn serverseitig genutzt)
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       channelId,
       channelName,
@@ -40,13 +41,9 @@ class NotificationService {
     // Android 13+ → Push-Berechtigung anfragen
     if (Platform.isAndroid) {
       final fm = FirebaseMessaging.instance;
-      final settings = await fm.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      final perm = await fm.requestPermission(alert: true, badge: true, sound: true);
       if (kDebugMode) {
-        print('Push permission: ${settings.authorizationStatus}');
+        print('Push permission: ${perm.authorizationStatus}');
       }
     }
   }
@@ -57,8 +54,7 @@ class NotificationService {
     required String body,
     Map<String, String>? data,
   }) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: channelDescription,
@@ -69,9 +65,7 @@ class NotificationService {
       ticker: 'ticker',
     );
 
-    const NotificationDetails details = NotificationDetails(
-      android: androidDetails,
-    );
+    const NotificationDetails details = NotificationDetails(android: androidDetails);
 
     await _fln.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,

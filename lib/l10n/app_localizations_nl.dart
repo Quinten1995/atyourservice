@@ -199,7 +199,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get premiumFreeFeature4 => 'Categorie wijzigen slechts om de 20 dagen';
 
   @override
-  String get premiumSilverFeature1 => '3 opdrachten per week aannemen';
+  String get premiumSilverFeature1 => '2 opdrachten per week aannemen';
 
   @override
   String get premiumSilverFeature2 => 'Opdrachten binnen 15 km';
@@ -208,10 +208,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get premiumSilverFeature3 => 'Alle categorieën beschikbaar';
 
   @override
-  String get premiumGoldFeature1 => 'Onbeperkt opdrachten aannemen';
+  String get premiumGoldFeature1 => '5 opdrachten per week aannemen';
 
   @override
-  String get premiumGoldFeature2 => 'Opdrachten binnen 40 km';
+  String get premiumGoldFeature2 => 'Opdrachten binnen 30 km';
 
   @override
   String get premiumGoldFeature3 => 'Alle categorieën beschikbaar';
