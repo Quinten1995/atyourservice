@@ -13,8 +13,7 @@ class NotificationService {
 
   /// Initialisiert Local Notifications & legt den Channel an
   static Future<void> init() async {
-    // ✅ Fallback: Nutze das Launcher-Icon, damit nichts blockiert,
-    // falls @drawable/ic_stat_notification nicht existiert.
+    // Fallback: Launcher-Icon nehmen, damit nix blockiert wenn ein Custom-Icon fehlt
     const AndroidInitializationSettings androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -23,12 +22,12 @@ class NotificationService {
 
     await _fln.initialize(settings);
 
-    // High-Importance Channel erstellen (muss existieren, wenn serverseitig genutzt)
+    // High-Importance Channel erstellen (für Heads-Up)
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       channelId,
       channelName,
       description: channelDescription,
-      importance: Importance.max, // Wichtig: max für Heads-Up
+      importance: Importance.max,
       playSound: true,
       enableVibration: true,
     );
@@ -74,5 +73,12 @@ class NotificationService {
       details,
       payload: data != null ? data.toString() : null,
     );
+  }
+
+  /// Löscht alle aktiven System-Benachrichtigungen (damit verschwindet die Badge auf Android-Launchern)
+  static Future<void> clearAll() async {
+    try {
+      await _fln.cancelAll();
+    } catch (_) {}
   }
 }

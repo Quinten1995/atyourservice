@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // Supabase + Screens
 import 'utils/supabase_client.dart';
-import 'utils/notification_service.dart'; // High-Importance Channel + Permission
+import 'utils/notification_service.dart'; // High-Importance Channel + Permission + clearAll
 import 'screens/start_screen.dart';
 import 'screens/new_password_screen.dart';
 
@@ -37,6 +37,15 @@ Future<void> main() async {
   //    - fragt auf Android 13+ die Push-Permission an
   await NotificationService.init();
 
+  // 👉 Beim Start alles bereinigen (aktive Notifications entfernen)
+  await NotificationService.clearAll();
+
+  // 👉 Wenn App aus "beendet" via Notification geöffnet wurde: auch aufräumen
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    await NotificationService.clearAll();
+  }
+
   // 4) Token holen und in Supabase speichern (falls eingeloggt)
   await _saveFcmTokenToSupabase();
 
@@ -65,6 +74,11 @@ Future<void> main() async {
       body: body,
       data: message.data.map((k, v) => MapEntry(k, v.toString())),
     );
+  });
+
+  // 👉 Wenn App aus Hintergrund per Notification geöffnet wird → aufräumen
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    await NotificationService.clearAll();
   });
 
   runApp(const MyApp());
