@@ -990,7 +990,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get silverBadgeDesc => 'Je hebt een Silver-abonnement en kunt 3 klussen per week aannemen.';
 
   @override
-  String get topBewertetBadgeDesc => 'Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 2 beoordelingen.';
+  String get topBewertetBadgeDesc => 'Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 5 beoordelingen.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Rond je allereerste klus af.';
+  String get badgeCertifiedDesc => 'Voltooi 3 klussen.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Rond in totaal 2 klussen af.';
+  String get badgeExperiencedDesc => 'Rond in totaal 10 klussen af.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Rond in totaal 3 klussen af.';
+  String get badgeExpertDesc => 'Rond in totaal 25 klussen af.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Rond in totaal 4 klussen af.';
+  String get badgeMasterDesc => 'Rond in totaal 50 klussen af.';
 
   @override
   String get trafficScreenInfoText => 'Hier ziet u hoeveel dienstverleners per categorie momenteel actief zijn in uw omgeving. Hoe meer dienstverleners, hoe sneller uw opdracht meestal wordt geaccepteerd.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Betaalbaar binnen $days dagen zonder aftrek.';
   }
+
+  @override
+  String get badgeInfoText => 'Deze badges kunnen alleen door dienstverleners worden behaald en verschijnen wanneer de dienstverlener de opdracht accepteert.';
 }

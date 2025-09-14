@@ -990,7 +990,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get silverBadgeDesc => 'Hai un abbonamento Silver e puoi accettare 3 lavori a settimana.';
 
   @override
-  String get topBewertetBadgeDesc => 'Ottieni una media di almeno 4,5 stelle da almeno 2 recensioni.';
+  String get topBewertetBadgeDesc => 'Ottieni una media di almeno 4,5 stelle da almeno 5 recensioni.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Completa il tuo primo lavoro.';
+  String get badgeCertifiedDesc => 'Completa 3 lavori.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Completa un totale di 2 lavori.';
+  String get badgeExperiencedDesc => 'Completa un totale di 10 lavori.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Completa un totale di 3 lavori.';
+  String get badgeExpertDesc => 'Completa un totale di 25 lavori.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Completa un totale di 4 lavori.';
+  String get badgeMasterDesc => 'Completa un totale di 50 lavori.';
 
   @override
   String get trafficScreenInfoText => 'Qui puoi vedere quanti fornitori di servizi sono attualmente attivi per categoria nella tua zona. Più fornitori ci sono, più velocemente la tua richiesta verrà generalmente accettata.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Pagabile entro $days giorni senza detrazioni.';
   }
+
+  @override
+  String get badgeInfoText => 'Questi badge possono essere ottenuti solo dai fornitori di servizi e compaiono quando il fornitore accetta l\'incarico.';
 }

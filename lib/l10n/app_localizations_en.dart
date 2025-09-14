@@ -990,7 +990,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get silverBadgeDesc => 'You have a Silver subscription and can accept 3 jobs per week.';
 
   @override
-  String get topBewertetBadgeDesc => 'Maintain an average rating of at least 4.5 stars from at least 2 reviews.';
+  String get topBewertetBadgeDesc => 'Maintain an average rating of at least 4.5 stars from at least 5 reviews.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Complete your very first job.';
+  String get badgeCertifiedDesc => 'Complete 3 jobs.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Complete a total of 2 jobs.';
+  String get badgeExperiencedDesc => 'Complete a total of 10 jobs.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Complete a total of 3 jobs.';
+  String get badgeExpertDesc => 'Complete a total of 25 jobs.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Complete a total of 4 jobs.';
+  String get badgeMasterDesc => 'Complete a total of 50 jobs.';
 
   @override
   String get trafficScreenInfoText => 'Here you can see how many service providers are currently active in each category in your area. The more providers, the faster your request is usually accepted.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Payable within $days days without deduction.';
   }
+
+  @override
+  String get badgeInfoText => 'These badges can only be earned by service providers and appear when the provider accepts the job.';
 }

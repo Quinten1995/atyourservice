@@ -319,15 +319,15 @@
   "silverBadgeLabel": "Suscripción Silver",
   "silverBadgeDesc": "Tienes una suscripción Silver y puedes aceptar 3 trabajos por semana.",
   "topBewertetBadgeLabel": "Mejor valorado",
-  "topBewertetBadgeDesc": "Obtén una media de al menos 4,5 estrellas de al menos 2 valoraciones.",
+  "topBewertetBadgeDesc": "Obtén una media de al menos 4,5 estrellas de al menos 5 valoraciones.",
   "badgeCertifiedProgress": "Certificado ({count}/1)",
-  "badgeCertifiedDesc": "Completa tu primer trabajo.",
+  "badgeCertifiedDesc": "Completa 3 trabajos.",
   "badgeExperiencedProgress": "Experimentado ({count}/2)",
-  "badgeExperiencedDesc": "Completa un total de 2 trabajos.",
+  "badgeExperiencedDesc": "Completa un total de 10 trabajos.",
   "badgeExpertProgress": "Experto ({count}/3)",
-  "badgeExpertDesc": "Completa un total de 3 trabajos.",
+  "badgeExpertDesc": "Completa un total de 25 trabajos.",
   "badgeMasterProgress": "Maestro ({count}/4)",
-  "badgeMasterDesc": "Completa un total de 4 trabajos.",
+  "badgeMasterDesc": "Completa un total de 50 trabajos.",
   "trafficScreenInfoText": "Aquí puede ver cuántos proveedores de servicios hay actualmente activos por categoría en su zona. Cuantos más proveedores haya, más rápido se suele aceptar su solicitud.",
   "filterAbgeschlossen": "Completado",
   "auftraege": "Trabajos",
@@ -431,7 +431,9 @@
   "vatIdLabel": "NIF-IVA:",
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Pagadero dentro de {days} días sin deducciones.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "Estas insignias solo pueden ser obtenidas por los proveedores de servicios y aparecen cuando el proveedor acepta el trabajo."
+
 
 
 

@@ -1,7 +1,8 @@
 // login_kunde_screen.dart
-import 'dart:ui'; // zum Auslesen der aktuellen App/Device-Sprache
+import 'dart:ui'; // App/Device-Sprache
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'kunden_dashboard_screen.dart';
 import 'registrierung_screen.dart';
 import 'passwort_vergessen_screen.dart';
@@ -26,7 +27,6 @@ Future<void> _updateUserLangForPushOnly(SupabaseClient supabase) async {
 
   final lang = _normalizeLangCode(PlatformDispatcher.instance.locale);
 
-  // Optional: nur updaten, wenn sich's wirklich geändert hat
   final current = await supabase
       .from('users')
       .select('lang')
@@ -47,15 +47,36 @@ class LoginKundeScreen extends StatefulWidget {
 }
 
 class _LoginKundeScreenState extends State<LoginKundeScreen> {
-  final _emailController =
-      TextEditingController();
+  final _emailController = TextEditingController();
   final _passwortController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   final supabase = Supabase.instance.client;
 
+  // Nur die letzte E-Mail merken (ohne Checkbox & ohne Passwortspeicher)
+  static const _prefsKeyEmail = 'last_email_kunde';
+
   static const Color primaryColor = Color(0xFF3876BF);
   static const Color accentColor = Color(0xFFE7ECEF);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLastEmail(); // lädt nur die letzte E-Mail, kein Auto-Login
+  }
+
+  Future<void> _loadLastEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_prefsKeyEmail);
+    if (saved != null && mounted) {
+      setState(() => _emailController.text = saved);
+    }
+  }
+
+  Future<void> _saveLastEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefsKeyEmail, _emailController.text.trim());
+  }
 
   Future<void> _login() async {
     final l10n = AppLocalizations.of(context)!;
@@ -85,15 +106,17 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
       // 3) DL-Account blocken
       if (existing != null && existing['rolle'] == 'dienstleister') {
         await supabase.auth.signOut();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(l10n.wrongRoleCustomer),
-              backgroundColor: Colors.redAccent),
+            content: Text(l10n.wrongRoleCustomer),
+            backgroundColor: Colors.redAccent,
+          ),
         );
         return;
       }
 
-      // 4) Wenn es noch keinen Eintrag gibt -> als Kunde anlegen
+      // 4) Falls kein Eintrag -> als Kunde anlegen
       if (existing == null) {
         try {
           await supabase.from('users').insert({
@@ -108,17 +131,20 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         }
       }
 
-      // 4b) Push-Sprache einmalig setzen (hat keinen Einfluss auf UI/l10n)
+      // 4b) Push-Sprache (nur Server-seitig)
       await _updateUserLangForPushOnly(supabase);
 
+      // Nur die E-Mail persistieren
+      await _saveLastEmail();
+
       // 5) Erfolg
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.loginSuccess)),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.loginSuccess)));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => const KundenDashboardScreen()),
+        MaterialPageRoute(builder: (context) => const KundenDashboardScreen()),
       );
     } on AuthException catch (error) {
       bool showNotRegistered = false;
@@ -140,20 +166,24 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
         }
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(showNotRegistered
-              ? l10n.accountNotRegistered
-              : l10n.wrongCredentials),
+          content: Text(
+            showNotRegistered
+                ? l10n.accountNotRegistered
+                : l10n.wrongCredentials,
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.loginUnknownError(e.toString()))),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -173,14 +203,23 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwortController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final textColor = Colors.black.withOpacity(0.87);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.loginKundeAppBar,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.loginKundeAppBar,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -226,153 +265,186 @@ class _LoginKundeScreenState extends State<LoginKundeScreen> {
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 22.0, vertical: 12),
+                    horizontal: 22.0,
+                    vertical: 12,
+                  ),
                   child: Card(
                     color: Colors.white.withOpacity(0.96),
                     elevation: 8,
                     shadowColor: primaryColor.withOpacity(0.12),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22)),
+                      borderRadius: BorderRadius.circular(22),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 28),
+                        horizontal: 22,
+                        vertical: 28,
+                      ),
                       child: Form(
                         key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.account_circle_rounded,
-                                size: 56, color: primaryColor),
-                            const SizedBox(height: 18),
-                            Text(
-                              l10n.loginKundeHeadline,
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                                letterSpacing: 1.2,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 2,
-                                    color: Colors.white54,
-                                    offset: Offset(0, 1),
-                                  )
+                        child: AutofillGroup(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.account_circle_rounded,
+                                size: 56,
+                                color: primaryColor,
+                              ),
+                              const SizedBox(height: 18),
+                              Text(
+                                l10n.loginKundeHeadline,
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                  letterSpacing: 1.2,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 2,
+                                      color: Colors.white54,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.emailLabel,
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 14,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(
+                                      color: primaryColor,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                autofillHints: const [
+                                  AutofillHints.username,
+                                  AutofillHints.email,
                                 ],
+                                validator: _validateEmail,
                               ),
-                            ),
-                            const SizedBox(height: 32),
-                            TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: l10n.emailLabel,
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _passwortController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.passwordLabel,
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 14,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    borderSide: BorderSide(
+                                      color: primaryColor,
+                                      width: 2,
+                                    ),
+                                  ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                      color: primaryColor, width: 2),
+                                obscureText: true,
+                                textInputAction: TextInputAction.done,
+                                onFieldSubmitted: (_) => _login(),
+                                autofillHints: const [AutofillHints.password],
+                                validator: _validatePasswort,
+                              ),
+
+                              // Keine Merken-Checkboxen – nur E-Mail wird automatisch behalten
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PasswortVergessenScreen(),
+                                      ),
+                                    );
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: primaryColor,
+                                    textStyle: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  child: Text(l10n.forgotPasswordButton),
                                 ),
                               ),
-                              keyboardType: TextInputType.emailAddress,
-                              validator: _validateEmail,
-                            ),
-                            const SizedBox(height: 20),
-                            TextFormField(
-                              controller: _passwortController,
-                              decoration: InputDecoration(
-                                labelText: l10n.passwordLabel,
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 14),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  borderSide: BorderSide(
-                                      color: primaryColor, width: 2),
-                                ),
-                              ),
-                              obscureText: true,
-                              validator: _validatePasswort,
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
+                              const SizedBox(height: 18),
+
+                              _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: _login,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                          elevation: 4,
+                                          shadowColor: primaryColor.withOpacity(
+                                            0.20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          l10n.loginButton,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                              const SizedBox(height: 14),
+                              TextButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          PasswortVergessenScreen(),
+                                          const RegistrierungScreen(),
                                     ),
                                   );
                                 },
                                 style: TextButton.styleFrom(
                                   foregroundColor: primaryColor,
                                   textStyle: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                child: Text(l10n.forgotPasswordButton),
-                              ),
-                            ),
-                            const SizedBox(height: 18),
-
-                            // Login-Button
-                            _isLoading
-                                ? const CircularProgressIndicator()
-                                : SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: _login,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: primaryColor,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        elevation: 4,
-                                        shadowColor:
-                                            primaryColor.withOpacity(0.20),
-                                      ),
-                                      child: Text(l10n.loginButton,
-                                          style: const TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w600)),
-                                    ),
-                                  ),
-
-                            // Debug-Button ENTFERNT
-
-                            const SizedBox(height: 14),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RegistrierungScreen(),
-                                  ),
-                                );
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: primaryColor,
-                                textStyle: const TextStyle(
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w500),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                child: Text(l10n.noAccountYet),
                               ),
-                              child: Text(l10n.noAccountYet),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

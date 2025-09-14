@@ -313,19 +313,19 @@
   "badgeMasterCounter": "{count} Aufträge abgeschlossen",
   "achievementTitle": "Erfolge & Abzeichen",
   "goldBadgeLabel": "Gold-Abo",
-  "goldBadgeDesc": "Du besitzt ein Gold-Abo und kannst unbegrenzt viele Aufträge annehmen.",
+  "goldBadgeDesc": "Du besitzt ein Gold-Abo und kannst 5 Aufträge pro Woche annehmen.",
   "silverBadgeLabel": "Silber-Abo",
-  "silverBadgeDesc": "Du besitzt ein Silber-Abo und kannst 3 Aufträge pro Woche annehmen.",
+  "silverBadgeDesc": "Du besitzt ein Silber-Abo und kannst 2 Aufträge pro Woche annehmen.",
   "topBewertetBadgeLabel": "Top bewertet",
-  "topBewertetBadgeDesc": "Erhalte einen Schnitt von mindestens 4,5 Sternen aus mindestens 2 Bewertungen.",
+  "topBewertetBadgeDesc": "Erhalte einen Schnitt von mindestens 4,5 Sternen aus mindestens 5 Bewertungen.",
   "badgeCertifiedProgress": "Zertifiziert ({count}/1)",
-  "badgeCertifiedDesc": "Schließe deinen allerersten Auftrag ab.",
+  "badgeCertifiedDesc": "Schließe 3 Aufträge ab.",
   "badgeExperiencedProgress": "Erfahren ({count}/2)",
-  "badgeExperiencedDesc": "Schließe insgesamt 2 Aufträge ab.",
+  "badgeExperiencedDesc": "Schließe insgesamt 10 Aufträge ab.",
   "badgeExpertProgress": "Experte ({count}/3)",
-  "badgeExpertDesc": "Schließe insgesamt 3 Aufträge ab.",
+  "badgeExpertDesc": "Schließe insgesamt 25 Aufträge ab.",
   "badgeMasterProgress": "Meister ({count}/4)",
-  "badgeMasterDesc": "Schließe insgesamt 4 Aufträge ab.",
+  "badgeMasterDesc": "Schließe insgesamt 50 Aufträge ab.",
   "trafficScreenInfoText": "Hier sehen Sie, wie viele Dienstleister pro Kategorie aktuell in Ihrer Umgebung aktiv sind. Je mehr Dienstleister, desto schneller wird Ihr Auftrag in der Regel angenommen.",
   "filterAbgeschlossen": "Abgeschlossen",
   "auftraege": "Aufträge",
@@ -426,42 +426,8 @@
   "vatIdLabel": "USt-IdNr.:",
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Zahlbar innerhalb von {days} Tagen ohne Abzug.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt."
 
 
 
@@ -470,3 +436,39 @@
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

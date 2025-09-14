@@ -319,15 +319,15 @@
   "silverBadgeLabel": "Silver Subscription",
   "silverBadgeDesc": "You have a Silver subscription and can accept 3 jobs per week.",
   "topBewertetBadgeLabel": "Top Rated",
-  "topBewertetBadgeDesc": "Maintain an average rating of at least 4.5 stars from at least 2 reviews.",
+  "topBewertetBadgeDesc": "Maintain an average rating of at least 4.5 stars from at least 5 reviews.",
   "badgeCertifiedProgress": "Certified ({count}/1)",
-  "badgeCertifiedDesc": "Complete your very first job.",
+  "badgeCertifiedDesc": "Complete 3 jobs.",
   "badgeExperiencedProgress": "Experienced ({count}/2)",
-  "badgeExperiencedDesc": "Complete a total of 2 jobs.",
+  "badgeExperiencedDesc": "Complete a total of 10 jobs.",
   "badgeExpertProgress": "Expert ({count}/3)",
-  "badgeExpertDesc": "Complete a total of 3 jobs.",
+  "badgeExpertDesc": "Complete a total of 25 jobs.",
   "badgeMasterProgress": "Master ({count}/4)",
-  "badgeMasterDesc": "Complete a total of 4 jobs.",
+  "badgeMasterDesc": "Complete a total of 50 jobs.",
   "trafficScreenInfoText": "Here you can see how many service providers are currently active in each category in your area. The more providers, the faster your request is usually accepted.",
   "filterAbgeschlossen": "Completed",
   "auftraege": "Jobs",
@@ -431,7 +431,9 @@
   "vatIdLabel": "VAT ID:",
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Payable within {days} days without deduction.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "These badges can only be earned by service providers and appear when the provider accepts the job."
+
 
 
 

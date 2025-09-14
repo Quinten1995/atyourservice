@@ -1950,7 +1950,7 @@ abstract class AppLocalizations {
   /// No description provided for @topBewertetBadgeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Maintain an average rating of at least 4.5 stars from at least 2 reviews.'**
+  /// **'Maintain an average rating of at least 4.5 stars from at least 5 reviews.'**
   String get topBewertetBadgeDesc;
 
   /// No description provided for @badgeCertifiedProgress.
@@ -1962,7 +1962,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeCertifiedDesc.
   ///
   /// In en, this message translates to:
-  /// **'Complete your very first job.'**
+  /// **'Complete 3 jobs.'**
   String get badgeCertifiedDesc;
 
   /// No description provided for @badgeExperiencedProgress.
@@ -1974,7 +1974,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeExperiencedDesc.
   ///
   /// In en, this message translates to:
-  /// **'Complete a total of 2 jobs.'**
+  /// **'Complete a total of 10 jobs.'**
   String get badgeExperiencedDesc;
 
   /// No description provided for @badgeExpertProgress.
@@ -1986,7 +1986,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeExpertDesc.
   ///
   /// In en, this message translates to:
-  /// **'Complete a total of 3 jobs.'**
+  /// **'Complete a total of 25 jobs.'**
   String get badgeExpertDesc;
 
   /// No description provided for @badgeMasterProgress.
@@ -1998,7 +1998,7 @@ abstract class AppLocalizations {
   /// No description provided for @badgeMasterDesc.
   ///
   /// In en, this message translates to:
-  /// **'Complete a total of 4 jobs.'**
+  /// **'Complete a total of 50 jobs.'**
   String get badgeMasterDesc;
 
   /// No description provided for @trafficScreenInfoText.
@@ -2588,6 +2588,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payable within {days} days without deduction.'**
   String paymentTermsDefault(Object days);
+
+  /// No description provided for @badgeInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'These badges can only be earned by service providers and appear when the provider accepts the job.'**
+  String get badgeInfoText;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

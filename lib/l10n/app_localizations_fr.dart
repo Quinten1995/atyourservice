@@ -990,7 +990,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get silverBadgeDesc => 'Vous avez un abonnement Silver et pouvez accepter 3 missions par semaine.';
 
   @override
-  String get topBewertetBadgeDesc => 'Obtenez une moyenne d\'au moins 4,5 étoiles sur au moins 2 évaluations.';
+  String get topBewertetBadgeDesc => 'Obtenez une moyenne d\'au moins 4,5 étoiles sur au moins 5 évaluations.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Terminez votre toute première mission.';
+  String get badgeCertifiedDesc => 'Terminez 3 missions.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Terminez un total de 2 missions.';
+  String get badgeExperiencedDesc => 'Terminez un total de 10 missions.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Terminez un total de 3 missions.';
+  String get badgeExpertDesc => 'Terminez un total de 25 missions.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Terminez un total de 4 missions.';
+  String get badgeMasterDesc => 'Terminez un total de 50 missions.';
 
   @override
   String get trafficScreenInfoText => 'Ici, vous voyez combien de prestataires de services sont actuellement actifs par catégorie dans votre région. Plus il y a de prestataires, plus votre demande sera généralement acceptée rapidement.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Payable sous $days jours sans déduction.';
   }
+
+  @override
+  String get badgeInfoText => 'Ces badges ne peuvent être obtenus que par les prestataires et s\'affichent lorsque le prestataire accepte la mission.';
 }

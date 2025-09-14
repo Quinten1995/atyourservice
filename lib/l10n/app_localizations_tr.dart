@@ -990,7 +990,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get silverBadgeDesc => 'Gümüş aboneliğiniz var ve haftada 3 iş kabul edebilirsiniz.';
 
   @override
-  String get topBewertetBadgeDesc => 'En az 2 değerlendirmeden ortalama en az 4,5 yıldız alın.';
+  String get topBewertetBadgeDesc => 'En az 5 değerlendirmeden ortalama en az 4,5 yıldız alın.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'İlk işini tamamla.';
+  String get badgeCertifiedDesc => '3 işi tamamla.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Toplam 2 işi tamamla.';
+  String get badgeExperiencedDesc => 'Toplam 10 işi tamamla.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Toplam 3 işi tamamla.';
+  String get badgeExpertDesc => 'Toplam 25 işi tamamla.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Toplam 4 işi tamamla.';
+  String get badgeMasterDesc => 'Toplam 50 işi tamamla.';
 
   @override
   String get trafficScreenInfoText => 'Burada, bulunduğunuz bölgede her kategoride kaç hizmet sağlayıcının aktif olduğunu görebilirsiniz. Ne kadar çok sağlayıcı varsa, talebiniz genellikle o kadar hızlı kabul edilir.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return '$days gün içinde kesinti olmadan ödenir.';
   }
+
+  @override
+  String get badgeInfoText => 'Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür.';
 }

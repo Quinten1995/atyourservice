@@ -319,15 +319,15 @@
   "silverBadgeLabel": "Gümüş Abonelik",
   "silverBadgeDesc": "Gümüş aboneliğiniz var ve haftada 3 iş kabul edebilirsiniz.",
   "topBewertetBadgeLabel": "En yüksek puanlı",
-  "topBewertetBadgeDesc": "En az 2 değerlendirmeden ortalama en az 4,5 yıldız alın.",
+  "topBewertetBadgeDesc": "En az 5 değerlendirmeden ortalama en az 4,5 yıldız alın.",
   "badgeCertifiedProgress": "Sertifikalı ({count}/1)",
-  "badgeCertifiedDesc": "İlk işini tamamla.",
+  "badgeCertifiedDesc": "3 işi tamamla.",
   "badgeExperiencedProgress": "Deneyimli ({count}/2)",
-  "badgeExperiencedDesc": "Toplam 2 işi tamamla.",
+  "badgeExperiencedDesc": "Toplam 10 işi tamamla.",
   "badgeExpertProgress": "Uzman ({count}/3)",
-  "badgeExpertDesc": "Toplam 3 işi tamamla.",
+  "badgeExpertDesc": "Toplam 25 işi tamamla.",
   "badgeMasterProgress": "Usta ({count}/4)",
-  "badgeMasterDesc": "Toplam 4 işi tamamla.",
+  "badgeMasterDesc": "Toplam 50 işi tamamla.",
   "trafficScreenInfoText": "Burada, bulunduğunuz bölgede her kategoride kaç hizmet sağlayıcının aktif olduğunu görebilirsiniz. Ne kadar çok sağlayıcı varsa, talebiniz genellikle o kadar hızlı kabul edilir.",
    "filterAbgeschlossen": "Tamamlandı",
   "auftraege": "İşler",
@@ -431,7 +431,9 @@
   "vatIdLabel": "KDV No:",
   "bicLabel": "BIC:",
   "paymentTermsDefault": "{days} gün içinde kesinti olmadan ödenir.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür."
+
 
 
 

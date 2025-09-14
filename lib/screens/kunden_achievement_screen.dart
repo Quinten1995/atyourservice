@@ -63,63 +63,77 @@ class KundenAchievementScreen extends StatelessWidget {
         centerTitle: true,
       ),
       backgroundColor: Colors.grey[100],
-      body: ListView.separated(
+      body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        itemCount: badges.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 15),
-        itemBuilder: (context, i) {
-          final badge = badges[i];
-          return Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: badge.color?.withOpacity(0.13),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    padding: const EdgeInsets.all(13),
-                    child: Icon(
-                      badge.icon,
-                      color: badge.color,
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          badge.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          badge.description,
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+        children: [
+          // Kleine Info ganz oben
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              l10n.badgeInfoText,
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
               ),
             ),
-          );
-        },
+          ),
+          // Liste der Badges
+          ListView.separated(
+            shrinkWrap: true,
+            itemCount: badges.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 15),
+            itemBuilder: (context, i) {
+              final badge = badges[i];
+              return Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: badge.color?.withOpacity(0.13),
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        padding: const EdgeInsets.all(13),
+                        child: Icon(badge.icon, color: badge.color, size: 32),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              badge.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              badge.description,
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

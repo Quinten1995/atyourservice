@@ -309,15 +309,15 @@
   "silverBadgeLabel": "Silver-abonnement",
   "silverBadgeDesc": "Je hebt een Silver-abonnement en kunt 3 klussen per week aannemen.",
   "topBewertetBadgeLabel": "Top beoordeeld",
-  "topBewertetBadgeDesc": "Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 2 beoordelingen.",
+  "topBewertetBadgeDesc": "Behaal een gemiddelde van minimaal 4,5 sterren uit minstens 5 beoordelingen.",
   "badgeCertifiedProgress": "Gecertificeerd ({count}/1)",
-  "badgeCertifiedDesc": "Rond je allereerste klus af.",
+  "badgeCertifiedDesc": "Voltooi 3 klussen.",
   "badgeExperiencedProgress": "Ervaren ({count}/2)",
-  "badgeExperiencedDesc": "Rond in totaal 2 klussen af.",
+  "badgeExperiencedDesc": "Rond in totaal 10 klussen af.",
   "badgeExpertProgress": "Expert ({count}/3)",
-  "badgeExpertDesc": "Rond in totaal 3 klussen af.",
+  "badgeExpertDesc": "Rond in totaal 25 klussen af.",
   "badgeMasterProgress": "Meester ({count}/4)",
-  "badgeMasterDesc": "Rond in totaal 4 klussen af.",
+  "badgeMasterDesc": "Rond in totaal 50 klussen af.",
   "trafficScreenInfoText": "Hier ziet u hoeveel dienstverleners per categorie momenteel actief zijn in uw omgeving. Hoe meer dienstverleners, hoe sneller uw opdracht meestal wordt geaccepteerd.",
   "filterAbgeschlossen": "Afgerond",
   "auftraege": "Opdrachten",
@@ -421,7 +421,9 @@
   "vatIdLabel": "Btw-nr.:",
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Betaalbaar binnen {days} dagen zonder aftrek.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "Deze badges kunnen alleen door dienstverleners worden behaald en verschijnen wanneer de dienstverlener de opdracht accepteert."
+
 
 
 

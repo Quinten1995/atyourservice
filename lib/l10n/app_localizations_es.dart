@@ -990,7 +990,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get silverBadgeDesc => 'Tienes una suscripción Silver y puedes aceptar 3 trabajos por semana.';
 
   @override
-  String get topBewertetBadgeDesc => 'Obtén una media de al menos 4,5 estrellas de al menos 2 valoraciones.';
+  String get topBewertetBadgeDesc => 'Obtén una media de al menos 4,5 estrellas de al menos 5 valoraciones.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Completa tu primer trabajo.';
+  String get badgeCertifiedDesc => 'Completa 3 trabajos.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Completa un total de 2 trabajos.';
+  String get badgeExperiencedDesc => 'Completa un total de 10 trabajos.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Completa un total de 3 trabajos.';
+  String get badgeExpertDesc => 'Completa un total de 25 trabajos.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Completa un total de 4 trabajos.';
+  String get badgeMasterDesc => 'Completa un total de 50 trabajos.';
 
   @override
   String get trafficScreenInfoText => 'Aquí puede ver cuántos proveedores de servicios hay actualmente activos por categoría en su zona. Cuantos más proveedores haya, más rápido se suele aceptar su solicitud.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Pagadero dentro de $days días sin deducciones.';
   }
+
+  @override
+  String get badgeInfoText => 'Estas insignias solo pueden ser obtenidas por los proveedores de servicios y aparecen cuando el proveedor acepta el trabajo.';
 }

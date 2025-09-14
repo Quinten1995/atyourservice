@@ -53,6 +53,7 @@ class _DienstleisterDashboardScreenState
 
   int _completedJobsCount = 0;
   double _durchschnittsbewertung = 0.0;
+  int _anzahlBewertungen = 0; // <— NEU: für Top-bewertet-Kriterium
 
   @override
   void initState() {
@@ -73,6 +74,7 @@ class _DienstleisterDashboardScreenState
       _offenePassendeAuftraege = [];
       _completedJobsCount = 0;
       _durchschnittsbewertung = 0.0;
+      _anzahlBewertungen = 0; // <— Reset
     });
 
     try {
@@ -130,6 +132,7 @@ class _DienstleisterDashboardScreenState
 
       _completedJobsCount = _alleAbgeschlosseneAuftraegeRaw.length;
 
+      // Bewertungen laden → Durchschnitt + Anzahl
       final bewertungenData = await supabase
           .from('bewertungen')
           .select('bewertung')
@@ -148,6 +151,7 @@ class _DienstleisterDashboardScreenState
           }
         }
         if (count > 0) _durchschnittsbewertung = sum / count;
+        _anzahlBewertungen = count; // <— Anzahl speichern
       }
 
       double radiusKm = 5.0;
@@ -666,8 +670,10 @@ class _DienstleisterDashboardScreenState
         if (i == _bottomNavIndex) return;
         setState(() => _bottomNavIndex = i);
         if (i == 1) {
+          // Top bewertet: Ø >= 4.5 UND mindestens 5 Bewertungen
           final isTopBewertet =
-              _completedJobsCount >= 1 && _durchschnittsbewertung >= 4.5;
+              _durchschnittsbewertung >= 4.5 && _anzahlBewertungen >= 5;
+
           await Navigator.push(
             context,
             MaterialPageRoute(

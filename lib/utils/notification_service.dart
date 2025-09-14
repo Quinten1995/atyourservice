@@ -6,79 +6,104 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 class NotificationService {
   static const String channelId = 'high_importance_channel';
   static const String channelName = 'High Importance Notifications';
-  static const String channelDescription = 'Heads-Up Banner for critical alerts';
+  static const String channelDescription =
+      'Heads-Up Banner for critical alerts';
 
   static final FlutterLocalNotificationsPlugin _fln =
       FlutterLocalNotificationsPlugin();
 
-  /// Initialisiert Local Notifications & legt den Channel an
+  /// Initialisiert Local Notifications & FCM (Android + iOS)
   static Future<void> init() async {
-    // Fallback: Launcher-Icon nehmen, damit nix blockiert wenn ein Custom-Icon fehlt
+    // iOS + Android Init
+    const DarwinInitializationSettings iosInit = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     const AndroidInitializationSettings androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings settings =
-        InitializationSettings(android: androidInit);
-
-    await _fln.initialize(settings);
-
-    // High-Importance Channel erstellen (für Heads-Up)
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      channelId,
-      channelName,
-      description: channelDescription,
-      importance: Importance.max,
-      playSound: true,
-      enableVibration: true,
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidInit,
+      iOS: iosInit,
     );
 
-    await _fln
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+    await _fln.initialize(initSettings);
 
-    // Android 13+ → Push-Berechtigung anfragen
+    // iOS: Banner/Sound/Badge auch im Vordergrund zeigen
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+
+    // iOS & Android: Permission anfragen
+    final perm = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+    );
+    if (kDebugMode) {
+      print('🔔 FCM permission: ${perm.authorizationStatus}');
+    }
+
+    // Android: High-Importance Channel anlegen (Heads-Up)
     if (Platform.isAndroid) {
-      final fm = FirebaseMessaging.instance;
-      final perm = await fm.requestPermission(alert: true, badge: true, sound: true);
-      if (kDebugMode) {
-        print('Push permission: ${perm.authorizationStatus}');
-      }
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        channelId,
+        channelName,
+        description: channelDescription,
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      );
+      await _fln
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(channel);
     }
   }
 
-  /// Zeigt eine Heads-Up Notification im Vordergrund
+  /// Heads-Up (Android) / normale (iOS) Notification im Vordergrund
   static Future<void> showForegroundNotification({
     required String title,
     required String body,
     Map<String, String>? data,
   }) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      channelId,
-      channelName,
-      channelDescription: channelDescription,
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-      enableVibration: true,
-      ticker: 'ticker',
+    final details = NotificationDetails(
+      android: const AndroidNotificationDetails(
+        channelId,
+        channelName,
+        channelDescription: channelDescription,
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        ticker: 'ticker',
+      ),
+      iOS: const DarwinNotificationDetails(),
     );
-
-    const NotificationDetails details = NotificationDetails(android: androidDetails);
 
     await _fln.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title,
       body,
       details,
-      payload: data != null ? data.toString() : null,
+      payload: data?.toString(),
     );
   }
 
-  /// Löscht alle aktiven System-Benachrichtigungen (damit verschwindet die Badge auf Android-Launchern)
+  /// Alle sichtbaren System-Notifications löschen
   static Future<void> clearAll() async {
     try {
       await _fln.cancelAll();
+      // Hinweis: In deiner Plugin-Version gibt es kein iOS setBadgeCount().
+      // Falls du die Badge auch auf iOS auf 0 setzen willst, brauchst du
+      // entweder ein Plugin wie `flutter_app_badger` ODER ein Update auf
+      // neuere flutter_local_notifications (dann per Darwin-Plugin möglich).
     } catch (_) {}
   }
 }

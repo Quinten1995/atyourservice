@@ -346,15 +346,15 @@
   "silverBadgeLabel": "Abonnement Silver",
   "silverBadgeDesc": "Vous avez un abonnement Silver et pouvez accepter 3 missions par semaine.",
   "topBewertetBadgeLabel": "Top évalué",
-  "topBewertetBadgeDesc": "Obtenez une moyenne d'au moins 4,5 étoiles sur au moins 2 évaluations.",
+  "topBewertetBadgeDesc": "Obtenez une moyenne d'au moins 4,5 étoiles sur au moins 5 évaluations.",
   "badgeCertifiedProgress": "Certifié ({count}/1)",
-  "badgeCertifiedDesc": "Terminez votre toute première mission.",
+  "badgeCertifiedDesc": "Terminez 3 missions.",
   "badgeExperiencedProgress": "Expérimenté ({count}/2)",
-  "badgeExperiencedDesc": "Terminez un total de 2 missions.",
+  "badgeExperiencedDesc": "Terminez un total de 10 missions.",
   "badgeExpertProgress": "Expert ({count}/3)",
-  "badgeExpertDesc": "Terminez un total de 3 missions.",
+  "badgeExpertDesc": "Terminez un total de 25 missions.",
   "badgeMasterProgress": "Maître ({count}/4)",
-  "badgeMasterDesc": "Terminez un total de 4 missions.",
+  "badgeMasterDesc": "Terminez un total de 50 missions.",
   "trafficScreenInfoText": "Ici, vous voyez combien de prestataires de services sont actuellement actifs par catégorie dans votre région. Plus il y a de prestataires, plus votre demande sera généralement acceptée rapidement.",
   "filterAbgeschlossen": "Terminé",
   "auftraege": "Travaux",
@@ -458,7 +458,9 @@
   "vatIdLabel": "N° TVA :",
   "bicLabel": "BIC :",
   "paymentTermsDefault": "Payable sous {days} jours sans déduction.",
-  "@paymentTermsDefault": { "placeholders": { "days": {} } }
+  "@paymentTermsDefault": { "placeholders": { "days": {} } },
+  "badgeInfoText": "Ces badges ne peuvent être obtenus que par les prestataires et s'affichent lorsque le prestataire accepte la mission."
+
 
 
 

@@ -984,13 +984,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get achievementTitle => 'Erfolge & Abzeichen';
 
   @override
-  String get goldBadgeDesc => 'Du besitzt ein Gold-Abo und kannst unbegrenzt viele Aufträge annehmen.';
+  String get goldBadgeDesc => 'Du besitzt ein Gold-Abo und kannst 5 Aufträge pro Woche annehmen.';
 
   @override
-  String get silverBadgeDesc => 'Du besitzt ein Silber-Abo und kannst 3 Aufträge pro Woche annehmen.';
+  String get silverBadgeDesc => 'Du besitzt ein Silber-Abo und kannst 2 Aufträge pro Woche annehmen.';
 
   @override
-  String get topBewertetBadgeDesc => 'Erhalte einen Schnitt von mindestens 4,5 Sternen aus mindestens 2 Bewertungen.';
+  String get topBewertetBadgeDesc => 'Erhalte einen Schnitt von mindestens 4,5 Sternen aus mindestens 5 Bewertungen.';
 
   @override
   String badgeCertifiedProgress(Object count) {
@@ -998,7 +998,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get badgeCertifiedDesc => 'Schließe deinen allerersten Auftrag ab.';
+  String get badgeCertifiedDesc => 'Schließe 3 Aufträge ab.';
 
   @override
   String badgeExperiencedProgress(Object count) {
@@ -1006,7 +1006,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get badgeExperiencedDesc => 'Schließe insgesamt 2 Aufträge ab.';
+  String get badgeExperiencedDesc => 'Schließe insgesamt 10 Aufträge ab.';
 
   @override
   String badgeExpertProgress(Object count) {
@@ -1014,7 +1014,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get badgeExpertDesc => 'Schließe insgesamt 3 Aufträge ab.';
+  String get badgeExpertDesc => 'Schließe insgesamt 25 Aufträge ab.';
 
   @override
   String badgeMasterProgress(Object count) {
@@ -1022,7 +1022,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get badgeMasterDesc => 'Schließe insgesamt 4 Aufträge ab.';
+  String get badgeMasterDesc => 'Schließe insgesamt 50 Aufträge ab.';
 
   @override
   String get trafficScreenInfoText => 'Hier sehen Sie, wie viele Dienstleister pro Kategorie aktuell in Ihrer Umgebung aktiv sind. Je mehr Dienstleister, desto schneller wird Ihr Auftrag in der Regel angenommen.';
@@ -1325,4 +1325,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String paymentTermsDefault(Object days) {
     return 'Zahlbar innerhalb von $days Tagen ohne Abzug.';
   }
+
+  @override
+  String get badgeInfoText => 'Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt.';
 }
