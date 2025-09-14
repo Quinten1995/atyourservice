@@ -12,8 +12,8 @@ class RegistrierungScreen extends StatefulWidget {
 
 class _RegistrierungScreenState extends State<RegistrierungScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'quintenhessmann1995@yahoo.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   String _rolle = 'kunde';
   String? _selectedKategorie;
   bool _isLoading = false;

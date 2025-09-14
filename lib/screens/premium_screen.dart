@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import '../l10n/app_localizations.dart';
 import '../utils/in_app_purchase_service.dart';
+// ✅ Import unseres Widgets
+import '../widgets/premium_legal_section.dart';
 
 // IDs wie im Play Store/App Store angelegt!
 const Set<String> _kProductIds = {'atyourservice_silver', 'atyourservice_gold'};
@@ -235,7 +237,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
                     features: [
-                      // Neu: Push-Verhalten für FREE (1h Delay)
                       l10n.premiumPushDelayFree,
                       l10n.premiumFreeFeature1,
                       l10n.premiumFreeFeature2,
@@ -255,7 +256,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
                     features: [
-                      // Neu: Push-Verhalten für SILVER (30 min Delay)
                       l10n.premiumPushDelaySilver,
                       l10n.premiumSilverFeature1,
                       l10n.premiumSilverFeature2,
@@ -277,7 +277,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
                     features: [
-                      // Neu: Push-Verhalten für GOLD (sofort)
                       l10n.premiumPushDelayGold,
                       l10n.premiumGoldFeature1,
                       l10n.premiumGoldFeature2,
@@ -301,8 +300,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       children: [
                         Text(
                           l10n.premiumStoreNotLoaded,
-                          style: TextStyle(
-                              color: Colors.red[700], fontSize: 13),
+                          style:
+                              TextStyle(color: Colors.red[700], fontSize: 13),
                         ),
                         const SizedBox(height: 6),
                         TextButton(
@@ -317,6 +316,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     l10n.premiumPaymentNote,
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
+
+                  // ✅ Hier kommt das Legal Widget
+                  const SizedBox(height: 20),
+                  const PremiumLegalSection(),
                 ],
               ),
             ),
@@ -378,7 +381,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green, size: 17),
+                    const Icon(Icons.check_circle,
+                        color: Colors.green, size: 17),
                     const SizedBox(width: 7),
                     Flexible(
                       child: Text(

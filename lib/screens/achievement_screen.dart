@@ -6,6 +6,12 @@ class AchievementScreen extends StatelessWidget {
   final bool isTopBewertet;
   final int completedJobsCount;
 
+  // Thresholds (kept as agreed)
+  static const int _tCertified = 3;    // was 1
+  static const int _tExperienced = 10; // was 2
+  static const int _tExpert = 25;      // was 3
+  static const int _tMaster = 50;      // was 4
+
   const AchievementScreen({
     Key? key,
     required this.aboTyp,
@@ -17,7 +23,7 @@ class AchievementScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    // Alle erreichbaren Badges mit ihren Bedingungen und korrektem Fortschritt
+    // All achievable badges with conditions and progress
     final List<_AchievementBadge> allBadges = [
       // Gold
       _AchievementBadge(
@@ -43,41 +49,45 @@ class AchievementScreen extends StatelessWidget {
         unlocked: isTopBewertet,
         progress: isTopBewertet ? 1.0 : 0.0,
       ),
-      // Certified
+      // Certified (>= 3)
       _AchievementBadge(
         icon: Icons.verified,
         title: l10n.badgeCertifiedProgress(completedJobsCount),
         description: l10n.badgeCertifiedDesc,
-        unlocked: completedJobsCount >= 1,
-        progress: (completedJobsCount / 1).clamp(0, 1),
-        progressText: "${completedJobsCount.clamp(0, 1)} / 1",
+        unlocked: completedJobsCount >= _tCertified,
+        progress: (completedJobsCount / _tCertified).clamp(0, 1).toDouble(),
+        progressText:
+            "${completedJobsCount.clamp(0, _tCertified)} / $_tCertified",
       ),
-      // Experienced
+      // Experienced (>= 10)
       _AchievementBadge(
         icon: Icons.star_half,
         title: l10n.badgeExperiencedProgress(completedJobsCount),
         description: l10n.badgeExperiencedDesc,
-        unlocked: completedJobsCount >= 2,
-        progress: (completedJobsCount / 2).clamp(0, 1),
-        progressText: "${completedJobsCount.clamp(0, 2)} / 2",
+        unlocked: completedJobsCount >= _tExperienced,
+        progress: (completedJobsCount / _tExperienced).clamp(0, 1).toDouble(),
+        progressText:
+            "${completedJobsCount.clamp(0, _tExperienced)} / $_tExperienced",
       ),
-      // Expert
+      // Expert (>= 25)
       _AchievementBadge(
         icon: Icons.star,
         title: l10n.badgeExpertProgress(completedJobsCount),
         description: l10n.badgeExpertDesc,
-        unlocked: completedJobsCount >= 3,
-        progress: (completedJobsCount / 3).clamp(0, 1),
-        progressText: "${completedJobsCount.clamp(0, 3)} / 3",
+        unlocked: completedJobsCount >= _tExpert,
+        progress: (completedJobsCount / _tExpert).clamp(0, 1).toDouble(),
+        progressText:
+            "${completedJobsCount.clamp(0, _tExpert)} / $_tExpert",
       ),
-      // Master
+      // Master (>= 50)
       _AchievementBadge(
         icon: Icons.military_tech,
         title: l10n.badgeMasterProgress(completedJobsCount),
         description: l10n.badgeMasterDesc,
-        unlocked: completedJobsCount >= 4,
-        progress: (completedJobsCount / 4).clamp(0, 1),
-        progressText: "${completedJobsCount.clamp(0, 4)} / 4",
+        unlocked: completedJobsCount >= _tMaster,
+        progress: (completedJobsCount / _tMaster).clamp(0, 1).toDouble(),
+        progressText:
+            "${completedJobsCount.clamp(0, _tMaster)} / $_tMaster",
       ),
     ];
 
@@ -176,14 +186,14 @@ class AchievementScreen extends StatelessWidget {
   }
 }
 
-/// Internes Modell für ein Achievement/Badge (nur für diesen Screen)
+/// Internal model for an achievement/badge (screen-local)
 class _AchievementBadge {
   final IconData icon;
   final String title;
   final String description;
   final bool unlocked;
-  final double? progress;      // für Fortschrittsbalken (null = kein Balken)
-  final String? progressText;  // optionaler Text (z.B. "2 / 4")
+  final double? progress;      // progress bar (null = no bar)
+  final String? progressText;  // optional text (e.g., "12 / 50")
 
   _AchievementBadge({
     required this.icon,

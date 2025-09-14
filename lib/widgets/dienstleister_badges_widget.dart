@@ -132,10 +132,11 @@ class DienstleisterBadgesHelper {
     }).toList();
   }
 
-  static const int kZertifiziert = 1;
-  static const int kErfahren = 2;
-  static const int kExperte = 3;
-  static const int kMaster = 4;
+  // Neue Schwellenwerte (müssen zu AchievementScreen passen)
+  static const int kZertifiziert = 5;
+  static const int kErfahren = 15;
+  static const int kExperte = 50;
+  static const int kMaster = 150;
 
   Widget _buildBadge({
     required IconData icon,

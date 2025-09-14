@@ -42,7 +42,7 @@ IconData getKategorieIcon(String? kategorie) {
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
   const AuftragDetailScreen({Key? key, required this.initialAuftrag})
-    : super(key: key);
+      : super(key: key);
 
   @override
   _AuftragDetailScreenState createState() => _AuftragDetailScreenState();
@@ -208,8 +208,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           .eq('id', widget.initialAuftrag.id)
           .maybeSingle();
 
-      if (auftragMap == null)
+      if (auftragMap == null) {
         throw Exception(AppLocalizations.of(context)!.auftragNichtGefunden);
+      }
 
       final Auftrag aktuellerAuftrag = Auftrag.fromJson(auftragMap);
       setState(() {
@@ -513,9 +514,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           })
           .eq('id', _auftragDetails!.id);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.auftragErneutGepostet)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.auftragErneutGepostet)));
 
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
@@ -819,13 +819,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           children: [
             CircleAvatar(
               radius: 27,
-              backgroundImage:
-                  (_dienstleisterProfilbildUrl != null &&
+              backgroundImage: (_dienstleisterProfilbildUrl != null &&
                       _dienstleisterProfilbildUrl!.isNotEmpty)
                   ? NetworkImage(_dienstleisterProfilbildUrl!)
                   : null,
-              child:
-                  (_dienstleisterProfilbildUrl == null ||
+              child: (_dienstleisterProfilbildUrl == null ||
                       _dienstleisterProfilbildUrl!.isEmpty)
                   ? const Icon(Icons.person, size: 34, color: Colors.grey)
                   : null,
@@ -851,11 +849,11 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                         runSpacing: 4,
                         children: DienstleisterBadgesHelper(
                           aboTyp: _dienstleisterAboTyp!,
-                          isTopBewertet:
-                              _dlDurchschnitt != null &&
+                          // Top Rated: Ø >= 4.5 Sterne UND mind. 5 Bewertungen
+                          isTopBewertet: _dlDurchschnitt != null &&
                               _dlDurchschnitt! >= 4.5 &&
                               _dlAnzahlBewertungen != null &&
-                              _dlAnzahlBewertungen! >= 2,
+                              _dlAnzahlBewertungen! >= 5,
                           completedJobsCount: _completedJobsCount ?? 0,
                         ).buildBadges(context),
                       ),
@@ -1080,7 +1078,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       appBar: AppBar(
         title: Text(
           l10n.auftragDetailTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -1092,19 +1090,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-            ? Center(child: Text(l10n.keineDatenVerfuegbar))
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _auftragInfoCard(),
-                    _angenommenVonInfo(),
-                    _dienstleisterVisitenkarte(),
-                    _kontaktBereich(),
-                    _actionButtons(),
-                  ],
-                ),
-              ),
+                ? Center(child: Text(l10n.keineDatenVerfuegbar))
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _auftragInfoCard(),
+                        _angenommenVonInfo(),
+                        _dienstleisterVisitenkarte(),
+                        _kontaktBereich(),
+                        _actionButtons(),
+                      ],
+                    ),
+                  ),
       ),
     );
   }
