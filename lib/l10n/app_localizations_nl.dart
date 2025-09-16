@@ -1328,4 +1328,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'Deze badges kunnen alleen door dienstverleners worden behaald en verschijnen wanneer de dienstverlener de opdracht accepteert.';
+
+  @override
+  String get noAuftraegeKundeHint => 'Maak je eerste opdracht aan door op de plusknop (+) te tikken.';
 }

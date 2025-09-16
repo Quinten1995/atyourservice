@@ -1328,4 +1328,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'These badges can only be earned by service providers and appear when the provider accepts the job.';
+
+  @override
+  String get noAuftraegeKundeHint => 'Create your first job by tapping the plus (+) button.';
 }

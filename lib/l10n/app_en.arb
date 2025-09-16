@@ -432,7 +432,8 @@
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Payable within {days} days without deduction.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "These badges can only be earned by service providers and appear when the provider accepts the job."
+  "badgeInfoText": "These badges can only be earned by service providers and appear when the provider accepts the job.",
+"noAuftraegeKundeHint": "Create your first job by tapping the plus (+) button."
 
 
 

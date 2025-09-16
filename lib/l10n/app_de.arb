@@ -427,7 +427,8 @@
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Zahlbar innerhalb von {days} Tagen ohne Abzug.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt."
+  "badgeInfoText": "Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt.",
+"noAuftraegeKundeHint": "Erstelle deinen ersten Auftrag, indem du auf das Plus-Symbol (+) tippst."
 
 
 

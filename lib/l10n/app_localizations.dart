@@ -2594,6 +2594,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'These badges can only be earned by service providers and appear when the provider accepts the job.'**
   String get badgeInfoText;
+
+  /// No description provided for @noAuftraegeKundeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first job by tapping the plus (+) button.'**
+  String get noAuftraegeKundeHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

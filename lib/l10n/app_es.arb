@@ -432,7 +432,8 @@
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Pagadero dentro de {days} días sin deducciones.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "Estas insignias solo pueden ser obtenidas por los proveedores de servicios y aparecen cuando el proveedor acepta el trabajo."
+  "badgeInfoText": "Estas insignias solo pueden ser obtenidas por los proveedores de servicios y aparecen cuando el proveedor acepta el trabajo.",
+"noAuftraegeKundeHint": "Crea tu primer encargo tocando el botón de más (+)."
 
 
 

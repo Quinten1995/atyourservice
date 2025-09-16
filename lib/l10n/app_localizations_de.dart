@@ -1328,4 +1328,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt.';
+
+  @override
+  String get noAuftraegeKundeHint => 'Erstelle deinen ersten Auftrag, indem du auf das Plus-Symbol (+) tippst.';
 }

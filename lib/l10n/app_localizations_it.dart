@@ -1328,4 +1328,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'Questi badge possono essere ottenuti solo dai fornitori di servizi e compaiono quando il fornitore accetta l\'incarico.';
+
+  @override
+  String get noAuftraegeKundeHint => 'Crea il tuo primo incarico toccando il pulsante più (+).';
 }

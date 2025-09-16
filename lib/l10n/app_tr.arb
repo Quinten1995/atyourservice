@@ -432,7 +432,8 @@
   "bicLabel": "BIC:",
   "paymentTermsDefault": "{days} gün içinde kesinti olmadan ödenir.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür."
+  "badgeInfoText": "Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür.",
+"noAuftraegeKundeHint": "İlk işini oluşturmak için artı (+) düğmesine dokun."
 
 
 

@@ -227,14 +227,17 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
       }
     }
 
+    // ⤵️ Leerzustand NUR bei "Alle" (0) und "Offen" (1) anzeigen
     return Expanded(
       child: cards.isEmpty
-          ? Center(
-              child: Text(
-                l10n.noPassendeAuftraege,
-                style: TextStyle(fontSize: 15, color: Colors.grey[600]),
-              ),
-            )
+          ? ((_selectedFilter == 0 || _selectedFilter == 1)
+                ? Center(
+                    child: Text(
+                      l10n.noAuftraegeKundeHint,
+                      style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+                    ),
+                  )
+                : const SizedBox.shrink())
           : ListView.separated(
               itemCount: cards.length,
               separatorBuilder: (_, __) => const SizedBox(height: 13),

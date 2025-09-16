@@ -79,6 +79,40 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
     await prefs.setString(_prefsKeyEmail, _emailController.text.trim());
   }
 
+  /// Stellt sicher, dass es eine users-Zeile gibt und dass sie die DL-Rolle hat.
+  /// - Wenn kein Eintrag existiert -> als 'dienstleister' anlegen.
+  /// - Wenn Eintrag existiert, aber rolle != 'dienstleister' -> Fehler werfen.
+  Future<void> _ensureDienstleisterUserRow({
+    required String userId,
+    required String? email,
+  }) async {
+    final row = await supabase
+        .from('users')
+        .select('rolle')
+        .eq('id', userId)
+        .maybeSingle();
+
+    if (row == null) {
+      // Ersteintrag als Dienstleister
+      await supabase.from('users').insert({
+        'id': userId,
+        'email': email,
+        'rolle': 'dienstleister',
+        'erstellt_am': DateTime.now().toIso8601String(),
+      });
+      return;
+    }
+
+    final rolle = row['rolle'] as String?;
+    if (rolle == null || rolle == 'dienstleister') {
+      // alles gut
+      return;
+    }
+
+    // Hier existiert bereits ein Eintrag als 'kunde' (oder etwas anderes) -> blockieren
+    throw const AuthException('ROLE_CONFLICT_KUNDE_EXISTS');
+  }
+
   Future<void> _login() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
@@ -97,33 +131,19 @@ class _LoginDienstleisterScreenState extends State<LoginDienstleisterScreen> {
         throw const AuthException('Invalid login credentials');
       }
 
-      // 2) Rolle prüfen/nachziehen
-      final fetched = await supabase
-          .from('users')
-          .select('rolle')
-          .eq('id', user.id)
-          .maybeSingle();
-
-      if (fetched == null) {
-        // Ersteintrag für DL
-        try {
-          await supabase.from('users').insert({
-            'id': user.id,
-            'email': user.email,
-            'rolle': 'dienstleister',
-            'erstellt_am': DateTime.now().toIso8601String(),
-          });
-        } catch (e) {
-          // ignore: avoid_print
-          print('[DEBUG] Insert in users (dienstleister) schlug fehl: $e');
-        }
-      } else if (fetched['rolle'] != 'dienstleister') {
+      // 2) Rolle in users-Tabelle sicherstellen (und Konflikte abfangen)
+      try {
+        await _ensureDienstleisterUserRow(userId: user.id, email: user.email);
+      } on AuthException catch (e) {
+        // Rolle conflict -> ausloggen und Fehlermeldung
         await supabase.auth.signOut();
+        if (!mounted) return;
+        final msg = e.message == 'ROLE_CONFLICT_KUNDE_EXISTS'
+            ? l10n
+                  .wrongRoleDL // z.B. "Dieser Account ist ein Kunden-Account."
+            : l10n.wrongRoleDL;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.wrongRoleDL),
-            backgroundColor: Colors.redAccent,
-          ),
+          SnackBar(content: Text(msg), backgroundColor: Colors.redAccent),
         );
         return;
       }

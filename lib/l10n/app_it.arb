@@ -430,7 +430,8 @@
   "bicLabel": "BIC:",
   "paymentTermsDefault": "Pagabile entro {days} giorni senza detrazioni.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "Questi badge possono essere ottenuti solo dai fornitori di servizi e compaiono quando il fornitore accetta l'incarico."
+  "badgeInfoText": "Questi badge possono essere ottenuti solo dai fornitori di servizi e compaiono quando il fornitore accetta l'incarico.",
+"noAuftraegeKundeHint": "Crea il tuo primo incarico toccando il pulsante più (+)."
 
 
 

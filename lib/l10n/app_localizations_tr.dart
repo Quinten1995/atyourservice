@@ -1328,4 +1328,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür.';
+
+  @override
+  String get noAuftraegeKundeHint => 'İlk işini oluşturmak için artı (+) düğmesine dokun.';
 }

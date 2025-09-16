@@ -459,7 +459,8 @@
   "bicLabel": "BIC :",
   "paymentTermsDefault": "Payable sous {days} jours sans déduction.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
-  "badgeInfoText": "Ces badges ne peuvent être obtenus que par les prestataires et s'affichent lorsque le prestataire accepte la mission."
+  "badgeInfoText": "Ces badges ne peuvent être obtenus que par les prestataires et s'affichent lorsque le prestataire accepte la mission.",
+"noAuftraegeKundeHint": "Créez votre première demande en appuyant sur le bouton plus (+)."
 
 
 

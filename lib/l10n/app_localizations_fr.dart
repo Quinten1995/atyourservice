@@ -1328,4 +1328,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get badgeInfoText => 'Ces badges ne peuvent être obtenus que par les prestataires et s\'affichent lorsque le prestataire accepte la mission.';
+
+  @override
+  String get noAuftraegeKundeHint => 'Créez votre première demande en appuyant sur le bouton plus (+).';
 }
