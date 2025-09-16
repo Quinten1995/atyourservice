@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 class NotificationService {
   static const String channelId = 'high_importance_channel';
@@ -72,6 +73,7 @@ class NotificationService {
     required String title,
     required String body,
     Map<String, String>? data,
+    int? id,
   }) async {
     final details = NotificationDetails(
       android: const AndroidNotificationDetails(
@@ -84,11 +86,14 @@ class NotificationService {
         enableVibration: true,
         ticker: 'ticker',
       ),
-      iOS: const DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(
+        // Wichtig: im Foreground Badge NICHT erhöhen
+        presentBadge: false,
+      ),
     );
 
     await _fln.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      id ?? (DateTime.now().millisecondsSinceEpoch ~/ 1000),
       title,
       body,
       details,
@@ -96,14 +101,34 @@ class NotificationService {
     );
   }
 
-  /// Alle sichtbaren System-Notifications löschen
+  /// Alle sichtbaren System-Notifications löschen UND App-Badge entfernen
   static Future<void> clearAll() async {
     try {
+      // Android & iOS: Tray leeren
       await _fln.cancelAll();
-      // Hinweis: In deiner Plugin-Version gibt es kein iOS setBadgeCount().
-      // Falls du die Badge auch auf iOS auf 0 setzen willst, brauchst du
-      // entweder ein Plugin wie `flutter_app_badger` ODER ein Update auf
-      // neuere flutter_local_notifications (dann per Darwin-Plugin möglich).
+    } catch (_) {}
+
+    // iOS & (viele) Android-Launcher: Badge zurücksetzen
+    try {
+      final supported = await FlutterAppBadger.isAppBadgeSupported();
+      if (supported) {
+        FlutterAppBadger.removeBadge();
+      }
+    } catch (_) {
+      // unkritisch
+    }
+  }
+
+  /// Optional: explizit eine Badge-Zahl setzen (z. B. ungelesene Zähler)
+  static Future<void> setBadge(int count) async {
+    try {
+      final supported = await FlutterAppBadger.isAppBadgeSupported();
+      if (!supported) return;
+      if (count <= 0) {
+        FlutterAppBadger.removeBadge();
+      } else {
+        FlutterAppBadger.updateBadgeCount(count);
+      }
     } catch (_) {}
   }
 }
