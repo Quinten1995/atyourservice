@@ -2,13 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+
 import '../l10n/app_localizations.dart';
 import '../utils/in_app_purchase_service.dart';
-// ✅ Import unseres Widgets
 import '../widgets/premium_legal_section.dart';
-
-// IDs wie im Play Store/App Store angelegt!
-const Set<String> _kProductIds = {'atyourservice_silver', 'atyourservice_gold'};
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -19,9 +16,10 @@ class PremiumScreen extends StatefulWidget {
 
 class _PremiumScreenState extends State<PremiumScreen> {
   String? _aboTyp;
-  bool _isLoading = true;
+  bool _isLoadingUser = true;
   bool _storeAvailable = false;
   List<ProductDetails> _products = [];
+  String? _storeError; // z.B. wenn notFoundIDs vorhanden sind
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
   @override
@@ -29,8 +27,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
     super.initState();
     _ladeAboTyp();
     _ladeStoreProdukte();
-    _purchaseSubscription =
-        InAppPurchaseService().listenToPurchases().listen(_handlePurchases);
+    _purchaseSubscription = InAppPurchaseService().listenToPurchases().listen(
+      _handlePurchases,
+    );
   }
 
   @override
@@ -41,7 +40,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   // Holt aktuellen Abo-Typ aus Supabase
   Future<void> _ladeAboTyp() async {
-    setState(() => _isLoading = true);
+    setState(() => _isLoadingUser = true);
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null) {
@@ -50,41 +49,66 @@ class _PremiumScreenState extends State<PremiumScreen> {
             .select('abo_typ')
             .eq('id', user.id)
             .maybeSingle();
+
+        if (!mounted) return;
         setState(() {
           _aboTyp = res?['abo_typ'] ?? 'free';
         });
+      } else {
+        if (!mounted) return;
+        setState(() {
+          _aboTyp = 'free';
+        });
       }
     } catch (_) {
-      // Fehler ignorieren
+      if (!mounted) return;
+      // Falls Fehler: nicht crashen, einfach als unbekannt behandeln
+      _aboTyp = _aboTyp ?? 'free';
     } finally {
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() => _isLoadingUser = false);
     }
   }
 
   // Lädt Store-Produkte (Abos)
   Future<void> _ladeStoreProdukte() async {
+    setState(() {
+      _storeAvailable = false;
+      _products = [];
+      _storeError = null;
+    });
+
     final available = await InAppPurchaseService().isAvailable();
     if (!available) {
+      if (!mounted) return;
       setState(() {
         _storeAvailable = false;
         _products = [];
+        _storeError = 'store_unavailable';
       });
       return;
     }
+
     final resp = await InAppPurchaseService().getProducts();
+
+    if (!mounted) return;
     setState(() {
       _storeAvailable = true;
       _products = resp.productDetails.toList();
+      if (resp.notFoundIDs.isNotEmpty) {
+        _storeError = 'not_found:${resp.notFoundIDs.join(",")}';
+      } else if (resp.error != null) {
+        _storeError = 'error:${resp.error}';
+      }
     });
   }
 
-  // Produkt anhand der ID
+  // Produkt anhand der ID aus der geladenen Liste
   ProductDetails? _getProduct(String id) {
-    try {
-      return _products.firstWhere((p) => p.id == id);
-    } catch (_) {
-      return null;
+    for (final p in _products) {
+      if (p.id == id) return p;
     }
+    return null;
   }
 
   // Stream-Callback für Käufe + automatische Rückstufung auf "free"
@@ -99,17 +123,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
         final user = Supabase.instance.client.auth.currentUser;
 
         if (user != null && typ != null && typ != _aboTyp) {
-          await Supabase.instance.client
-              .from('users')
-              .update({'abo_typ': typ})
-              .eq('id', user.id);
-
-          setState(() {
-            _aboTyp = typ;
-          });
-
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
+          try {
+            await Supabase.instance.client
+                .from('users')
+                .update({'abo_typ': typ})
+                .eq('id', user.id);
+            if (!mounted) return;
+            setState(() {
+              _aboTyp = typ;
+            });
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
+          } catch (_) {
+            // still proceed to complete purchase
+          }
         }
 
         foundActive = true;
@@ -118,6 +146,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           await InAppPurchase.instance.completePurchase(purchase);
         }
       } else if (purchase.status == PurchaseStatus.error) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -128,20 +157,25 @@ class _PremiumScreenState extends State<PremiumScreen> {
       }
     }
 
+    // Wenn kein aktives Purchase gefunden wurde → auf free zurückstufen
     if (!foundActive) {
       final user = Supabase.instance.client.auth.currentUser;
       if (user != null && _aboTyp != 'free') {
-        await Supabase.instance.client
-            .from('users')
-            .update({'abo_typ': 'free'})
-            .eq('id', user.id);
-
-        setState(() {
-          _aboTyp = 'free';
-        });
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
+        try {
+          await Supabase.instance.client
+              .from('users')
+              .update({'abo_typ': 'free'})
+              .eq('id', user.id);
+          if (!mounted) return;
+          setState(() {
+            _aboTyp = 'free';
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
+        } catch (_) {
+          // ignore
+        }
       }
     }
   }
@@ -156,8 +190,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final silver = _getProduct('atyourservice_silver');
-    final gold = _getProduct('atyourservice_gold');
+
+    final silver = _getProduct(InAppPurchaseService.silverId);
+    final gold = _getProduct(InAppPurchaseService.goldId);
 
     return Scaffold(
       appBar: AppBar(
@@ -176,13 +211,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
           ),
         ],
       ),
-      body: _isLoading
+      body: _isLoadingUser
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header
                   Text(
                     l10n.premiumChoosePlan,
                     style: const TextStyle(
@@ -190,20 +226,26 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   const SizedBox(height: 8),
                   if (_aboTyp != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Row(
                         children: [
-                          const Icon(Icons.verified_user,
-                              color: Colors.blueAccent, size: 23),
+                          const Icon(
+                            Icons.verified_user,
+                            color: Colors.blueAccent,
+                            size: 23,
+                          ),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
                               l10n.premiumCurrentPlan,
                               style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.bold),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -217,8 +259,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 color: _aboTyp == 'gold'
                                     ? Colors.amber[900]
                                     : _aboTyp == 'silver'
-                                        ? Colors.blueGrey[700]
-                                        : Colors.grey[600],
+                                    ? Colors.blueGrey[700]
+                                    : Colors.grey[600],
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.2,
                               ),
@@ -294,15 +336,30 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                   const SizedBox(height: 20),
 
-                  if (!_storeAvailable || _products.isEmpty)
+                  // Fehler-/Hinweisbereich zum Store
+                  if (!_storeAvailable ||
+                      _products.isEmpty ||
+                      _storeError != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           l10n.premiumStoreNotLoaded,
-                          style:
-                              TextStyle(color: Colors.red[700], fontSize: 13),
+                          style: TextStyle(
+                            color: Colors.red[700],
+                            fontSize: 13,
+                          ),
                         ),
+                        if (_storeError != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            _storeError!,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 6),
                         TextButton(
                           onPressed: _ladeStoreProdukte,
@@ -317,7 +374,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
 
-                  // ✅ Hier kommt das Legal Widget
                   const SizedBox(height: 20),
                   const PremiumLegalSection(),
                 ],
@@ -342,8 +398,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(18),
-        border:
-            highlighted ? Border.all(color: Colors.blueAccent, width: 2) : null,
+        border: highlighted
+            ? Border.all(color: Colors.blueAccent, width: 2)
+            : null,
         boxShadow: highlighted
             ? [
                 BoxShadow(
@@ -381,8 +438,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 2),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle,
-                        color: Colors.green, size: 17),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 17,
+                    ),
                     const SizedBox(width: 7),
                     Flexible(
                       child: Text(
@@ -402,16 +462,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: onTap,
-                  child: Text(
-                    AppLocalizations.of(context)!.premiumChooseButton(title),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     textStyle: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.w600),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.premiumChooseButton(title),
                   ),
                 ),
               ),
