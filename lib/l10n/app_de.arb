@@ -428,7 +428,15 @@
   "paymentTermsDefault": "Zahlbar innerhalb von {days} Tagen ohne Abzug.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Diese Abzeichen können nur von Dienstleistern erworben werden und erscheinen, wenn der Dienstleister den Auftrag annimmt.",
-"noAuftraegeKundeHint": "Erstelle deinen ersten Auftrag, indem du auf das Plus-Symbol (+) tippst."
+"noAuftraegeKundeHint": "Erstelle deinen ersten Auftrag, indem du auf das Plus-Symbol (+) tippst.",
+"upsellCardTitle": "Auftrag in deiner Nähe",
+  "upsellCategoryLabel": "Kategorie: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Upgrade auf {plan}, um diesen Auftrag zu sehen",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Free",
+  "planSilver": "Silber",
+  "planGold": "Gold"
 
 
 

@@ -431,7 +431,15 @@
   "paymentTermsDefault": "Pagabile entro {days} giorni senza detrazioni.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Questi badge possono essere ottenuti solo dai fornitori di servizi e compaiono quando il fornitore accetta l'incarico.",
-"noAuftraegeKundeHint": "Crea il tuo primo incarico toccando il pulsante più (+)."
+"noAuftraegeKundeHint": "Crea il tuo primo incarico toccando il pulsante più (+).",
+"upsellCardTitle": "Incarico vicino a te",
+  "upsellCategoryLabel": "Categoria: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Passa a {plan} per vedere questo incarico",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Gratuito",
+  "planSilver": "Argento",
+  "planGold": "Oro"
 
 
 

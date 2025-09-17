@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/auftrag.dart';
 import '../utils/entfernung_utils.dart';
+
 import 'auftrag_detail_screen.dart';
 import 'profil_dienstleister_screen.dart';
-import '../l10n/app_localizations.dart';
-import '../l10n/status_value_extension.dart';
 import 'pdf_rechnung_screen.dart';
 import 'achievement_screen.dart';
+import 'premium_screen.dart'; // für Upgrade-CTA
+
+import '../l10n/app_localizations.dart';
+import '../l10n/status_value_extension.dart';
 
 class DienstleisterDashboardScreen extends StatefulWidget {
   const DienstleisterDashboardScreen({Key? key}) : super(key: key);
@@ -46,14 +50,19 @@ class _DienstleisterDashboardScreenState
   List<Map<String, dynamic>> _alleOffenenAuftraegeRaw = [];
   List<Map<String, dynamic>> _alleLaufendenAuftraegeRaw = [];
   List<Map<String, dynamic>> _alleAbgeschlosseneAuftraegeRaw = [];
+
+  /// Sichtbar im aktuellen Plan
   List<Auftrag> _offenePassendeAuftraege = [];
+
+  /// Außerhalb aktueller Radius, aber innerhalb des nächsten Plans (Upsell)
+  List<Auftrag> _offeneUpsellAuftraege = [];
 
   int _selectedFilter = 0; // 0: Alle, 1: Offen, 2: Laufend, 3: Abgeschlossen
   int _bottomNavIndex = 0;
 
   int _completedJobsCount = 0;
   double _durchschnittsbewertung = 0.0;
-  int _anzahlBewertungen = 0; // <— NEU: für Top-bewertet-Kriterium
+  int _anzahlBewertungen = 0;
 
   @override
   void initState() {
@@ -63,18 +72,57 @@ class _DienstleisterDashboardScreenState
     });
   }
 
+  // --------- Abo-/Radius-Helper ---------
+  double _planRadius(String? abo) {
+    switch ((abo ?? 'free').toLowerCase()) {
+      case 'gold':
+        return 30.0; // aktuell in deinem Projekt so genutzt
+      case 'silver':
+        return 15.0;
+      default:
+        return 5.0;
+    }
+  }
+
+  String? _nextPlan(String? abo) {
+    switch ((abo ?? 'free').toLowerCase()) {
+      case 'free':
+        return 'silver';
+      case 'silver':
+        return 'gold';
+      default:
+        return null; // gold hat keinen nächsthöheren Plan
+    }
+  }
+
+  String _planPretty(BuildContext context, String plan) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (plan) {
+      case 'silver':
+        return l10n.planSilver;
+      case 'gold':
+        return l10n.planGold;
+      default:
+        return l10n.planFree;
+    }
+  }
+
   Future<void> _ladeProfilUndAuftraege() async {
     final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+
       _alleOffenenAuftraegeRaw = [];
       _alleLaufendenAuftraegeRaw = [];
       _alleAbgeschlosseneAuftraegeRaw = [];
+
       _offenePassendeAuftraege = [];
+      _offeneUpsellAuftraege = [];
+
       _completedJobsCount = 0;
       _durchschnittsbewertung = 0.0;
-      _anzahlBewertungen = 0; // <— Reset
+      _anzahlBewertungen = 0;
     });
 
     try {
@@ -104,7 +152,7 @@ class _DienstleisterDashboardScreenState
           .select('abo_typ')
           .eq('id', user.id)
           .maybeSingle();
-      _aboTyp = userData?['abo_typ'] as String? ?? 'free';
+      _aboTyp = (userData?['abo_typ'] as String?) ?? 'free';
 
       if (_meineKategorie != null) {
         final List<dynamic> rawOffen = await supabase
@@ -132,7 +180,7 @@ class _DienstleisterDashboardScreenState
 
       _completedJobsCount = _alleAbgeschlosseneAuftraegeRaw.length;
 
-      // Bewertungen laden → Durchschnitt + Anzahl
+      // Bewertungen → Durchschnitt + Anzahl
       final bewertungenData = await supabase
           .from('bewertungen')
           .select('bewertung')
@@ -151,56 +199,69 @@ class _DienstleisterDashboardScreenState
           }
         }
         if (count > 0) _durchschnittsbewertung = sum / count;
-        _anzahlBewertungen = count; // <— Anzahl speichern
+        _anzahlBewertungen = count;
       }
 
-      double radiusKm = 5.0;
-      if (_aboTyp == 'silver') {
-        radiusKm = 15.0;
-      } else if (_aboTyp == 'gold') {
-        radiusKm = 30.0;
-      }
+      // ---------- Radius-Filter + Upsell-Berechnung ----------
+      final double baseRadiusKm = _planRadius(_aboTyp);
+      final String? nextPlan = _nextPlan(_aboTyp);
+      final double? nextRadiusKm = nextPlan != null
+          ? _planRadius(nextPlan)
+          : null;
 
       if (_meineLatitude != null && _meineLongitude != null) {
-        _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
+        final alleOffen = _alleOffenenAuftraegeRaw
             .map((map) => Auftrag.fromJson(map))
-            .where((auftrag) {
-              if (auftrag.latitude == null || auftrag.longitude == null) {
-                return false;
-              }
-              final dist = berechneEntfernung(
-                _meineLatitude!,
-                _meineLongitude!,
-                auftrag.latitude!,
-                auftrag.longitude!,
-              );
-              return dist <= radiusKm;
-            })
-            .toList();
+            .where((a) => a.latitude != null && a.longitude != null);
 
-        _offenePassendeAuftraege.sort((a, b) {
-          final distA = (a.latitude != null && a.longitude != null)
-              ? berechneEntfernung(
-                  _meineLatitude!,
-                  _meineLongitude!,
-                  a.latitude!,
-                  a.longitude!,
-                )
-              : double.infinity;
-          final distB = (b.latitude != null && b.longitude != null)
-              ? berechneEntfernung(
-                  _meineLatitude!,
-                  _meineLongitude!,
-                  b.latitude!,
-                  b.longitude!,
-                )
-              : double.infinity;
-          return distA.compareTo(distB);
-        });
+        final visible = <Auftrag>[];
+        final upsell = <Auftrag>[];
+
+        for (final a in alleOffen) {
+          final dist = berechneEntfernung(
+            _meineLatitude!,
+            _meineLongitude!,
+            a.latitude!,
+            a.longitude!,
+          );
+          if (dist <= baseRadiusKm) {
+            visible.add(a);
+          } else if (nextRadiusKm != null && dist <= nextRadiusKm) {
+            upsell.add(a);
+          }
+        }
+
+        // Sortiere beide nach Distanz
+        int cmpByDist(Auftrag x, Auftrag y) {
+          final dx = berechneEntfernung(
+            _meineLatitude!,
+            _meineLongitude!,
+            x.latitude!,
+            x.longitude!,
+          );
+          final dy = berechneEntfernung(
+            _meineLatitude!,
+            _meineLongitude!,
+            y.latitude!,
+            y.longitude!,
+          );
+          return dx.compareTo(dy);
+        }
+
+        visible.sort(cmpByDist);
+        upsell.sort(cmpByDist);
+
+        _offenePassendeAuftraege = visible;
+        // Nicht spammen: max. 3 Upsell-Karten lokal
+        _offeneUpsellAuftraege = nextPlan == null
+            ? <Auftrag>[]
+            : upsell.take(3).toList();
       } else {
+        // kein Standort → alles normal sichtbar, kein Upsell
         _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
-            .map((map) => Auftrag.fromJson(map))
+            .map((m) => Auftrag.fromJson(m))
             .toList();
+        _offeneUpsellAuftraege = [];
       }
 
       setState(() => _isLoading = false);
@@ -283,68 +344,7 @@ class _DienstleisterDashboardScreenState
     );
   }
 
-  // ----- Filterchips: horizontal scrollbar -----
-  Widget _buildFilterChips(AppLocalizations l10n) {
-    final labels = [
-      l10n.filterAlle,
-      l10n.filterOffen,
-      l10n.filterLaufend,
-      l10n.filterAbgeschlossen,
-    ];
-    final chipIcons = [
-      Icons.filter_alt,
-      DienstleisterDashboardScreen.statusIcons['offen']!,
-      DienstleisterDashboardScreen.statusIcons['in bearbeitung']!,
-      DienstleisterDashboardScreen.statusIcons['abgeschlossen']!,
-    ];
-    final chipColors = [
-      Colors.grey,
-      DienstleisterDashboardScreen.statusColors['offen']!,
-      DienstleisterDashboardScreen.statusColors['in bearbeitung']!,
-      DienstleisterDashboardScreen.statusColors['abgeschlossen']!,
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 10),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(labels.length, (i) {
-            final isSelected = _selectedFilter == i;
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: ChoiceChip(
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      chipIcons[i],
-                      size: 17,
-                      color: isSelected ? Colors.white : chipColors[i],
-                    ),
-                    const SizedBox(width: 6),
-                    Text(labels[i]),
-                  ],
-                ),
-                selected: isSelected,
-                selectedColor: chipColors[i],
-                backgroundColor: Colors.grey[200],
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-                onSelected: (_) => setState(() => _selectedFilter = i),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
-  }
-
+  // ----- Aktionen (PDF/Delete) -----
   Widget _buildCardActions({
     required bool showPdf,
     required VoidCallback? onPdf,
@@ -386,6 +386,7 @@ class _DienstleisterDashboardScreenState
     );
   }
 
+  // ----- Normale (sichtbare) Auftrags-Karte -----
   Widget _buildAuftragsKarte({
     required Auftrag auftrag,
     String? kundenEmail,
@@ -435,7 +436,7 @@ class _DienstleisterDashboardScreenState
                   if (showPdf || showDelete) ...[
                     const SizedBox(width: 6),
                     Transform.translate(
-                      offset: const Offset(0, -2), // Icons minimal anheben
+                      offset: const Offset(0, -2),
                       child: _buildCardActions(
                         showPdf: showPdf,
                         onPdf: onPdf,
@@ -482,8 +483,99 @@ class _DienstleisterDashboardScreenState
     );
   }
 
+  // ----- Upsell (LOCKED) Karte — ohne Kategoriezeile -----
+  Widget _buildLockedCard({
+    required Auftrag auftrag,
+    required String requiredPlan, // 'silver' | 'gold'
+    String? distText,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final pretty = _planPretty(context, requiredPlan);
+    return Material(
+      elevation: 2.5,
+      borderRadius: BorderRadius.circular(18),
+      color: Colors.white,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Kopfzeile
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
+                  child: const Icon(Icons.lock, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.upsellCardTitle,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (distText != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                distText,
+                style: TextStyle(
+                  color: Colors.black.withOpacity(0.65),
+                  fontSize: 13,
+                ),
+              ),
+            ],
+            const SizedBox(height: 10),
+            // CTA
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.workspace_premium),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: DienstleisterDashboardScreen.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PremiumScreen()),
+                  );
+                },
+                label: Text(l10n.upsellUpgradeButton(pretty)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ----- Kartenlisten -----
   List<Widget> _buildOffeneKarten(AppLocalizations l10n) {
-    return _offenePassendeAuftraege.map((auftrag) {
+    // Normale offene Karten
+    final openCards = _offenePassendeAuftraege.map((auftrag) {
       String distText = '';
       if (_meineLatitude != null &&
           _meineLongitude != null &&
@@ -512,6 +604,48 @@ class _DienstleisterDashboardScreenState
         },
       );
     }).toList();
+
+    // Upsell-Karten (max 3), an sinnvollen Positionen einstreuen
+    if (_offeneUpsellAuftraege.isNotEmpty) {
+      final lockedCards = <Widget>[];
+      final nextPlan = _nextPlan(_aboTyp)!;
+
+      for (final a in _offeneUpsellAuftraege) {
+        String? distText;
+        if (_meineLatitude != null &&
+            _meineLongitude != null &&
+            a.latitude != null &&
+            a.longitude != null) {
+          final d = berechneEntfernung(
+            _meineLatitude!,
+            _meineLongitude!,
+            a.latitude!,
+            a.longitude!,
+          );
+          distText = l10n.entfernungSuffix(d.toStringAsFixed(1));
+        }
+        lockedCards.add(
+          _buildLockedCard(
+            auftrag: a,
+            requiredPlan: nextPlan,
+            distText: distText,
+          ),
+        );
+      }
+
+      // Einfüge-Positionen (nicht aggressiv)
+      final positions = <int>[2, 7, 12];
+      int li = 0;
+      for (final p in positions) {
+        if (li >= lockedCards.length) break;
+        final idx = (p < 0)
+            ? 0
+            : (p > openCards.length ? openCards.length : p); // int clamp
+        openCards.insert(idx, lockedCards[li++]);
+      }
+    }
+
+    return openCards;
   }
 
   List<Widget> _buildLaufendeKarten(AppLocalizations l10n) {
@@ -626,13 +760,12 @@ class _DienstleisterDashboardScreenState
       if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty) {
         cards.addAll(_buildAbgeschlosseneKarten(l10n));
       }
-      if (_offenePassendeAuftraege.isNotEmpty) {
-        cards.addAll(_buildOffeneKarten(l10n));
-      }
+      // Offene + Upsell
+      final offeneMitUpsell = _buildOffeneKarten(l10n);
+      if (offeneMitUpsell.isNotEmpty) cards.addAll(offeneMitUpsell);
     } else if (_selectedFilter == 1) {
-      if (_offenePassendeAuftraege.isNotEmpty) {
-        cards.addAll(_buildOffeneKarten(l10n));
-      }
+      final offeneMitUpsell = _buildOffeneKarten(l10n);
+      if (offeneMitUpsell.isNotEmpty) cards.addAll(offeneMitUpsell);
     } else if (_selectedFilter == 2) {
       if (_alleLaufendenAuftraegeRaw.isNotEmpty) {
         cards.addAll(_buildLaufendeKarten(l10n));
@@ -786,6 +919,68 @@ class _DienstleisterDashboardScreenState
         ],
       ),
       bottomNavigationBar: _buildBottomNav(l10n),
+    );
+  }
+
+  // ----- Filterchips -----
+  Widget _buildFilterChips(AppLocalizations l10n) {
+    final labels = [
+      l10n.filterAlle,
+      l10n.filterOffen,
+      l10n.filterLaufend,
+      l10n.filterAbgeschlossen,
+    ];
+    final chipIcons = [
+      Icons.filter_alt,
+      DienstleisterDashboardScreen.statusIcons['offen']!,
+      DienstleisterDashboardScreen.statusIcons['in bearbeitung']!,
+      DienstleisterDashboardScreen.statusIcons['abgeschlossen']!,
+    ];
+    final chipColors = [
+      Colors.grey,
+      DienstleisterDashboardScreen.statusColors['offen']!,
+      DienstleisterDashboardScreen.statusColors['in bearbeitung']!,
+      DienstleisterDashboardScreen.statusColors['abgeschlossen']!,
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(labels.length, (i) {
+            final isSelected = _selectedFilter == i;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: ChoiceChip(
+                label: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      chipIcons[i],
+                      size: 17,
+                      color: isSelected ? Colors.white : chipColors[i],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(labels[i]),
+                  ],
+                ),
+                selected: isSelected,
+                selectedColor: chipColors[i],
+                backgroundColor: Colors.grey[200],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                onSelected: (_) => setState(() => _selectedFilter = i),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
     );
   }
 }

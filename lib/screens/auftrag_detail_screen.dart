@@ -42,7 +42,7 @@ IconData getKategorieIcon(String? kategorie) {
 class AuftragDetailScreen extends StatefulWidget {
   final Auftrag initialAuftrag;
   const AuftragDetailScreen({Key? key, required this.initialAuftrag})
-      : super(key: key);
+    : super(key: key);
 
   @override
   _AuftragDetailScreenState createState() => _AuftragDetailScreenState();
@@ -438,6 +438,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     }
   }
 
+  // ==== NEU: UI-Gate für echtes Löschen ====
+  bool _kundeDarfEndgueltigLoeschen(Auftrag ad) {
+    final uid = _supabase.auth.currentUser?.id;
+    return uid != null &&
+        !_isDienstleister &&
+        ad.kundeId == uid &&
+        ad.status == 'offen' &&
+        ad.dienstleisterId == null;
+  }
+
+  // ==== NEU: wirklich löschen (DELETE) statt "nur aus Übersicht" ====
   Future<void> _kundeAuftragEntfernen() async {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
@@ -463,15 +474,15 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _supabase
-          .from('auftraege')
-          .update({
-            'kunde_auftragsstatus': 'entfernt',
-            'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('id', _auftragDetails!.id);
+      // RLS sorgt dafür, dass nur offene, unzugewiesene eigene Aufträge gelöscht werden können
+      await _supabase.from('auftraege').delete().eq('id', _auftragDetails!.id);
 
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop(); // Detail-Screen schließen
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Auftrag gelöscht')));
+      }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -514,8 +525,9 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           })
           .eq('id', _auftragDetails!.id);
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.auftragErneutGepostet)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.auftragErneutGepostet)));
 
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
@@ -819,11 +831,13 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
           children: [
             CircleAvatar(
               radius: 27,
-              backgroundImage: (_dienstleisterProfilbildUrl != null &&
+              backgroundImage:
+                  (_dienstleisterProfilbildUrl != null &&
                       _dienstleisterProfilbildUrl!.isNotEmpty)
                   ? NetworkImage(_dienstleisterProfilbildUrl!)
                   : null,
-              child: (_dienstleisterProfilbildUrl == null ||
+              child:
+                  (_dienstleisterProfilbildUrl == null ||
                       _dienstleisterProfilbildUrl!.isEmpty)
                   ? const Icon(Icons.person, size: 34, color: Colors.grey)
                   : null,
@@ -850,7 +864,8 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
                         children: DienstleisterBadgesHelper(
                           aboTyp: _dienstleisterAboTyp!,
                           // Top Rated: Ø >= 4.5 Sterne UND mind. 5 Bewertungen
-                          isTopBewertet: _dlDurchschnitt != null &&
+                          isTopBewertet:
+                              _dlDurchschnitt != null &&
                               _dlDurchschnitt! >= 4.5 &&
                               _dlAnzahlBewertungen != null &&
                               _dlAnzahlBewertungen! >= 5,
@@ -1016,22 +1031,17 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
-        if (!_isDienstleister &&
-            (ad.status == 'offen' ||
-                ad.status == 'in bearbeitung' ||
-                ad.status == 'abgeschlossen'))
+
+        // ▼▼ neu: echter Delete-Button nur wenn erlaubt ▼▼
+        if (_kundeDarfEndgueltigLoeschen(ad))
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _kundeAuftragEntfernen,
-              icon: const Icon(Icons.delete),
-              label: Text(
-                ad.status == 'abgeschlossen'
-                    ? l10n.auftragEntfernenUebersicht
-                    : l10n.auftragEntfernen,
-              ),
+              icon: const Icon(Icons.delete_forever),
+              label: Text(l10n.auftragEntfernen),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
+                backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -1040,6 +1050,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
               ),
             ),
           ),
+
         if (!_isDienstleister && ad.status == 'in bearbeitung')
           const SizedBox(height: 18),
         if (!_isDienstleister && ad.status == 'in bearbeitung')
@@ -1078,7 +1089,7 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       appBar: AppBar(
         title: Text(
           l10n.auftragDetailTitle,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -1090,19 +1101,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _auftragDetails == null
-                ? Center(child: Text(l10n.keineDatenVerfuegbar))
-                : SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _auftragInfoCard(),
-                        _angenommenVonInfo(),
-                        _dienstleisterVisitenkarte(),
-                        _kontaktBereich(),
-                        _actionButtons(),
-                      ],
-                    ),
-                  ),
+            ? Center(child: Text(l10n.keineDatenVerfuegbar))
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _auftragInfoCard(),
+                    _angenommenVonInfo(),
+                    _dienstleisterVisitenkarte(),
+                    _kontaktBereich(),
+                    _actionButtons(),
+                  ],
+                ),
+              ),
       ),
     );
   }

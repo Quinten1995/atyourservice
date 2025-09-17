@@ -433,7 +433,15 @@
   "paymentTermsDefault": "Pagadero dentro de {days} días sin deducciones.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Estas insignias solo pueden ser obtenidas por los proveedores de servicios y aparecen cuando el proveedor acepta el trabajo.",
-"noAuftraegeKundeHint": "Crea tu primer encargo tocando el botón de más (+)."
+"noAuftraegeKundeHint": "Crea tu primer encargo tocando el botón de más (+).",
+"upsellCardTitle": "Trabajo cerca de ti",
+  "upsellCategoryLabel": "Categoría: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Mejora a {plan} para ver este trabajo",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Gratis",
+  "planSilver": "Plata",
+  "planGold": "Oro"
 
 
 

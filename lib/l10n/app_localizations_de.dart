@@ -1331,4 +1331,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noAuftraegeKundeHint => 'Erstelle deinen ersten Auftrag, indem du auf das Plus-Symbol (+) tippst.';
+
+  @override
+  String get upsellCardTitle => 'Auftrag in deiner Nähe';
+
+  @override
+  String upsellCategoryLabel(String category) {
+    return 'Kategorie: $category';
+  }
+
+  @override
+  String upsellUpgradeButton(String plan) {
+    return 'Upgrade auf $plan, um diesen Auftrag zu sehen';
+  }
+
+  @override
+  String get planFree => 'Free';
+
+  @override
+  String get planSilver => 'Silber';
+
+  @override
+  String get planGold => 'Gold';
 }

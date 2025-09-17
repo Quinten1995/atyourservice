@@ -423,7 +423,15 @@
   "paymentTermsDefault": "Betaalbaar binnen {days} dagen zonder aftrek.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Deze badges kunnen alleen door dienstverleners worden behaald en verschijnen wanneer de dienstverlener de opdracht accepteert.",
-"noAuftraegeKundeHint": "Maak je eerste opdracht aan door op de plusknop (+) te tikken."
+"noAuftraegeKundeHint": "Maak je eerste opdracht aan door op de plusknop (+) te tikken.",
+"upsellCardTitle": "Opdracht bij jou in de buurt",
+  "upsellCategoryLabel": "Categorie: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Upgrade naar {plan} om deze opdracht te zien",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Gratis",
+  "planSilver": "Zilver",
+  "planGold": "Goud"
 
 
 

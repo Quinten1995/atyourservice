@@ -433,7 +433,15 @@
   "paymentTermsDefault": "Payable within {days} days without deduction.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "These badges can only be earned by service providers and appear when the provider accepts the job.",
-"noAuftraegeKundeHint": "Create your first job by tapping the plus (+) button."
+"noAuftraegeKundeHint": "Create your first job by tapping the plus (+) button.",
+"upsellCardTitle": "Job near you",
+  "upsellCategoryLabel": "Category: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Upgrade to {plan} to view this job",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Free",
+  "planSilver": "Silver",
+  "planGold": "Gold"
 
 
 

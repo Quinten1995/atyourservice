@@ -2600,6 +2600,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create your first job by tapping the plus (+) button.'**
   String get noAuftraegeKundeHint;
+
+  /// No description provided for @upsellCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Job near you'**
+  String get upsellCardTitle;
+
+  /// No description provided for @upsellCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {category}'**
+  String upsellCategoryLabel(String category);
+
+  /// No description provided for @upsellUpgradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to {plan} to view this job'**
+  String upsellUpgradeButton(String plan);
+
+  /// No description provided for @planFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get planFree;
+
+  /// No description provided for @planSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get planSilver;
+
+  /// No description provided for @planGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get planGold;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

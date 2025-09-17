@@ -1331,4 +1331,26 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noAuftraegeKundeHint => 'Maak je eerste opdracht aan door op de plusknop (+) te tikken.';
+
+  @override
+  String get upsellCardTitle => 'Opdracht bij jou in de buurt';
+
+  @override
+  String upsellCategoryLabel(String category) {
+    return 'Categorie: $category';
+  }
+
+  @override
+  String upsellUpgradeButton(String plan) {
+    return 'Upgrade naar $plan om deze opdracht te zien';
+  }
+
+  @override
+  String get planFree => 'Gratis';
+
+  @override
+  String get planSilver => 'Zilver';
+
+  @override
+  String get planGold => 'Goud';
 }

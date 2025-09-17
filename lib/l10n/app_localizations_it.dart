@@ -1331,4 +1331,26 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get noAuftraegeKundeHint => 'Crea il tuo primo incarico toccando il pulsante più (+).';
+
+  @override
+  String get upsellCardTitle => 'Incarico vicino a te';
+
+  @override
+  String upsellCategoryLabel(String category) {
+    return 'Categoria: $category';
+  }
+
+  @override
+  String upsellUpgradeButton(String plan) {
+    return 'Passa a $plan per vedere questo incarico';
+  }
+
+  @override
+  String get planFree => 'Gratuito';
+
+  @override
+  String get planSilver => 'Argento';
+
+  @override
+  String get planGold => 'Oro';
 }

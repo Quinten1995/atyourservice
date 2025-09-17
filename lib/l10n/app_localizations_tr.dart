@@ -1331,4 +1331,26 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noAuftraegeKundeHint => 'İlk işini oluşturmak için artı (+) düğmesine dokun.';
+
+  @override
+  String get upsellCardTitle => 'Yakınında bir iş';
+
+  @override
+  String upsellCategoryLabel(String category) {
+    return 'Kategori: $category';
+  }
+
+  @override
+  String upsellUpgradeButton(String plan) {
+    return 'Bu işi görmek için $plan’a yükselt';
+  }
+
+  @override
+  String get planFree => 'Ücretsiz';
+
+  @override
+  String get planSilver => 'Gümüş';
+
+  @override
+  String get planGold => 'Altın';
 }

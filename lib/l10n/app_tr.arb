@@ -433,7 +433,15 @@
   "paymentTermsDefault": "{days} gün içinde kesinti olmadan ödenir.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Bu rozetler yalnızca hizmet sağlayıcılar tarafından kazanılabilir ve sağlayıcı işi kabul ettiğinde görünür.",
-"noAuftraegeKundeHint": "İlk işini oluşturmak için artı (+) düğmesine dokun."
+"noAuftraegeKundeHint": "İlk işini oluşturmak için artı (+) düğmesine dokun.",
+"upsellCardTitle": "Yakınında bir iş",
+  "upsellCategoryLabel": "Kategori: {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Bu işi görmek için {plan}’a yükselt",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Ücretsiz",
+  "planSilver": "Gümüş",
+  "planGold": "Altın"
 
 
 

@@ -1331,4 +1331,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noAuftraegeKundeHint => 'Create your first job by tapping the plus (+) button.';
+
+  @override
+  String get upsellCardTitle => 'Job near you';
+
+  @override
+  String upsellCategoryLabel(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String upsellUpgradeButton(String plan) {
+    return 'Upgrade to $plan to view this job';
+  }
+
+  @override
+  String get planFree => 'Free';
+
+  @override
+  String get planSilver => 'Silver';
+
+  @override
+  String get planGold => 'Gold';
 }

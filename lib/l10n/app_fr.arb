@@ -460,7 +460,15 @@
   "paymentTermsDefault": "Payable sous {days} jours sans déduction.",
   "@paymentTermsDefault": { "placeholders": { "days": {} } },
   "badgeInfoText": "Ces badges ne peuvent être obtenus que par les prestataires et s'affichent lorsque le prestataire accepte la mission.",
-"noAuftraegeKundeHint": "Créez votre première demande en appuyant sur le bouton plus (+)."
+"noAuftraegeKundeHint": "Créez votre première demande en appuyant sur le bouton plus (+).",
+"upsellCardTitle": "Mission près de chez vous",
+  "upsellCategoryLabel": "Catégorie : {category}",
+  "@upsellCategoryLabel": { "placeholders": { "category": { "type": "String" } } },
+  "upsellUpgradeButton": "Passez à {plan} pour voir cette mission",
+  "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
+  "planFree": "Gratuit",
+  "planSilver": "Argent",
+  "planGold": "Or"
 
 
 
