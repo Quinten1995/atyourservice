@@ -13,6 +13,9 @@ import 'premium_screen.dart'; // für Upgrade-CTA
 import '../l10n/app_localizations.dart';
 import '../l10n/status_value_extension.dart';
 
+// 🔎 Analytics
+import '../utils/analytics_service.dart';
+
 class DienstleisterDashboardScreen extends StatefulWidget {
   const DienstleisterDashboardScreen({Key? key}) : super(key: key);
 
@@ -63,6 +66,16 @@ class _DienstleisterDashboardScreenState
   int _completedJobsCount = 0;
   double _durchschnittsbewertung = 0.0;
   int _anzahlBewertungen = 0;
+
+  // --- Neu-Toggle (zeitbasiert) ---
+  bool _onlyNew = false;
+  static const int _kNewWindowHours = 24; // 24h-Fenster für "Neu"
+
+  bool _isNewByTime(DateTime? createdUtc) {
+    if (createdUtc == null) return false;
+    final diff = DateTime.now().toUtc().difference(createdUtc.toUtc());
+    return diff.inHours <= _kNewWindowHours;
+  }
 
   @override
   void initState() {
@@ -264,10 +277,22 @@ class _DienstleisterDashboardScreenState
         _offeneUpsellAuftraege = [];
       }
 
+      // 🔎 Analytics: User-Kontext nach erfolgreichem Laden setzen
+      try {
+        await AnalyticsService.I.setUserId(user.id);
+        await AnalyticsService.I.setUserProps(
+          role: 'provider',
+          plan: _aboTyp ?? 'free',
+          locale: l10n.localeName,
+          // city könntest du später setzen, sobald du einen City-String hast
+        );
+      } catch (_) {}
+
       setState(() => _isLoading = false);
     } catch (e) {
+      final msg = e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = msg;
         _isLoading = false;
       });
     }
@@ -400,6 +425,7 @@ class _DienstleisterDashboardScreenState
   }) {
     final l10n = AppLocalizations.of(context)!;
     final priceText = _formatPrice(auftrag, l10n);
+    final bool isNew = _isNewByTime(auftrag.erstelltAm);
 
     return Material(
       elevation: 3,
@@ -452,6 +478,27 @@ class _DienstleisterDashboardScreenState
               Row(
                 children: [
                   buildStatusBadge(auftrag.status, l10n),
+                  if (isNew) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.16),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        l10n.filterNeu, // "Neu"
+                        style: const TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (!auftrag.soSchnellWieMoeglich) ...[
                     const SizedBox(width: 12),
                     Icon(
@@ -574,8 +621,15 @@ class _DienstleisterDashboardScreenState
 
   // ----- Kartenlisten -----
   List<Widget> _buildOffeneKarten(AppLocalizations l10n) {
-    // Normale offene Karten
-    final openCards = _offenePassendeAuftraege.map((auftrag) {
+    // 1) Optionale Neu-Filterung (nur sichtbare, offene!)
+    final List<Auftrag> sichtbareOffene = _onlyNew
+        ? _offenePassendeAuftraege
+              .where((a) => _isNewByTime(a.erstelltAm))
+              .toList()
+        : _offenePassendeAuftraege;
+
+    // 2) Normale offenen Karten rendern
+    final openCards = sichtbareOffene.map((auftrag) {
       String distText = '';
       if (_meineLatitude != null &&
           _meineLongitude != null &&
@@ -605,7 +659,7 @@ class _DienstleisterDashboardScreenState
       );
     }).toList();
 
-    // Upsell-Karten (max 3), an sinnvollen Positionen einstreuen
+    // 3) Upsell-Karten (max 3), an sinnvollen Positionen einstreuen
     if (_offeneUpsellAuftraege.isNotEmpty) {
       final lockedCards = <Widget>[];
       final nextPlan = _nextPlan(_aboTyp)!;
@@ -640,7 +694,7 @@ class _DienstleisterDashboardScreenState
         if (li >= lockedCards.length) break;
         final idx = (p < 0)
             ? 0
-            : (p > openCards.length ? openCards.length : p); // int clamp
+            : (p > openCards.length ? openCards.length : p); // clamp
         openCards.insert(idx, lockedCards[li++]);
       }
     }
@@ -907,11 +961,12 @@ class _DienstleisterDashboardScreenState
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
-                ? Center(child: Text(l10n.errorPrefix(_errorMessage!)))
+                ? Center(child: Text(_errorMessage!))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildFilterChips(l10n),
+                      _buildNewToggle(l10n),
                       _buildFilteredList(l10n),
                     ],
                   ),
@@ -922,7 +977,7 @@ class _DienstleisterDashboardScreenState
     );
   }
 
-  // ----- Filterchips -----
+  // ----- Filterchips (Status) -----
   Widget _buildFilterChips(AppLocalizations l10n) {
     final labels = [
       l10n.filterAlle,
@@ -944,7 +999,7 @@ class _DienstleisterDashboardScreenState
     ];
 
     return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 10),
+      padding: const EdgeInsets.only(top: 12, bottom: 6),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -980,6 +1035,48 @@ class _DienstleisterDashboardScreenState
             );
           }),
         ),
+      ),
+    );
+  }
+
+  // ----- Neu-Toggle-Zeile: runder Button -----
+  Widget _buildNewToggle(AppLocalizations l10n) {
+    final bool on = _onlyNew;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          const SizedBox(width: 4),
+          Tooltip(
+            message: l10n.filterNeu,
+            child: RawMaterialButton(
+              onPressed: () => setState(() => _onlyNew = !on),
+              elevation: on ? 4 : 1,
+              highlightElevation: 6,
+              constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+              shape: const CircleBorder(),
+              fillColor: on ? Colors.orange[700] : Colors.white,
+              splashColor: Colors.orange.withOpacity(0.15),
+              child: Icon(
+                Icons.fiber_new,
+                size: 22,
+                color: on ? Colors.white : Colors.orange[700],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          if (on)
+            Expanded(
+              child: Text(
+                l10n.onlyNewWindowInfo(_kNewWindowHours),
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: Colors.black.withOpacity(0.65),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+        ],
       ),
     );
   }

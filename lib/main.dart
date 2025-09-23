@@ -21,6 +21,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+// 🔎 Analytics
+import 'utils/analytics_service.dart';
+
 final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
@@ -40,9 +43,16 @@ Future<void> main() async {
   // 👉 Beim Start alles bereinigen (aktive Notifications entfernen)
   await NotificationService.clearAll();
 
-  // 👉 Wenn App aus "beendet" via Notification geöffnet wurde: auch aufräumen
+  // 🔎 Analytics grundsätzlich aktivieren (TODO: an Consent koppeln)
+  await AnalyticsService.I.setEnabled(true);
+
+  // 👉 Wenn App aus "beendet" via Notification geöffnet wurde
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
+    // Analytics: Push-Open tracken
+    final type = initialMessage.data['type']?.toString() ?? 'unknown';
+    await AnalyticsService.I.pushOpened(type: type);
+
     await NotificationService.clearAll();
   }
 
@@ -55,20 +65,28 @@ Future<void> main() async {
   });
 
   // 6) Auf Login/Logout reagieren -> Token korrekt binden/lösen
-  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
     if (data.event == AuthChangeEvent.signedIn) {
-      _saveFcmTokenToSupabase();
+      await _saveFcmTokenToSupabase();
+
+      // Optional: UserId an Analytics setzen (keine PII)
+      final uid = Supabase.instance.client.auth.currentUser?.id;
+      await AnalyticsService.I.setUserId(uid);
     } else if (data.event == AuthChangeEvent.signedOut) {
-      _clearFcmTokenInSupabase();
+      await _clearFcmTokenInSupabase();
+
+      // Optional: UserId entfernen
+      await AnalyticsService.I.setUserId(null);
     }
   });
 
   // 7) Foreground-Handler für Heads-Up Banner
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     final title =
-        message.notification?.title ?? message.data['title'] ?? 'Benachrichtigung';
-    final body =
-        message.notification?.body ?? message.data['body'] ?? '';
+        message.notification?.title ??
+        message.data['title'] ??
+        'Benachrichtigung';
+    final body = message.notification?.body ?? message.data['body'] ?? '';
     NotificationService.showForegroundNotification(
       title: title,
       body: body,
@@ -76,8 +94,12 @@ Future<void> main() async {
     );
   });
 
-  // 👉 Wenn App aus Hintergrund per Notification geöffnet wird → aufräumen
+  // 👉 Wenn App aus Hintergrund per Notification geöffnet wird
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    // Analytics: Push-Open tracken
+    final type = message.data['type']?.toString() ?? 'unknown';
+    await AnalyticsService.I.pushOpened(type: type);
+
     await NotificationService.clearAll();
   });
 
@@ -99,7 +121,9 @@ Future<void> _ensureUserRow() async {
         .upsert({'id': user.id}, onConflict: 'id')
         .select()
         .maybeSingle();
-    print('✅ ensureUserRow: ${resp != null ? 'Row vorhanden/angelegt' : 'keine Row'}');
+    print(
+      '✅ ensureUserRow: ${resp != null ? 'Row vorhanden/angelegt' : 'keine Row'}',
+    );
   } catch (e) {
     print('❌ ensureUserRow Fehler: $e');
   }
@@ -125,14 +149,16 @@ Future<void> _saveFcmTokenToSupabase([String? token]) async {
   }
 
   try {
-    await Supabase.instance.client.rpc('set_user_push_token', params: {
-      'p_user': user.id,
-      'p_token': t,
-    });
+    await Supabase.instance.client.rpc(
+      'set_user_push_token',
+      params: {'p_user': user.id, 'p_token': t},
+    );
     print('✅ push_token via RPC gesetzt (unique bind).');
   } catch (e) {
     // Fallback: direkter Update (nicht ideal, aber verhindert Stillstand)
-    print('❌ RPC set_user_push_token Fehler: $e — Fallback auf direktes Update.');
+    print(
+      '❌ RPC set_user_push_token Fehler: $e — Fallback auf direktes Update.',
+    );
     try {
       final updated = await Supabase.instance.client
           .from('users')
@@ -152,10 +178,10 @@ Future<void> _clearFcmTokenInSupabase() async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user == null) return;
   try {
-    await Supabase.instance.client.rpc('set_user_push_token', params: {
-      'p_user': user.id,
-      'p_token': null,
-    });
+    await Supabase.instance.client.rpc(
+      'set_user_push_token',
+      params: {'p_user': user.id, 'p_token': null},
+    );
     print('✅ push_token via RPC gelöscht.');
   } catch (e) {
     print('❌ RPC clear Fehler: $e — Fallback auf direktes Update.');
@@ -190,6 +216,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _appLinks = AppLinks();
 
+    // 🔎 App-Open tracken, sobald UI steht
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AnalyticsService.I.appOpen();
+    });
+
     // 1) Initiale URI (kalter Start)
     _handleInitialUri();
 
@@ -199,19 +230,22 @@ class _MyAppState extends State<MyApp> {
     }, onError: (_) {});
 
     // 3) Persistenter Auth-State-Listener (Password Recovery)
-    _authSubPersistent =
-        Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.passwordRecovery) {
-        _goToReset();
-      }
-    });
+    _authSubPersistent = Supabase.instance.client.auth.onAuthStateChange.listen(
+      (data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          _goToReset();
+        }
+      },
+    );
   }
 
   Future<void> _handleInitialUri() async {
     try {
       final uri = await _appLinks.getInitialAppLink();
       await _handleIncomingUri(uri);
-    } catch (_) {/* ignore */}
+    } catch (_) {
+      /* ignore */
+    }
   }
 
   bool _isOurCallback(Uri? uri) =>
@@ -243,8 +277,10 @@ class _MyAppState extends State<MyApp> {
     final incoming = uri!;
 
     try {
-      await Supabase.instance.client.auth
-          .getSessionFromUrl(incoming, storeSession: true);
+      await Supabase.instance.client.auth.getSessionFromUrl(
+        incoming,
+        storeSession: true,
+      );
     } catch (_) {}
 
     final t = _supabaseType(incoming);
@@ -314,17 +350,16 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           elevation: 2,
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
-            textStyle:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
             minimumSize: const Size(250, 55),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -336,9 +371,7 @@ class _MyAppState extends State<MyApp> {
           headlineSmall: TextStyle(fontWeight: FontWeight.bold),
         ),
         inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.deepPurple),
             borderRadius: BorderRadius.circular(10),

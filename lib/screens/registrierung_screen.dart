@@ -3,6 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/kategorien.dart';
 import '../l10n/app_localizations.dart'; // Lokalisation importieren
 
+// 🔎 Analytics
+import '../utils/analytics_service.dart';
+
 class RegistrierungScreen extends StatefulWidget {
   const RegistrierungScreen({Key? key}) : super(key: key);
 
@@ -33,10 +36,29 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     final password = _passwordController.text;
 
     try {
-      final response = await supabase.auth.signUp(email: email, password: password);
+      final response = await supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
 
       final identities = response.user?.identities;
       if (identities != null && identities.isNotEmpty) {
+        // 🔎 Analytics nach erfolgreichem Signup
+        final l10n = AppLocalizations.of(context)!;
+        final role = (_rolle == 'dienstleister') ? 'provider' : 'customer';
+        final uid = response.user?.id;
+
+        try {
+          await AnalyticsService.I.setUserId(uid);
+          await AnalyticsService.I.setUserProps(
+            role: role,
+            locale: l10n.localeName,
+            // city kannst du später setzen, wenn du sie hast (Profil/Adresse)
+          );
+          // City noch unbekannt → placeholder 'unknown' (später ersetzen)
+          await AnalyticsService.I.signupCompleted(role: role, city: 'unknown');
+        } catch (_) {}
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppLocalizations.of(context)!.registerSuccess),
@@ -45,9 +67,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
         Navigator.of(context).pop();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.registerExists),
-          ),
+          SnackBar(content: Text(AppLocalizations.of(context)!.registerExists)),
         );
         // KEIN pop im Fehlerfall!
       }
@@ -63,15 +83,21 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       } else if (err.contains('password')) {
         userMessage = AppLocalizations.of(context)!.registerPasswordShort;
       } else {
-        userMessage = AppLocalizations.of(context)!.registerFailed(authError.message);
+        userMessage = AppLocalizations.of(
+          context,
+        )!.registerFailed(authError.message);
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(userMessage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(userMessage)));
       // KEIN pop im Fehlerfall!
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.registerUnknownError(e.toString()))),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.registerUnknownError(e.toString()),
+          ),
+        ),
       );
       // KEIN pop im Fehlerfall!
     } finally {
@@ -237,7 +263,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       labelText: l10n.roleLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -246,7 +275,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         borderSide: BorderSide(color: primaryColor, width: 2),
                       ),
                     ),
-                    borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
+                    borderRadius: BorderRadius.circular(
+                      22,
+                    ), // Menüs jetzt abgerundet!
                     items: [
                       DropdownMenuItem(
                         value: 'kunde',
@@ -261,7 +292,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       if (value != null) {
                         setState(() {
                           _rolle = value;
-                          if (_rolle != 'dienstleister') _selectedKategorie = null;
+                          if (_rolle != 'dienstleister')
+                            _selectedKategorie = null;
                         });
                       }
                     },
@@ -276,7 +308,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         labelText: l10n.categoryLabel,
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 14,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -285,7 +320,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
                       ),
-                      borderRadius: BorderRadius.circular(22), // Menüs jetzt abgerundet!
+                      borderRadius: BorderRadius.circular(
+                        22,
+                      ), // Menüs jetzt abgerundet!
                       items: kategorieKeys.map((kategorie) {
                         return DropdownMenuItem(
                           value: kategorie,
@@ -295,7 +332,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       onChanged: (value) {
                         setState(() => _selectedKategorie = value);
                       },
-                      validator: (value) => (_rolle == 'dienstleister' && (value == null || value.isEmpty))
+                      validator: (value) =>
+                          (_rolle == 'dienstleister' &&
+                              (value == null || value.isEmpty))
                           ? l10n.categoryValidator
                           : null,
                     ),
@@ -310,7 +349,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       labelText: l10n.emailLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -321,7 +363,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return l10n.emailEmpty;
+                      if (value == null || value.isEmpty)
+                        return l10n.emailEmpty;
                       if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
                         return l10n.emailInvalid;
                       }
@@ -338,7 +381,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                       labelText: l10n.passwordLabel,
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 14,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -349,7 +395,8 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) return l10n.passwordEmpty;
+                      if (value == null || value.isEmpty)
+                        return l10n.passwordEmpty;
                       if (value.length < 6) return l10n.passwordTooShort;
                       return null;
                     },
@@ -374,7 +421,10 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                             ),
                             child: Text(
                               l10n.registerButton,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),

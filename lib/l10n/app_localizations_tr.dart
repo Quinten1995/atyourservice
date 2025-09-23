@@ -1353,4 +1353,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get planGold => 'Altın';
+
+  @override
+  String get filterNeu => 'Yeni';
+
+  @override
+  String onlyNewWindowInfo(int hours) {
+    return 'Son $hours saat içindeki işleri gösteriyor.';
+  }
 }

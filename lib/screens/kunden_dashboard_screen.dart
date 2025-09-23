@@ -12,6 +12,9 @@ import '../l10n/status_value_extension.dart';
 import '../data/kategorie_icons.dart';
 import 'start_screen.dart'; // Für Logout-Navigation
 
+// 🔎 Analytics
+import '../utils/analytics_service.dart';
+
 extension StatusTranslation on AppLocalizations {
   String translateStatus(String? status) {
     switch (status?.toLowerCase()) {
@@ -97,6 +100,16 @@ class _KundenDashboardScreenState extends State<KundenDashboardScreen> {
           )
           .map((map) => Auftrag.fromJson(map))
           .toList();
+
+      // 🔎 Analytics: User-Kontext setzen (Kunde)
+      try {
+        await AnalyticsService.I.setUserId(user.id);
+        await AnalyticsService.I.setUserProps(
+          role: 'customer',
+          locale: l10n.localeName,
+          // city: <falls verfügbar>, z.B. aus Profil/Adresse
+        );
+      } catch (_) {}
 
       setState(() => _isLoading = false);
     } catch (e) {

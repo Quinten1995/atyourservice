@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_localizations.dart';
 import '../utils/in_app_purchase_service.dart';
 import '../widgets/premium_legal_section.dart';
+// 🔎 Analytics
+import '../utils/analytics_service.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -19,8 +22,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
   bool _isLoadingUser = true;
   bool _storeAvailable = false;
   List<ProductDetails> _products = [];
-  String? _storeError; // z.B. wenn notFoundIDs vorhanden sind
+  String? _storeError;
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
+
+  bool _didRestoreAfterFirstPurchase = false;
 
   @override
   void initState() {
@@ -30,6 +35,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
     _purchaseSubscription = InAppPurchaseService().listenToPurchases().listen(
       _handlePurchases,
     );
+
+    // 🔎 optional: Screen-Open loggen
+    // (GA4 erfasst screen_view meist automatisch, schadet aber nicht)
+    unawaited(AnalyticsService.I.log('premium_screen_opened'));
   }
 
   @override
@@ -54,16 +63,20 @@ class _PremiumScreenState extends State<PremiumScreen> {
         setState(() {
           _aboTyp = res?['abo_typ'] ?? 'free';
         });
+
+        // 🔎 User-Property sicherstellen
+        unawaited(AnalyticsService.I.setUserProps(plan: _aboTyp));
       } else {
         if (!mounted) return;
         setState(() {
           _aboTyp = 'free';
         });
+        unawaited(AnalyticsService.I.setUserProps(plan: 'free'));
       }
     } catch (_) {
       if (!mounted) return;
-      // Falls Fehler: nicht crashen, einfach als unbekannt behandeln
       _aboTyp = _aboTyp ?? 'free';
+      unawaited(AnalyticsService.I.setUserProps(plan: _aboTyp));
     } finally {
       if (!mounted) return;
       setState(() => _isLoadingUser = false);
@@ -111,36 +124,60 @@ class _PremiumScreenState extends State<PremiumScreen> {
     return null;
   }
 
-  // Stream-Callback für Käufe + automatische Rückstufung auf "free"
+  // Produkt-ID → Abo-Typ
+  String? _aboTypFromProductId(String productId) {
+    if (productId.contains('gold')) return 'gold';
+    if (productId.contains('silver')) return 'silver';
+    return null;
+  }
+
+  // Preiszeile „Monthly • {localized price}“
+  Widget _priceLine(ProductDetails p, {required String durationLabel}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        '$durationLabel • ${p.price}',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
+  // Stream-Callback für Käufe (+ einmaliger Restore-Kick)
   void _handlePurchases(List<PurchaseDetails> purchases) async {
     final l10n = AppLocalizations.of(context)!;
-    bool foundActive = false;
+    bool anyPurchaseCompleted = false;
 
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
-        final typ = _aboTypFromProductId(purchase.productID);
+        final typ = _aboTypFromProductId(purchase.productID) ?? 'free';
         final user = Supabase.instance.client.auth.currentUser;
 
-        if (user != null && typ != null && typ != _aboTyp) {
+        if (user != null && typ != _aboTyp) {
           try {
             await Supabase.instance.client
                 .from('users')
                 .update({'abo_typ': typ})
                 .eq('id', user.id);
+
             if (!mounted) return;
             setState(() {
               _aboTyp = typ;
             });
+
+            // 🔎 Analytics: Subscription gestartet + User-Property „plan“
+            unawaited(AnalyticsService.I.subscriptionStarted(plan: typ));
+            unawaited(AnalyticsService.I.setUserProps(plan: typ));
+
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(l10n.premiumActivated)));
           } catch (_) {
-            // still proceed to complete purchase
+            // ignore; Kauf trotzdem abschließen
           }
         }
 
-        foundActive = true;
+        anyPurchaseCompleted = true;
 
         if (purchase.pendingCompletePurchase) {
           await InAppPurchase.instance.completePurchase(purchase);
@@ -157,34 +194,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
       }
     }
 
-    // Wenn kein aktives Purchase gefunden wurde → auf free zurückstufen
-    if (!foundActive) {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user != null && _aboTyp != 'free') {
-        try {
-          await Supabase.instance.client
-              .from('users')
-              .update({'abo_typ': 'free'})
-              .eq('id', user.id);
-          if (!mounted) return;
-          setState(() {
-            _aboTyp = 'free';
-          });
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(l10n.premiumDeactivated)));
-        } catch (_) {
-          // ignore
-        }
-      }
+    // Einmaliger Restore-Kick
+    if (anyPurchaseCompleted && !_didRestoreAfterFirstPurchase) {
+      _didRestoreAfterFirstPurchase = true;
+      try {
+        await InAppPurchaseService().restorePurchases();
+      } catch (_) {}
     }
-  }
-
-  // Produkt-ID → Abo-Typ
-  String? _aboTypFromProductId(String productId) {
-    if (productId.contains('gold')) return 'gold';
-    if (productId.contains('silver')) return 'silver';
-    return null;
   }
 
   @override
@@ -278,6 +294,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'FREE',
                     color: Colors.grey[50]!,
                     badge: Icons.lock_open_rounded,
+                    extraTop: null,
                     features: [
                       l10n.premiumPushDelayFree,
                       l10n.premiumFreeFeature1,
@@ -297,6 +314,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'SILVER',
                     color: Colors.blue[50]!,
                     badge: Icons.verified,
+                    extraTop: (silver != null)
+                        ? _priceLine(silver!, durationLabel: 'Monthly')
+                        : null,
                     features: [
                       l10n.premiumPushDelaySilver,
                       l10n.premiumSilverFeature1,
@@ -318,6 +338,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     title: 'GOLD',
                     color: Colors.amber[100]!,
                     badge: Icons.workspace_premium,
+                    extraTop: (gold != null)
+                        ? _priceLine(gold!, durationLabel: 'Monthly')
+                        : null,
                     features: [
                       l10n.premiumPushDelayGold,
                       l10n.premiumGoldFeature1,
@@ -336,7 +359,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Fehler-/Hinweisbereich zum Store
                   if (!_storeAvailable ||
                       _products.isEmpty ||
                       _storeError != null)
@@ -391,6 +413,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     required VoidCallback onTap,
     bool highlighted = false,
     bool showButton = true,
+    Widget? extraTop,
   }) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
@@ -432,6 +455,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 const Spacer(),
               ],
             ),
+            if (extraTop != null) ...[const SizedBox(height: 8), extraTop],
             const SizedBox(height: 10),
             ...?features?.map(
               (f) => Padding(

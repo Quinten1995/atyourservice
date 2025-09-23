@@ -439,7 +439,10 @@
   "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
   "planFree": "Gratuito",
   "planSilver": "Argento",
-  "planGold": "Oro"
+  "planGold": "Oro",
+  "filterNeu": "Nuovi",
+"onlyNewWindowInfo": "Mostra gli incarichi delle ultime {hours} ore.",
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
 
 
 

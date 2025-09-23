@@ -1353,4 +1353,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get planGold => 'Or';
+
+  @override
+  String get filterNeu => 'Nouveau';
+
+  @override
+  String onlyNewWindowInfo(int hours) {
+    return 'Affiche les missions des $hours dernières heures.';
+  }
 }

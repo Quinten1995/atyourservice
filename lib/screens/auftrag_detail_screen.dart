@@ -9,6 +9,8 @@ import '../utils/pdf_invoice_service.dart';
 import 'pdf_rechnung_screen.dart';
 import '../utils/category_utils.dart';
 import '../widgets/dienstleister_badges_widget.dart';
+// 🔎 Analytics
+import '../utils/analytics_service.dart';
 
 IconData getKategorieIcon(String? kategorie) {
   if (kategorie == null) return Icons.assignment_ind;
@@ -271,6 +273,25 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
       setState(() {
         _isLoading = false;
       });
+
+      // 🔎 Analytics: job_viewed (nur für Dienstleister)
+      try {
+        if (_isDienstleister && _auftragDetails != null) {
+          await AnalyticsService.I.logEvent(
+            'job_viewed',
+            params: {
+              'job_id': _auftragDetails!.id,
+              'category': _auftragDetails!.kategorie ?? '(none)',
+              'price_type': (_auftragDetails!.preisTyp ?? '(none)')
+                  .toLowerCase(),
+              'has_address':
+                  (_auftragDetails!.adresse != null &&
+                  _auftragDetails!.adresse!.isNotEmpty),
+              'status': _auftragDetails!.status.toLowerCase(),
+            },
+          );
+        }
+      } catch (_) {}
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
@@ -401,6 +422,19 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _isLoading = false;
       });
 
+      // 🔎 Analytics: Job angenommen (optional mit Time-to-Response)
+      try {
+        final createdAt = _auftragDetails?.erstelltAm;
+        final ttr = createdAt != null
+            ? DateTime.now().toUtc().difference(createdAt.toUtc()).inSeconds
+            : null;
+
+        await AnalyticsService.I.jobAccepted(
+          category: _auftragDetails?.kategorie ?? 'unknown',
+          ttr_s: ttr,
+        );
+      } catch (_) {}
+
       await _ladeRolleUndAktuellenAuftrag();
     } catch (e) {
       setState(() {
@@ -428,6 +462,21 @@ class _AuftragDetailScreenState extends State<AuftragDetailScreen> {
         _auftragDetails = Auftrag.fromJson(updated);
         _isLoading = false;
       });
+
+      // 🔎 Analytics: job_completed
+      try {
+        if (_auftragDetails != null) {
+          await AnalyticsService.I.logEvent(
+            'job_completed',
+            params: {
+              'job_id': _auftragDetails!.id,
+              'category': _auftragDetails!.kategorie ?? '(none)',
+              'price_type': (_auftragDetails!.preisTyp ?? '(none)')
+                  .toLowerCase(),
+            },
+          );
+        }
+      } catch (_) {}
 
       _zeigeBewertungsDialogWennNoetig();
     } catch (e) {

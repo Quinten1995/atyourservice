@@ -2636,6 +2636,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gold'**
   String get planGold;
+
+  /// No description provided for @filterNeu.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get filterNeu;
+
+  /// No description provided for @onlyNewWindowInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing jobs from the last {hours} hours.'**
+  String onlyNewWindowInfo(int hours);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

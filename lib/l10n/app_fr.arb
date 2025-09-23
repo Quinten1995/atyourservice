@@ -468,7 +468,10 @@
   "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
   "planFree": "Gratuit",
   "planSilver": "Argent",
-  "planGold": "Or"
+  "planGold": "Or",
+  "filterNeu": "Nouveau",
+"onlyNewWindowInfo": "Affiche les missions des {hours} dernières heures.",
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
 
 
 

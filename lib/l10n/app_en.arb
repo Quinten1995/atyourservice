@@ -441,7 +441,10 @@
   "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
   "planFree": "Free",
   "planSilver": "Silver",
-  "planGold": "Gold"
+  "planGold": "Gold",
+  "filterNeu": "New",
+"onlyNewWindowInfo": "Showing jobs from the last {hours} hours.",
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
 
 
 

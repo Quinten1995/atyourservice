@@ -436,7 +436,10 @@
   "@upsellUpgradeButton": { "placeholders": { "plan": { "type": "String" } } },
   "planFree": "Free",
   "planSilver": "Silber",
-  "planGold": "Gold"
+  "planGold": "Gold",
+  "filterNeu": "Neu",
+"onlyNewWindowInfo": "Zeigt Aufträge der letzten {hours} Stunden.",
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
 
 
 
