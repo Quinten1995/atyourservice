@@ -1361,4 +1361,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String onlyNewWindowInfo(int hours) {
     return 'Toont opdrachten van de laatste $hours uur.';
   }
+
+  @override
+  String get cancelLabel => 'Annuleren';
+
+  @override
+  String get editProfileCta => 'Profiel voltooien';
 }

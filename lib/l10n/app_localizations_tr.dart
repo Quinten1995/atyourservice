@@ -1361,4 +1361,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String onlyNewWindowInfo(int hours) {
     return 'Son $hours saat içindeki işleri gösteriyor.';
   }
+
+  @override
+  String get cancelLabel => 'İptal';
+
+  @override
+  String get editProfileCta => 'Profili tamamla';
 }

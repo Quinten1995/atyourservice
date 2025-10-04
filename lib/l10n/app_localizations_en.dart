@@ -1361,4 +1361,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String onlyNewWindowInfo(int hours) {
     return 'Showing jobs from the last $hours hours.';
   }
+
+  @override
+  String get cancelLabel => 'Cancel';
+
+  @override
+  String get editProfileCta => 'Complete profile';
 }

@@ -8,7 +8,7 @@ import 'auftrag_detail_screen.dart';
 import 'profil_dienstleister_screen.dart';
 import 'pdf_rechnung_screen.dart';
 import 'achievement_screen.dart';
-import 'premium_screen.dart'; // für Upgrade-CTA
+import 'premium_screen.dart';
 
 import '../l10n/app_localizations.dart';
 import '../l10n/status_value_extension.dart';
@@ -71,6 +71,11 @@ class _DienstleisterDashboardScreenState
   bool _onlyNew = false;
   static const int _kNewWindowHours = 24; // 24h-Fenster für "Neu"
 
+  // --- Profil-Popup-Steuerung ---
+  bool _needsProfileCompletion = false;
+  bool _profilePopupShown = false;
+  String? _profilePromptText; // aus l10n
+
   bool _isNewByTime(DateTime? createdUtc) {
     if (createdUtc == null) return false;
     final diff = DateTime.now().toUtc().difference(createdUtc.toUtc());
@@ -89,7 +94,7 @@ class _DienstleisterDashboardScreenState
   double _planRadius(String? abo) {
     switch ((abo ?? 'free').toLowerCase()) {
       case 'gold':
-        return 30.0; // aktuell in deinem Projekt so genutzt
+        return 30.0; // aktuell so genutzt
       case 'silver':
         return 15.0;
       default:
@@ -136,30 +141,41 @@ class _DienstleisterDashboardScreenState
       _completedJobsCount = 0;
       _durchschnittsbewertung = 0.0;
       _anzahlBewertungen = 0;
+
+      _needsProfileCompletion = false;
+      _profilePromptText = null;
     });
 
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception(l10n.notLoggedIn);
 
+      // --- Profil laden ---
       final List<dynamic> profilList = await supabase
           .from('dienstleister_details')
           .select('kategorie, latitude, longitude')
           .eq('user_id', user.id);
 
-      if (profilList.isEmpty) throw Exception(l10n.pleaseCreateProfile);
+      if (profilList.isEmpty) {
+        _needsProfileCompletion = true;
+        _profilePromptText = l10n.pleaseCreateProfile;
+      } else {
+        final profilData = profilList.first as Map<String, dynamic>;
+        final String? kategorie = profilData['kategorie'] as String?;
+        final double? latitude = (profilData['latitude'] as num?)?.toDouble();
+        final double? longitude = (profilData['longitude'] as num?)?.toDouble();
 
-      final profilData = profilList.first as Map<String, dynamic>;
-      final String? kategorie = profilData['kategorie'] as String?;
-      final double? latitude = (profilData['latitude'] as num?)?.toDouble();
-      final double? longitude = (profilData['longitude'] as num?)?.toDouble();
+        if (kategorie == null || kategorie.isEmpty) {
+          _needsProfileCompletion = true;
+          _profilePromptText = l10n.profilMissingCategory;
+        } else {
+          _meineKategorie = kategorie;
+          _meineLatitude = latitude;
+          _meineLongitude = longitude;
+        }
+      }
 
-      if (kategorie == null) throw Exception(l10n.profilMissingCategory);
-
-      _meineKategorie = kategorie;
-      _meineLatitude = latitude;
-      _meineLongitude = longitude;
-
+      // Abo-Typ
       final userData = await supabase
           .from('users')
           .select('abo_typ')
@@ -167,6 +183,7 @@ class _DienstleisterDashboardScreenState
           .maybeSingle();
       _aboTyp = (userData?['abo_typ'] as String?) ?? 'free';
 
+      // Aufträge nur laden, wenn Kategorie vorhanden
       if (_meineKategorie != null) {
         final List<dynamic> rawOffen = await supabase
             .from('auftraege')
@@ -244,7 +261,6 @@ class _DienstleisterDashboardScreenState
           }
         }
 
-        // Sortiere beide nach Distanz
         int cmpByDist(Auftrag x, Auftrag y) {
           final dx = berechneEntfernung(
             _meineLatitude!,
@@ -265,30 +281,35 @@ class _DienstleisterDashboardScreenState
         upsell.sort(cmpByDist);
 
         _offenePassendeAuftraege = visible;
-        // Nicht spammen: max. 3 Upsell-Karten lokal
         _offeneUpsellAuftraege = nextPlan == null
             ? <Auftrag>[]
             : upsell.take(3).toList();
       } else {
-        // kein Standort → alles normal sichtbar, kein Upsell
         _offenePassendeAuftraege = _alleOffenenAuftraegeRaw
             .map((m) => Auftrag.fromJson(m))
             .toList();
         _offeneUpsellAuftraege = [];
       }
 
-      // 🔎 Analytics: User-Kontext nach erfolgreichem Laden setzen
+      // 🔎 Analytics: User-Kontext
       try {
         await AnalyticsService.I.setUserId(user.id);
         await AnalyticsService.I.setUserProps(
           role: 'provider',
           plan: _aboTyp ?? 'free',
           locale: l10n.localeName,
-          // city könntest du später setzen, sobald du einen City-String hast
+          // city später, wenn verfügbar
         );
       } catch (_) {}
 
       setState(() => _isLoading = false);
+
+      // 👉 Nach dem Laden: ggf. Popup zeigen (nur 1x pro Sitzung)
+      if (_needsProfileCompletion && !_profilePopupShown) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showProfileIncompleteDialog();
+        });
+      }
     } catch (e) {
       final msg = e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
       setState(() {
@@ -298,7 +319,88 @@ class _DienstleisterDashboardScreenState
     }
   }
 
-  // ----- Preis Helpers (l10n-ready, analog Kunden-Dashboard) -----
+  // --- Popup bei unvollständigem Profil ---
+  Future<void> _showProfileIncompleteDialog() async {
+    if (_profilePopupShown) return;
+    _profilePopupShown = true;
+
+    final l10n = AppLocalizations.of(context)!;
+    final text = _profilePromptText ?? l10n.pleaseCreateProfile;
+
+    try {
+      await AnalyticsService.I.screenView(
+        screen: 'provider_profile_prompt',
+        step: 'incomplete',
+      );
+    } catch (_) {}
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.person_outline, size: 22),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.profil,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            text, // nutzt denselben l10n-Text wie vorher im Hintergrund
+            style: const TextStyle(fontSize: 15.5, height: 1.35),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).maybePop();
+              },
+              child: Text(l10n.cancelLabel), // <-- L10n-Key
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.edit),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: DienstleisterDashboardScreen.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () async {
+                try {
+                  await AnalyticsService.I.logEvent(
+                    'provider_profile_prompt_cta',
+                    params: {'action': 'go_to_profile'},
+                  );
+                } catch (_) {}
+                Navigator.of(ctx).maybePop();
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProfilDienstleisterScreen(),
+                  ),
+                );
+                // Nach Rückkehr neu laden
+                await _ladeProfilUndAuftraege();
+              },
+              label: Text(l10n.editProfileCta), // <-- L10n-Key
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ----- Preis Helpers (l10n-ready) -----
   String? _formatPrice(Auftrag a, AppLocalizations l10n) {
     final typ = (a.preisTyp ?? '').toLowerCase();
     final v = a.preis;
@@ -530,7 +632,7 @@ class _DienstleisterDashboardScreenState
     );
   }
 
-  // ----- Upsell (LOCKED) Karte — ohne Kategoriezeile -----
+  // ----- Upsell (LOCKED) Karte -----
   Widget _buildLockedCard({
     required Auftrag auftrag,
     required String requiredPlan, // 'silver' | 'gold'
@@ -621,14 +723,12 @@ class _DienstleisterDashboardScreenState
 
   // ----- Kartenlisten -----
   List<Widget> _buildOffeneKarten(AppLocalizations l10n) {
-    // 1) Optionale Neu-Filterung (nur sichtbare, offene!)
     final List<Auftrag> sichtbareOffene = _onlyNew
         ? _offenePassendeAuftraege
               .where((a) => _isNewByTime(a.erstelltAm))
               .toList()
         : _offenePassendeAuftraege;
 
-    // 2) Normale offenen Karten rendern
     final openCards = sichtbareOffene.map((auftrag) {
       String distText = '';
       if (_meineLatitude != null &&
@@ -659,7 +759,7 @@ class _DienstleisterDashboardScreenState
       );
     }).toList();
 
-    // 3) Upsell-Karten (max 3), an sinnvollen Positionen einstreuen
+    // Upsell-Karten einstreuen (max 3)
     if (_offeneUpsellAuftraege.isNotEmpty) {
       final lockedCards = <Widget>[];
       final nextPlan = _nextPlan(_aboTyp)!;
@@ -687,14 +787,11 @@ class _DienstleisterDashboardScreenState
         );
       }
 
-      // Einfüge-Positionen (nicht aggressiv)
       final positions = <int>[2, 7, 12];
       int li = 0;
       for (final p in positions) {
         if (li >= lockedCards.length) break;
-        final idx = (p < 0)
-            ? 0
-            : (p > openCards.length ? openCards.length : p); // clamp
+        final idx = (p < 0) ? 0 : (p > openCards.length ? openCards.length : p);
         openCards.insert(idx, lockedCards[li++]);
       }
     }
@@ -814,7 +911,6 @@ class _DienstleisterDashboardScreenState
       if (_alleAbgeschlosseneAuftraegeRaw.isNotEmpty) {
         cards.addAll(_buildAbgeschlosseneKarten(l10n));
       }
-      // Offene + Upsell
       final offeneMitUpsell = _buildOffeneKarten(l10n);
       if (offeneMitUpsell.isNotEmpty) cards.addAll(offeneMitUpsell);
     } else if (_selectedFilter == 1) {
@@ -857,7 +953,6 @@ class _DienstleisterDashboardScreenState
         if (i == _bottomNavIndex) return;
         setState(() => _bottomNavIndex = i);
         if (i == 1) {
-          // Top bewertet: Ø >= 4.5 UND mindestens 5 Bewertungen
           final isTopBewertet =
               _durchschnittsbewertung >= 4.5 && _anzahlBewertungen >= 5;
 
@@ -1039,7 +1134,7 @@ class _DienstleisterDashboardScreenState
     );
   }
 
-  // ----- Neu-Toggle-Zeile: runder Button -----
+  // ----- Neu-Toggle-Zeile -----
   Widget _buildNewToggle(AppLocalizations l10n) {
     final bool on = _onlyNew;
     return Padding(

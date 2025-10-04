@@ -1361,4 +1361,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String onlyNewWindowInfo(int hours) {
     return 'Mostra gli incarichi delle ultime $hours ore.';
   }
+
+  @override
+  String get cancelLabel => 'Annulla';
+
+  @override
+  String get editProfileCta => 'Completa il profilo';
 }

@@ -439,7 +439,9 @@
   "planGold": "Gold",
   "filterNeu": "Neu",
 "onlyNewWindowInfo": "Zeigt Aufträge der letzten {hours} Stunden.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "Abbrechen",
+  "editProfileCta": "Profil vervollständigen"
 
 
 

@@ -444,7 +444,11 @@
   "planGold": "Gold",
   "filterNeu": "New",
 "onlyNewWindowInfo": "Showing jobs from the last {hours} hours.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "Cancel",
+  "@cancelLabel": {"description": "Generic cancel button label"},
+  "editProfileCta": "Complete profile",
+  "@editProfileCta": {"description": "CTA to open provider profile screen"}
 
 
 

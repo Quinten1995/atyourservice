@@ -2648,6 +2648,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Showing jobs from the last {hours} hours.'**
   String onlyNewWindowInfo(int hours);
+
+  /// Generic cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelLabel;
+
+  /// CTA to open provider profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Complete profile'**
+  String get editProfileCta;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

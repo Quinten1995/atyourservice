@@ -434,7 +434,9 @@
   "planGold": "Goud",
   "filterNeu": "Nieuw",
 "onlyNewWindowInfo": "Toont opdrachten van de laatste {hours} uur.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "Annuleren",
+  "editProfileCta": "Profiel voltooien"
 
 
 

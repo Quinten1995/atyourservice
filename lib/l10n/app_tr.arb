@@ -444,7 +444,9 @@
   "planGold": "Altın",
   "filterNeu": "Yeni",
 "onlyNewWindowInfo": "Son {hours} saat içindeki işleri gösteriyor.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "İptal",
+  "editProfileCta": "Profili tamamla"
 
 
 

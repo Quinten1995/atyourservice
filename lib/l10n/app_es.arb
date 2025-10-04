@@ -444,7 +444,9 @@
   "planGold": "Oro",
   "filterNeu": "Nuevos",
 "onlyNewWindowInfo": "Muestra trabajos de las últimas {hours} horas.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "Cancelar",
+  "editProfileCta": "Completar perfil"
 
 
 

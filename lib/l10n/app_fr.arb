@@ -471,7 +471,9 @@
   "planGold": "Or",
   "filterNeu": "Nouveau",
 "onlyNewWindowInfo": "Affiche les missions des {hours} dernières heures.",
-"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } }
+"@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
+"cancelLabel": "Annuler",
+  "editProfileCta": "Compléter le profil"
 
 
 
