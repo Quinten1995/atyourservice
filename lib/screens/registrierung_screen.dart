@@ -53,9 +53,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
           await AnalyticsService.I.setUserProps(
             role: role,
             locale: l10n.localeName,
-            // city kannst du später setzen, wenn du sie hast (Profil/Adresse)
           );
-          // City noch unbekannt → placeholder 'unknown' (später ersetzen)
           await AnalyticsService.I.signupCompleted(role: role, city: 'unknown');
         } catch (_) {}
 
@@ -69,7 +67,6 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.registerExists)),
         );
-        // KEIN pop im Fehlerfall!
       }
     } on AuthException catch (authError) {
       final err = authError.message.toLowerCase();
@@ -90,7 +87,6 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(userMessage)));
-      // KEIN pop im Fehlerfall!
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -99,7 +95,6 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
           ),
         ),
       );
-      // KEIN pop im Fehlerfall!
     } finally {
       setState(() => _isLoading = false);
     }
@@ -112,7 +107,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     super.dispose();
   }
 
-  /// Helper zum Anzeigen der übersetzten Kategorie
+  /// Helper: übersetztes Label einer Kategorie
   String getKategorieLabel(String kategorieKey, AppLocalizations l10n) {
     switch (kategorieKey) {
       case 'category_babysitter':
@@ -140,7 +135,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
       case 'category_friseur':
         return l10n.category_friseur;
       case 'category_gartenpflege':
-        return l10n.category_gartenpflege;
+        return l10n.category_gartenpflege; // L10n: „Gartenpflege / GaLa-Bau“
       case 'category_grafikdesign':
         return l10n.category_grafikdesign;
       case 'category_handy_reparatur':
@@ -222,9 +217,67 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
     }
   }
 
+  /// ACTIVE zuerst (alphabetisch nach Label), dann BETA (alphabetisch)
+  List<String> sortedSelectableKeys(AppLocalizations l10n) {
+    final all = selectableCategoryKeys(); // ACTIVE + BETA aus kategorien.dart
+    final active = <String>[];
+    final beta = <String>[];
+
+    for (final k in all) {
+      (categoryStatus[k] == CategoryStatus.beta ? beta : active).add(k);
+    }
+
+    int byLabel(String a, String b) =>
+        getKategorieLabel(a, l10n).compareTo(getKategorieLabel(b, l10n));
+
+    active.sort(byLabel);
+    beta.sort(byLabel);
+    return [...active, ...beta];
+  }
+
+  /// UI: hübsches Dropdown-Item mit optionalem „Beta“-Chip
+  Widget _categoryDropdownItem(String key, AppLocalizations l10n) {
+    final baseLabel = getKategorieLabel(key, l10n);
+    final isBeta = categoryStatus[key] == CategoryStatus.beta;
+
+    // Falls du später einen i18n-Key möchtest: l10n.badgeBeta
+    const betaText = 'Beta';
+
+    // Chip-Optik dezent & lesbar im Dropdown
+    final betaChip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.amber.shade200),
+      ),
+      child: Text(
+        betaText,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.amber.shade800,
+          height: 1.0,
+        ),
+      ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: Text(baseLabel, overflow: TextOverflow.ellipsis)),
+        if (isBeta) ...[const SizedBox(width: 8), betaChip],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // 🔹 Nur ACTIVE + BETA für die Auswahl – erst ACTIVE (A-Z), dann BETA (A-Z)
+    final keys = sortedSelectableKeys(l10n);
+
     return Scaffold(
       backgroundColor: accentColor,
       appBar: AppBar(
@@ -275,9 +328,7 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                         borderSide: BorderSide(color: primaryColor, width: 2),
                       ),
                     ),
-                    borderRadius: BorderRadius.circular(
-                      22,
-                    ), // Menüs jetzt abgerundet!
+                    borderRadius: BorderRadius.circular(22),
                     items: [
                       DropdownMenuItem(
                         value: 'kunde',
@@ -303,7 +354,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                   if (_rolle == 'dienstleister') ...[
                     const SizedBox(height: 20),
                     DropdownButtonFormField<String>(
-                      value: _selectedKategorie ?? kategorieKeys.first,
+                      value:
+                          _selectedKategorie ??
+                          (keys.isNotEmpty ? keys.first : null),
                       decoration: InputDecoration(
                         labelText: l10n.categoryLabel,
                         filled: true,
@@ -320,23 +373,29 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                           borderSide: BorderSide(color: primaryColor, width: 2),
                         ),
                       ),
-                      borderRadius: BorderRadius.circular(
-                        22,
-                      ), // Menüs jetzt abgerundet!
-                      items: kategorieKeys.map((kategorie) {
+                      borderRadius: BorderRadius.circular(22),
+                      items: keys.map((kategorie) {
                         return DropdownMenuItem(
                           value: kategorie,
-                          child: Text(getKategorieLabel(kategorie, l10n)),
+                          child: _categoryDropdownItem(kategorie, l10n),
                         );
                       }).toList(),
                       onChanged: (value) {
                         setState(() => _selectedKategorie = value);
                       },
-                      validator: (value) =>
-                          (_rolle == 'dienstleister' &&
-                              (value == null || value.isEmpty))
-                          ? l10n.categoryValidator
-                          : null,
+                      validator: (value) {
+                        if (_rolle != 'dienstleister') return null;
+                        if (keys.isEmpty) {
+                          return l10n.kategorieValidator;
+                        }
+                        if (value == null || value.isEmpty) {
+                          return l10n.kategorieValidator;
+                        }
+                        if (!keys.contains(value)) {
+                          return l10n.kategorieValidator;
+                        }
+                        return null;
+                      },
                     ),
                   ],
 
@@ -363,8 +422,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return l10n.emailEmpty;
+                      }
                       if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
                         return l10n.emailInvalid;
                       }
@@ -395,8 +455,9 @@ class _RegistrierungScreenState extends State<RegistrierungScreen> {
                     ),
                     obscureText: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return l10n.passwordEmpty;
+                      }
                       if (value.length < 6) return l10n.passwordTooShort;
                       return null;
                     },

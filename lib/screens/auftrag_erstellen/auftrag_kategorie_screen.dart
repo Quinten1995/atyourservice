@@ -13,17 +13,68 @@ class AuftragKategorieScreen extends StatelessWidget {
   const AuftragKategorieScreen({Key? key, required this.formData})
     : super(key: key);
 
+  /// ACTIVE zuerst (alphabetisch nach Label), dann BETA (alphabetisch)
+  List<String> _sortedSelectableKeys(AppLocalizations l10n) {
+    final all = selectableCategoryKeys(); // ACTIVE + BETA aus kategorien.dart
+    final active = <String>[];
+    final beta = <String>[];
+
+    for (final k in all) {
+      (categoryStatus[k] == CategoryStatus.beta ? beta : active).add(k);
+    }
+
+    int byLabel(String a, String b) =>
+        getKategorieLabel(a, l10n).compareTo(getKategorieLabel(b, l10n));
+
+    active.sort(byLabel);
+    beta.sort(byLabel);
+    return [...active, ...beta];
+  }
+
+  /// Dropdown-Item mit optionalem „Beta“-Chip (gleicher Stil wie Registrierung)
+  Widget _categoryDropdownItem(String key, AppLocalizations l10n) {
+    final baseLabel = getKategorieLabel(key, l10n);
+    final isBeta = categoryStatus[key] == CategoryStatus.beta;
+
+    const betaText = 'Beta'; // Optional: via l10n.badgeBeta
+
+    final betaChip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.amber.shade200),
+      ),
+      child: Text(
+        betaText,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.amber.shade800,
+          height: 1.0,
+        ),
+      ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: Text(baseLabel, overflow: TextOverflow.ellipsis)),
+        if (isBeta) ...[const SizedBox(width: 8), betaChip],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    final sortedKategorieEntries =
-        (kategorieKeys
-            .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
-            .toList()
-          ..sort((a, b) => a.value.compareTo(b.value)));
+    // 🔹 Nur ACTIVE + BETA – erst ACTIVE (A–Z), dann BETA (A–Z)
+    final keys = _sortedSelectableKeys(l10n);
 
-    String? selectedKategorie = formData.kategorie ?? kategorieKeys.first;
+    // Fallback: falls (theoretisch) keine Keys vorhanden
+    String? selectedKategorie =
+        formData.kategorie ?? (keys.isNotEmpty ? keys.first : null);
     formData.kategorie ??= selectedKategorie;
 
     return Scaffold(
@@ -89,7 +140,7 @@ class AuftragKategorieScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 22),
 
-                      // ✅ Kein Expanded in ScrollView! Breite via SizedBox + isExpanded
+                      // ✅ Dropdown: ACTIVE zuerst, dann BETA (beide A–Z), mit Beta-Chip
                       SizedBox(
                         width: double.infinity,
                         child: DropdownButtonFormField<String>(
@@ -110,19 +161,26 @@ class AuftragKategorieScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          items: sortedKategorieEntries.map((entry) {
+                          items: keys.map((key) {
                             return DropdownMenuItem(
-                              value: entry.key,
-                              child: Text(
-                                entry.value,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
+                              value: key,
+                              child: _categoryDropdownItem(key, l10n),
                             );
                           }).toList(),
                           onChanged: (val) {
                             formData.kategorie = val;
                             selectedKategorie = val;
+                          },
+                          validator: (_) {
+                            if (formData.kategorie == null) {
+                              return l10n.kategorieValidator;
+                            }
+                            // Sicherheit: nur ACTIVE/BETA erlaubt
+                            if (formData.kategorie != null &&
+                                !keys.contains(formData.kategorie)) {
+                              return l10n.kategorieValidator;
+                            }
+                            return null;
                           },
                           borderRadius: BorderRadius.circular(16),
                         ),

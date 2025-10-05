@@ -27,25 +27,20 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _nameController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
-  String _selectedKategorie = kategorieKeys.first;
+  String? _selectedKategorie; // ← nicht mehr hart auf kategorieKeys.first
   final _adresseController = TextEditingController();
 
   // Rechnungs-/Firmen-/Steuerdaten
-  final _invoiceNameController =
-      TextEditingController(); // Absender-Name auf Rechnung
+  final _invoiceNameController = TextEditingController(); // Absender-Name
   final _invoiceAddressController = TextEditingController(); // Rechnungsadresse
-  final _invoiceTaxNumberController =
-      TextEditingController(); // Steuernummer (oder USt)
+  final _invoiceTaxNumberController = TextEditingController(); // Steuernummer
   final _invoiceIbanController = TextEditingController();
   final _invoiceBicController = TextEditingController();
   final _invoiceLogoUrlController = TextEditingController();
 
-  final _companyNameController =
-      TextEditingController(); // Firmenname (optional)
-  final _ustIdController = TextEditingController(); // USt-ID (optional)
-  final _vatRateController = TextEditingController(
-    text: '19',
-  ); // Standard-USt-Satz
+  final _companyNameController = TextEditingController(); // Firmenname (opt)
+  final _ustIdController = TextEditingController(); // USt-ID (opt)
+  final _vatRateController = TextEditingController(text: '19'); // Standard-USt
 
   bool _isSmallBusiness = false; // §19 UStG
 
@@ -120,7 +115,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   // --- Autosave: debounce + leise speichern ---
   void _scheduleAutosave() {
-    // Free + innerhalb 20 Tage gelockt -> NICHT speichern (wie bisher). Kein UI-Noise.
     final isFree = (_aboTyp ?? 'free') == 'free';
     final locked =
         isFree &&
@@ -148,7 +142,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     final email = _emailController.text.trim();
     final emailOk =
         email.isNotEmpty && RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email);
-    final katOk = _selectedKategorie.isNotEmpty;
+    final katOk = (_selectedKategorie ?? '').isNotEmpty;
     return nameOk && phoneOk && emailOk && katOk;
   }
 
@@ -174,13 +168,23 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           .eq('user_id', user.id)
           .maybeSingle();
 
+      // WELCHE Keys sind heute überhaupt auswählbar?
+      final allowedKeys = selectableCategoryKeys(); // ACTIVE + BETA
+
       if (data != null) {
         _nameController.text = data['name'] as String? ?? '';
-        final gespeicherteKategorie =
-            data['kategorie'] as String? ?? kategorieKeys.first;
-        _selectedKategorie = kategorieKeys.contains(gespeicherteKategorie)
-            ? gespeicherteKategorie
-            : kategorieKeys.first;
+
+        final gespeicherteKategorie = data['kategorie'] as String?;
+        // Nutzung nur, wenn zulässig – sonst Fallback auf erste erlaubte
+        if (gespeicherteKategorie != null &&
+            allowedKeys.contains(gespeicherteKategorie)) {
+          _selectedKategorie = gespeicherteKategorie;
+        } else {
+          _selectedKategorie = allowedKeys.isNotEmpty
+              ? allowedKeys.first
+              : null;
+        }
+
         _adresseController.text = data['adresse'] as String? ?? '';
         _telefonController.text = data['telefon'] as String? ?? '';
         _emailController.text = (data['email'] as String?)?.isNotEmpty == true
@@ -208,6 +212,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
         final vatNum = (data['default_vat_rate'] as num?)?.toDouble();
         _vatRateController.text = vatNum != null ? vatNum.toString() : '19';
+      } else {
+        // Kein Profil vorhanden → Fallback-Kategorie
+        _selectedKategorie = allowedKeys.isNotEmpty ? allowedKeys.first : null;
       }
 
       final userData = await _supabase
@@ -306,7 +313,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final isFree = (_aboTyp ?? 'free') == 'free';
       final now = DateTime.now();
 
-      // Free & gelockt -> nur Avatar erlauben, sonst nichts (Verhalten bleibt gleich)
+      // Free & gelockt -> nur Avatar erlauben
       final locked =
           isFree &&
           _lastProfileChange != null &&
@@ -339,26 +346,21 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             );
           }
         }
-        return; // fertig
+        return;
       }
 
-      // --- Nicht gelockt: silent => keine harte Form-Validierung/Fehler-UI
+      // Validierung
       if (!silent) {
-        if (!_formKey.currentState!.validate()) {
-          return;
-        }
+        if (!_formKey.currentState!.validate()) return;
       } else {
-        if (!_isSoftValid()) {
-          // leise abbrechen, um keine halbgaren Updates zu speichern
-          return;
-        }
+        if (!_isSoftValid()) return;
       }
 
       // Felder
       final name = _nameController.text.trim();
       final telefon = _telefonController.text.trim();
       final email = _emailController.text.trim();
-      final kategorie = _selectedKategorie;
+      final kategorie = _selectedKategorie; // bereits validiert
       final adresse = _adresseController.text.trim();
 
       double? lat;
@@ -367,7 +369,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         final coords = await GeocodingService().getCoordinates(adresse);
         if (coords == null) {
           if (silent) {
-            // leise abbrechen, wenn Adresse noch nicht geocodierbar ist
             return;
           } else {
             throw Exception(AppLocalizations.of(context)!.addressNotFound);
@@ -377,7 +378,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         lon = coords['lng'];
       }
 
-      // Avatar ggf. hochladen (auch hier, falls der Nutzer gerade geändert hat)
+      // Avatar ggf. hochladen
       String? profilbildUrl = _profilbildUrl;
       if (_neuesProfilbild != null) {
         final fileName =
@@ -447,7 +448,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(l10n.profileSaved)));
       }
-      if (!silent) _ladeBewertungen(); // wie vorher
+      if (!silent) _ladeBewertungen();
     } catch (e) {
       if (!silent) {
         setState(() {
@@ -473,7 +474,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       setState(() {
         _neuesProfilbild = File(picked.path);
       });
-      // Sofort Avatar speichern, unabhängig von Free/Lock und ohne restliche Validierung
       await _saveAvatarOnly();
     }
   }
@@ -622,6 +622,57 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     );
   }
 
+  /// ACTIVE zuerst (alphabetisch nach Label), dann BETA (alphabetisch)
+  List<String> _sortedSelectableKeys(AppLocalizations l10n) {
+    final all = selectableCategoryKeys(); // ACTIVE + BETA aus kategorien.dart
+    final active = <String>[];
+    final beta = <String>[];
+
+    for (final k in all) {
+      (categoryStatus[k] == CategoryStatus.beta ? beta : active).add(k);
+    }
+
+    int byLabel(String a, String b) =>
+        getKategorieLabel(a, l10n).compareTo(getKategorieLabel(b, l10n));
+
+    active.sort(byLabel);
+    beta.sort(byLabel);
+    return [...active, ...beta];
+  }
+
+  /// Dropdown-Item mit optionalem „Beta“-Chip
+  Widget _categoryDropdownItem(String key, AppLocalizations l10n) {
+    final baseLabel = getKategorieLabel(key, l10n);
+    final isBeta = categoryStatus[key] == CategoryStatus.beta;
+
+    const betaText = 'Beta'; // Optional: i18n
+    final betaChip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.amber.shade200),
+      ),
+      child: Text(
+        betaText,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.amber.shade800,
+          height: 1.0,
+        ),
+      ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(child: Text(baseLabel, overflow: TextOverflow.ellipsis)),
+        if (isBeta) ...[const SizedBox(width: 8), betaChip],
+      ],
+    );
+  }
+
   /// Rechnungs-/Steuerdaten: Immer sichtbar, aber bei Free/Silver ausgegraut
   Widget _rechnungsdatenWidget(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -648,8 +699,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           ),
         ),
         const SizedBox(height: 6),
-
-        // Firma & USt-ID (optional)
         TextFormField(
           controller: _companyNameController,
           decoration: invoiceDecoration(l10n.companyNameOptional),
@@ -664,8 +713,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           onChanged: (_) => _scheduleAutosave(),
         ),
         const SizedBox(height: 12),
-
-        // Rechnungsabsender
         TextFormField(
           controller: _invoiceNameController,
           decoration: invoiceDecoration(l10n.invoiceNameLabel),
@@ -687,8 +734,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           onChanged: (_) => _scheduleAutosave(),
         ),
         const SizedBox(height: 12),
-
-        // Bankdaten
         TextFormField(
           controller: _invoiceIbanController,
           decoration: invoiceDecoration(l10n.invoiceIbanLabel),
@@ -703,8 +748,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           onChanged: (_) => _scheduleAutosave(),
         ),
         const SizedBox(height: 12),
-
-        // Logo-URL
         TextFormField(
           controller: _invoiceLogoUrlController,
           decoration: invoiceDecoration(l10n.invoiceLogoUrlLabel),
@@ -712,8 +755,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           onChanged: (_) => _scheduleAutosave(),
         ),
         const SizedBox(height: 16),
-
-        // Kleinunternehmer / USt-Satz
         Opacity(
           opacity: isGold ? 1.0 : 0.6,
           child: IgnorePointer(
@@ -753,11 +794,10 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             ),
           ),
         ),
-
         const SizedBox(height: 10),
         if (!isGold)
           Text(
-            l10n.invoiceGoldInfo, // „Rechnungsdaten sind im GOLD-Abo bearbeitbar.“
+            l10n.invoiceGoldInfo,
             style: const TextStyle(fontSize: 13, color: Colors.red),
           ),
       ],
@@ -789,11 +829,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       }
     }
 
-    final sortedKategorieEntries =
-        (kategorieKeys
-            .map((key) => MapEntry(key, getKategorieLabel(key, l10n)))
-            .toList()
-          ..sort((a, b) => a.value.compareTo(b.value)));
+    // Nur ACTIVE + BETA – erst ACTIVE (A–Z), dann BETA (A–Z)
+    final keys = _sortedSelectableKeys(l10n);
 
     return Scaffold(
       backgroundColor: accentColor,
@@ -925,51 +962,54 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                         : null,
                                   ),
                                   const SizedBox(height: 18),
+
+                                  // Kategorien: ACTIVE zuerst, dann BETA (beide A–Z)
                                   DropdownButtonFormField<String>(
-                                    value: _selectedKategorie,
+                                    value:
+                                        _selectedKategorie ??
+                                        (keys.isNotEmpty ? keys.first : null),
                                     isExpanded: true,
                                     decoration: _inputDecoration(
                                       l10n.categoryLabel,
                                       icon: Icons.category,
                                     ),
                                     selectedItemBuilder: (context) =>
-                                        sortedKategorieEntries.map((entry) {
+                                        keys.map((k) {
                                           return Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              entry.value,
+                                              getKategorieLabel(k, l10n),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           );
                                         }).toList(),
-                                    items: sortedKategorieEntries.map((entry) {
+                                    items: keys.map((k) {
                                       return DropdownMenuItem(
-                                        value: entry.key,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: Text(
-                                            entry.value,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
+                                        value: k,
+                                        child: _categoryDropdownItem(k, l10n),
                                       );
                                     }).toList(),
                                     onChanged: (wert) {
                                       if (wert != null) {
-                                        setState(() {
-                                          _selectedKategorie = wert;
-                                        });
+                                        setState(
+                                          () => _selectedKategorie = wert,
+                                        );
                                         _scheduleAutosave();
                                       }
                                     },
-                                    validator: (value) =>
-                                        (value == null || value.isEmpty)
-                                        ? l10n.categoryValidator
-                                        : null,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return l10n.categoryValidator;
+                                      }
+                                      if (!keys.contains(value)) {
+                                        return l10n.categoryValidator;
+                                      }
+                                      return null;
+                                    },
                                     borderRadius: BorderRadius.circular(16),
                                   ),
+
                                   const SizedBox(height: 18),
                                   TextFormField(
                                     controller: _adresseController,
@@ -1030,7 +1070,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                         ),
                                       ),
                                     ),
-                                  // Speichern-Button bleibt (für Nutzer, die bewusst speichern wollen)
                                   SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton.icon(

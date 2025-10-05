@@ -623,7 +623,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get category_friseur => 'Friseur/in';
 
   @override
-  String get category_gartenpflege => 'Gartenpflege / Rasenmähen';
+  String get category_gartenpflege => 'Gartenpflege / GaLa-Bau';
 
   @override
   String get category_grafikdesign => 'Grafikdesign';

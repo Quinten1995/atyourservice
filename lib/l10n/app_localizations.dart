@@ -1380,7 +1380,7 @@ abstract class AppLocalizations {
   /// No description provided for @category_rasenmaeher_service.
   ///
   /// In en, this message translates to:
-  /// **'Lawnmower service'**
+  /// **'Garden Care / Landscaping'**
   String get category_rasenmaeher_service;
 
   /// No description provided for @category_rechtsberatung.

@@ -689,7 +689,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get category_personal_trainer => 'Personal trainer';
 
   @override
-  String get category_rasenmaeher_service => 'Grasmaaier-service';
+  String get category_rasenmaeher_service => 'Tuinonderhoud / Tuinaanleg';
 
   @override
   String get category_rechtsberatung => 'Juridisch advies';

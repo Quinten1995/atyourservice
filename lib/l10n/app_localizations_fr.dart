@@ -689,7 +689,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get category_personal_trainer => 'Coach personnel';
 
   @override
-  String get category_rasenmaeher_service => 'Service de tondeuse à gazon';
+  String get category_rasenmaeher_service => 'Entretien de jardin / Aménagement paysager';
 
   @override
   String get category_rechtsberatung => 'Conseil juridique';
