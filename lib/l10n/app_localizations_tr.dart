@@ -1367,4 +1367,22 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get editProfileCta => 'Profili tamamla';
+
+  @override
+  String get update_required_title => 'Güncelleme gerekli';
+
+  @override
+  String get update_required_message => 'Devam etmek için lütfen uygulamayı güncelle.';
+
+  @override
+  String get update_available_title => 'Güncelleme mevcut';
+
+  @override
+  String get update_available_message => 'Yeni bir sürüm mevcut. Şimdi güncellemek ister misiniz?';
+
+  @override
+  String get update_action_update_now => 'Şimdi güncelle';
+
+  @override
+  String get update_action_later => 'Daha sonra';
 }

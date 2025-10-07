@@ -444,7 +444,13 @@
 "onlyNewWindowInfo": "Mostra gli incarichi delle ultime {hours} ore.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "Annulla",
-  "editProfileCta": "Completa il profilo"
+  "editProfileCta": "Completa il profilo",
+  "update_required_title": "Aggiornamento richiesto",
+  "update_required_message": "Aggiorna l'app per continuare.",
+  "update_available_title": "Aggiornamento disponibile",
+  "update_available_message": "È disponibile una nuova versione. Vuoi aggiornare ora?",
+  "update_action_update_now": "Aggiorna ora",
+  "update_action_later": "Più tardi"
 
 
 

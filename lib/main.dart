@@ -24,6 +24,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 // 🔎 Analytics
 import 'utils/analytics_service.dart';
 
+// 🔔 Update-Gate (NEU)
+import 'update/update_gate.dart';
+
 final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
@@ -394,7 +397,12 @@ class _MyAppState extends State<MyApp> {
         Locale('it'),
         Locale('nl'),
       ],
-      home: const StartScreen(),
+
+      // 🔔 HIER: UpdateGate vor deine Startseite schalten
+      home: UpdateGate(
+        configUrl: Uri.parse('https://atyourservice24.eu/app-config.json'),
+        child: const StartScreen(),
+      ),
     );
   }
 }

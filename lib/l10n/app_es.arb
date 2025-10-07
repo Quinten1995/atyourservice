@@ -446,7 +446,13 @@
 "onlyNewWindowInfo": "Muestra trabajos de las últimas {hours} horas.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "Cancelar",
-  "editProfileCta": "Completar perfil"
+  "editProfileCta": "Completar perfil",
+  "update_required_title": "Actualización requerida",
+  "update_required_message": "Actualiza la app para continuar.",
+  "update_available_title": "Actualización disponible",
+  "update_available_message": "Hay una nueva versión disponible. ¿Actualizar ahora?",
+  "update_action_update_now": "Actualizar ahora",
+  "update_action_later": "Más tarde"
 
 
 

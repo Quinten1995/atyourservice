@@ -436,7 +436,13 @@
 "onlyNewWindowInfo": "Toont opdrachten van de laatste {hours} uur.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "Annuleren",
-  "editProfileCta": "Profiel voltooien"
+  "editProfileCta": "Profiel voltooien",
+  "update_required_title": "Update vereist",
+  "update_required_message": "Werk de app bij om verder te gaan.",
+  "update_available_title": "Update beschikbaar",
+  "update_available_message": "Er is een nieuwe versie beschikbaar. Nu updaten?",
+  "update_action_update_now": "Nu updaten",
+  "update_action_later": "Later"
 
 
 

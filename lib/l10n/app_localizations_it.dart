@@ -1367,4 +1367,22 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get editProfileCta => 'Completa il profilo';
+
+  @override
+  String get update_required_title => 'Aggiornamento richiesto';
+
+  @override
+  String get update_required_message => 'Aggiorna l\'app per continuare.';
+
+  @override
+  String get update_available_title => 'Aggiornamento disponibile';
+
+  @override
+  String get update_available_message => 'È disponibile una nuova versione. Vuoi aggiornare ora?';
+
+  @override
+  String get update_action_update_now => 'Aggiorna ora';
+
+  @override
+  String get update_action_later => 'Più tardi';
 }

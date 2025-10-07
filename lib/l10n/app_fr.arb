@@ -473,7 +473,13 @@
 "onlyNewWindowInfo": "Affiche les missions des {hours} dernières heures.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "Annuler",
-  "editProfileCta": "Compléter le profil"
+  "editProfileCta": "Compléter le profil",
+  "update_required_title": "Mise à jour requise",
+  "update_required_message": "Veuillez mettre à jour l’app pour continuer.",
+  "update_available_title": "Mise à jour disponible",
+  "update_available_message": "Une nouvelle version est disponible. Mettre à jour maintenant ?",
+  "update_action_update_now": "Mettre à jour",
+  "update_action_later": "Plus tard"
 
 
 

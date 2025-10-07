@@ -2660,6 +2660,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete profile'**
   String get editProfileCta;
+
+  /// No description provided for @update_required_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get update_required_title;
+
+  /// No description provided for @update_required_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Please update the app to continue.'**
+  String get update_required_message;
+
+  /// No description provided for @update_available_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Update available'**
+  String get update_available_title;
+
+  /// No description provided for @update_available_message.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version is available. Update now?'**
+  String get update_available_message;
+
+  /// No description provided for @update_action_update_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get update_action_update_now;
+
+  /// No description provided for @update_action_later.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get update_action_later;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -441,7 +441,13 @@
 "onlyNewWindowInfo": "Zeigt Aufträge der letzten {hours} Stunden.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "Abbrechen",
-  "editProfileCta": "Profil vervollständigen"
+  "editProfileCta": "Profil vervollständigen",
+  "update_required_title": "Update erforderlich",
+  "update_required_message": "Bitte aktualisiere die App, um fortzufahren.",
+  "update_available_title": "Update verfügbar",
+  "update_available_message": "Eine neue Version ist verfügbar. Jetzt aktualisieren?",
+  "update_action_update_now": "Jetzt aktualisieren",
+  "update_action_later": "Später"
 
 
 

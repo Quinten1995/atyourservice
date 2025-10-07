@@ -32,6 +32,7 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -46,7 +47,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 
-	<!-- 🔑 Deeplink-Scheme für atyourservice://login-callback -->
+	<!-- Deeplink-Scheme für atyourservice://login-callback -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -57,6 +58,12 @@
 				<string>atyourservice</string>
 			</array>
 		</dict>
+	</array>
+
+	<!-- Erlaubt Deep-Link zum App Store (für itms-apps://) -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>itms-apps</string>
 	</array>
 </dict>
 </plist>

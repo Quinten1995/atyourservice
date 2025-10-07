@@ -448,7 +448,13 @@
 "cancelLabel": "Cancel",
   "@cancelLabel": {"description": "Generic cancel button label"},
   "editProfileCta": "Complete profile",
-  "@editProfileCta": {"description": "CTA to open provider profile screen"}
+  "@editProfileCta": {"description": "CTA to open provider profile screen"},
+  "update_required_title": "Update required",
+  "update_required_message": "Please update the app to continue.",
+  "update_available_title": "Update available",
+  "update_available_message": "A new version is available. Update now?",
+  "update_action_update_now": "Update now",
+  "update_action_later": "Later"
 
 
 

@@ -1367,4 +1367,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get editProfileCta => 'Profiel voltooien';
+
+  @override
+  String get update_required_title => 'Update vereist';
+
+  @override
+  String get update_required_message => 'Werk de app bij om verder te gaan.';
+
+  @override
+  String get update_available_title => 'Update beschikbaar';
+
+  @override
+  String get update_available_message => 'Er is een nieuwe versie beschikbaar. Nu updaten?';
+
+  @override
+  String get update_action_update_now => 'Nu updaten';
+
+  @override
+  String get update_action_later => 'Later';
 }

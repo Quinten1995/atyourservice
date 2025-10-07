@@ -446,7 +446,13 @@
 "onlyNewWindowInfo": "Son {hours} saat içindeki işleri gösteriyor.",
 "@onlyNewWindowInfo": { "placeholders": { "hours": { "type": "int" } } },
 "cancelLabel": "İptal",
-  "editProfileCta": "Profili tamamla"
+  "editProfileCta": "Profili tamamla",
+  "update_required_title": "Güncelleme gerekli",
+  "update_required_message": "Devam etmek için lütfen uygulamayı güncelle.",
+  "update_available_title": "Güncelleme mevcut",
+  "update_available_message": "Yeni bir sürüm mevcut. Şimdi güncellemek ister misiniz?",
+  "update_action_update_now": "Şimdi güncelle",
+  "update_action_later": "Daha sonra"
 
 
 
