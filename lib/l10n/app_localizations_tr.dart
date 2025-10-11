@@ -1385,4 +1385,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get update_action_later => 'Daha sonra';
+
+  @override
+  String get invoiceSectionSubtitle => 'İsteğe bağlı: otomatik faturalandırma için şirket ve vergi bilgileri';
 }

@@ -1385,4 +1385,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get update_action_later => 'Later';
+
+  @override
+  String get invoiceSectionSubtitle => 'Optional: company & tax details for automatic invoicing';
 }

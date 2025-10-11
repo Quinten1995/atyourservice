@@ -1385,4 +1385,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get update_action_later => 'Más tarde';
+
+  @override
+  String get invoiceSectionSubtitle => 'Opcional: datos de empresa e impuestos para la facturación automática';
 }

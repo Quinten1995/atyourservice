@@ -27,7 +27,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   final _nameController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
-  String? _selectedKategorie; // ← nicht mehr hart auf kategorieKeys.first
+  String? _selectedKategorie;
   final _adresseController = TextEditingController();
 
   // Rechnungs-/Firmen-/Steuerdaten
@@ -64,6 +64,12 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
   // ===== Autosave =====
   Timer? _autosaveDebounce;
   bool _autosaveInFlight = false;
+
+  // ===== Diff-Tracking für geschützte Felder =====
+  Map<String, dynamic> _initialProtected = {};
+
+  // Rechnungsblock UI
+  bool _invoiceExpanded = false;
 
   @override
   void initState() {
@@ -115,20 +121,19 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
 
   // --- Autosave: debounce + leise speichern ---
   void _scheduleAutosave() {
+    // Für Free-User KEIN Autosave an geschützten Feldern (sonst verbrauchen sie ungewollt das Kontingent)
     final isFree = (_aboTyp ?? 'free') == 'free';
-    final locked =
-        isFree &&
-        _lastProfileChange != null &&
-        DateTime.now().difference(_lastProfileChange!).inDays < 20;
-
-    if (locked) return;
+    if (isFree) {
+      // Avatar darf separat gespeichert werden, der Rest per Autosave nicht.
+      return;
+    }
 
     _autosaveDebounce?.cancel();
     _autosaveDebounce = Timer(const Duration(milliseconds: 1000), () async {
       if (_autosaveInFlight) return;
       _autosaveInFlight = true;
       try {
-        await _profilSpeichern(silent: true); // leises Speichern
+        await _profilSpeichern(silent: true); // leises Speichern, ohne Lock
       } finally {
         _autosaveInFlight = false;
       }
@@ -144,6 +149,22 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         email.isNotEmpty && RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email);
     final katOk = (_selectedKategorie ?? '').isNotEmpty;
     return nameOk && phoneOk && emailOk && katOk;
+  }
+
+  // Aktuellen Zustand geschützter Felder für Diff
+  Map<String, dynamic> _currentProtected() => {
+    'name': _nameController.text.trim(),
+    'kategorie': _selectedKategorie,
+    'adresse': _adresseController.text.trim(),
+    'telefon': _telefonController.text.trim(),
+    'email': _emailController.text.trim(),
+  };
+
+  bool _protectedChangedSinceLoad() {
+    for (final k in _initialProtected.keys) {
+      if (_initialProtected[k] != _currentProtected()[k]) return true;
+    }
+    return false;
   }
 
   Future<void> _ladeProfil() async {
@@ -175,7 +196,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         _nameController.text = data['name'] as String? ?? '';
 
         final gespeicherteKategorie = data['kategorie'] as String?;
-        // Nutzung nur, wenn zulässig – sonst Fallback auf erste erlaubte
         if (gespeicherteKategorie != null &&
             allowedKeys.contains(gespeicherteKategorie)) {
           _selectedKategorie = gespeicherteKategorie;
@@ -213,7 +233,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         final vatNum = (data['default_vat_rate'] as num?)?.toDouble();
         _vatRateController.text = vatNum != null ? vatNum.toString() : '19';
       } else {
-        // Kein Profil vorhanden → Fallback-Kategorie
         _selectedKategorie = allowedKeys.isNotEmpty ? allowedKeys.first : null;
       }
 
@@ -223,6 +242,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           .eq('id', user.id)
           .maybeSingle();
       _aboTyp = userData?['abo_typ'] as String? ?? 'free';
+
+      // initial snapshot für Diff
+      _initialProtected = _currentProtected();
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -313,38 +335,37 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final isFree = (_aboTyp ?? 'free') == 'free';
       final now = DateTime.now();
 
-      // Free & gelockt -> nur Avatar erlauben
+      // Lock prüfen (Free-User)
       final locked =
           isFree &&
           _lastProfileChange != null &&
           now.difference(_lastProfileChange!).inDays < 20;
 
       if (locked) {
+        // Avatar-Durchlass
         if (_neuesProfilbild != null) {
           await _saveAvatarOnly(silent: silent);
-        } else {
-          if (!silent && mounted) {
-            final naechstesDatum = _lastProfileChange!.add(
-              const Duration(days: 20),
-            );
-            await showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Text(l10n.changeNotAllowedTitle),
-                content: Text(
-                  l10n.changeNotAllowedContent(
-                    naechstesDatum.toLocal().toString().substring(0, 10),
-                  ),
+        } else if (!silent && mounted) {
+          final naechstesDatum = _lastProfileChange!.add(
+            const Duration(days: 20),
+          );
+          await showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text(l10n.changeNotAllowedTitle),
+              content: Text(
+                l10n.changeNotAllowedContent(
+                  naechstesDatum.toLocal().toString().substring(0, 10),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.ok),
-                  ),
-                ],
               ),
-            );
-          }
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.ok),
+                ),
+              ],
+            ),
+          );
         }
         return;
       }
@@ -360,7 +381,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       final name = _nameController.text.trim();
       final telefon = _telefonController.text.trim();
       final email = _emailController.text.trim();
-      final kategorie = _selectedKategorie; // bereits validiert
+      final kategorie = _selectedKategorie;
       final adresse = _adresseController.text.trim();
 
       double? lat;
@@ -409,7 +430,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
           double.tryParse(_vatRateController.text.replaceAll(',', '.')) ?? 19.0;
       final defaultVatRate = parsedVat < 0 ? 0.0 : parsedVat;
 
-      await _supabase.from('dienstleister_details').upsert({
+      // Upsert
+      final payload = {
         'user_id': user.id,
         'name': name,
         'kategorie': kategorie,
@@ -420,8 +442,6 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         'email': email,
         'profilbild_url': profilbildUrl,
         'aktualisiert_am': DateTime.now().toUtc().toIso8601String(),
-        if (isFree)
-          'last_profile_change': DateTime.now().toUtc().toIso8601String(),
 
         // Rechnungs-/Steuer-/Firmen-Daten
         'invoice_name': invoiceName,
@@ -435,12 +455,32 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
         'ust_id': ustId,
         'is_small_business': _isSmallBusiness,
         'default_vat_rate': _isSmallBusiness ? 0.0 : defaultVatRate,
-      }, onConflict: 'user_id').select();
+      };
+
+      // Nur bei MANUELLEM Speichern & echten geschützten Änderungen das Lock "verbrauchen"
+      final protectedChanged = _protectedChangedSinceLoad();
+      final shouldConsumeQuota = !silent && isFree && protectedChanged;
+      if (shouldConsumeQuota) {
+        payload['last_profile_change'] = DateTime.now()
+            .toUtc()
+            .toIso8601String();
+      }
+
+      await _supabase
+          .from('dienstleister_details')
+          .upsert(payload, onConflict: 'user_id')
+          .select();
 
       setState(() {
         _profilbildUrl = profilbildUrl;
         _neuesProfilbild = null;
-        if (isFree) _lastProfileChange = now;
+        if (shouldConsumeQuota) {
+          _lastProfileChange = now;
+          _initialProtected = _currentProtected(); // Snapshot aktualisieren
+        } else if (!silent) {
+          // Bei manuellem Speichern ohne protected-Änderung trotzdem initialen Snapshot aktualisieren
+          _initialProtected = _currentProtected();
+        }
       });
 
       if (!silent && mounted) {
@@ -673,7 +713,8 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     );
   }
 
-  /// Rechnungs-/Steuerdaten: Immer sichtbar, aber bei Free/Silver ausgegraut
+  /// Rechnungs-/Steuerdaten: Immer sichtbar, aber bei Free/Silver ausgegraut,
+  /// hier als hübscher Aufklappblock (ExpansionTile)
   Widget _rechnungsdatenWidget(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isGold = (_aboTyp ?? 'free') == 'gold';
@@ -686,19 +727,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
       enabled: isGold,
     );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final inner = Column(
       children: [
-        const SizedBox(height: 18),
-        Text(
-          l10n.invoiceSectionTitle,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 17,
-            color: primaryColor,
-          ),
-        ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 12),
         TextFormField(
           controller: _companyNameController,
           decoration: invoiceDecoration(l10n.companyNameOptional),
@@ -794,13 +825,52 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         if (!isGold)
-          Text(
-            l10n.invoiceGoldInfo,
-            style: const TextStyle(fontSize: 13, color: Colors.red),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                l10n.invoiceGoldInfo,
+                style: const TextStyle(fontSize: 13, color: Colors.red),
+              ),
+            ),
           ),
       ],
+    );
+
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.black12),
+        ),
+        child: ExpansionTile(
+          initiallyExpanded: _invoiceExpanded,
+          onExpansionChanged: (v) => setState(() => _invoiceExpanded = v),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          childrenPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          leading: const Icon(Icons.receipt_long, color: primaryColor),
+          title: Text(
+            AppLocalizations.of(context)!.invoiceSectionTitle,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: primaryColor,
+            ),
+          ),
+          subtitle: Text(
+            AppLocalizations.of(context)!.invoiceSectionSubtitle,
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          children: [inner],
+        ),
+      ),
     );
   }
 
@@ -809,6 +879,7 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
     final l10n = AppLocalizations.of(context)!;
     Widget? limitHinweis;
     final isFree = (_aboTyp ?? 'free') == 'free';
+
     if (isFree && _lastProfileChange != null) {
       final naechstesDatum = _lastProfileChange!.add(const Duration(days: 20));
       final nochGesperrt = DateTime.now().isBefore(naechstesDatum);
@@ -1053,7 +1124,9 @@ class _ProfilDienstleisterScreenState extends State<ProfilDienstleisterScreen> {
                                     },
                                   ),
 
-                                  // Rechnungs-/Steuer-Bereich
+                                  const SizedBox(height: 18),
+
+                                  // Aufklappbarer Rechnungs-/Faktura-Block
                                   _rechnungsdatenWidget(context),
 
                                   const SizedBox(height: 24),

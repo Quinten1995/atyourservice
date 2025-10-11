@@ -479,7 +479,9 @@
   "update_available_title": "Mise à jour disponible",
   "update_available_message": "Une nouvelle version est disponible. Mettre à jour maintenant ?",
   "update_action_update_now": "Mettre à jour",
-  "update_action_later": "Plus tard"
+  "update_action_later": "Plus tard",
+  "invoiceSectionSubtitle": "Facultatif : informations d’entreprise et fiscales pour la facturation automatique"
+
 
 
 

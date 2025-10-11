@@ -1385,4 +1385,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get update_action_later => 'Later';
+
+  @override
+  String get invoiceSectionSubtitle => 'Optioneel: bedrijfs- en btw-gegevens voor automatische facturatie';
 }

@@ -2696,6 +2696,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Later'**
   String get update_action_later;
+
+  /// No description provided for @invoiceSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: company & tax details for automatic invoicing'**
+  String get invoiceSectionSubtitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

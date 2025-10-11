@@ -454,7 +454,9 @@
   "update_available_title": "Update available",
   "update_available_message": "A new version is available. Update now?",
   "update_action_update_now": "Update now",
-  "update_action_later": "Later"
+  "update_action_later": "Later",
+  "invoiceSectionSubtitle": "Optional: company & tax details for automatic invoicing"
+
 
 
 

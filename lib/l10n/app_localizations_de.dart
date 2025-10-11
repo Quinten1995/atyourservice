@@ -1385,4 +1385,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get update_action_later => 'Später';
+
+  @override
+  String get invoiceSectionSubtitle => 'Optional: Firmen- und Steuerdaten für die automatische Rechnungsstellung';
 }

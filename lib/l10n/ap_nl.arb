@@ -442,7 +442,9 @@
   "update_available_title": "Update beschikbaar",
   "update_available_message": "Er is een nieuwe versie beschikbaar. Nu updaten?",
   "update_action_update_now": "Nu updaten",
-  "update_action_later": "Later"
+  "update_action_later": "Later",
+  "invoiceSectionSubtitle": "Optioneel: bedrijfs- en btw-gegevens voor automatische facturatie"
+
 
 
 

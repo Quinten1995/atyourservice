@@ -452,7 +452,9 @@
   "update_available_title": "Actualización disponible",
   "update_available_message": "Hay una nueva versión disponible. ¿Actualizar ahora?",
   "update_action_update_now": "Actualizar ahora",
-  "update_action_later": "Más tarde"
+  "update_action_later": "Más tarde",
+  "invoiceSectionSubtitle": "Opcional: datos de empresa e impuestos para la facturación automática"
+
 
 
 
