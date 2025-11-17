@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationService {
   static const String channelId = 'high_importance_channel';
@@ -12,6 +14,8 @@ class NotificationService {
 
   static final FlutterLocalNotificationsPlugin _fln =
       FlutterLocalNotificationsPlugin();
+
+  static final SupabaseClient _supabase = Supabase.instance.client;
 
   /// Initialisiert Local Notifications & FCM (Android + iOS)
   static Future<void> init() async {
@@ -104,11 +108,9 @@ class NotificationService {
   /// Alle sichtbaren System-Notifications löschen UND App-Badge entfernen
   static Future<void> clearAll() async {
     try {
-      // Android & iOS: Tray leeren
-      await _fln.cancelAll();
+      await _fln.cancelAll(); // Android & iOS: Tray leeren
     } catch (_) {}
 
-    // iOS & (viele) Android-Launcher: Badge zurücksetzen
     try {
       final supported = await FlutterAppBadger.isAppBadgeSupported();
       if (supported) {
@@ -129,6 +131,80 @@ class NotificationService {
       } else {
         FlutterAppBadger.updateBadgeCount(count);
       }
-    } catch (_) {}
+    } catch (_) {
+      // unkritisch
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Remote Push über Edge Function `send_push`
+  // ---------------------------------------------------------------------------
+
+  /// Generischer Wrapper für deine Edge Function `send_push`.
+  /// Nutzt `user_ids`, damit die Function die Tokens aus der users-Tabelle holt.
+  static Future<void> sendRemotePush({
+    required String userId,
+    required String title,
+    required String body,
+    Map<String, String>? data,
+  }) async {
+    try {
+      await _supabase.functions.invoke(
+        'send_push',
+        body: {
+          // WICHTIG: Array, nicht user_id!
+          'user_ids': [userId],
+          'title': title,
+          'body': body,
+          if (data != null) 'data': data,
+        },
+      );
+    } catch (e, st) {
+      if (kDebugMode) {
+        print('❌ sendRemotePush error: $e');
+        print(st);
+      }
+    }
+  }
+
+  /// Push an Verkäufer: neue Bewerbung auf seinen Deal (S0 oder S1)
+  static Future<void> sendNewApplicationForDeal({
+    required String sellerUserId,
+    required String dealId,
+    required String dealTitle,
+    required String applicantName,
+    required bool isS1,
+  }) async {
+    final title = isS1
+        ? 'Neue Bewerbung für deinen S1-Auftrag'
+        : 'Neue Bewerbung für deinen Auftrag';
+    final body = '$applicantName hat sich auf "$dealTitle" beworben.';
+
+    await sendRemotePush(
+      userId: sellerUserId,
+      title: title,
+      body: body,
+      data: {'type': 'deal_application_new', 'deal_id': dealId},
+    );
+  }
+
+  /// Push an DL: er wurde für einen Deal beauftragt
+  static Future<void> sendDealAwardedPush({
+    required String receiverUserId,
+    required String dealId,
+    required String dealTitle,
+    required bool isS1,
+  }) async {
+    final title = isS1
+        ? 'Du wurdest für einen S1-Auftrag beauftragt'
+        : 'Du wurdest beauftragt';
+    final body = 'Du hast den Auftrag "$dealTitle" erhalten.';
+
+    await sendRemotePush(
+      userId: receiverUserId,
+      title: title,
+      body: body,
+      data: {'type': 'deal_awarded', 'deal_id': dealId},
+    );
   }
 }

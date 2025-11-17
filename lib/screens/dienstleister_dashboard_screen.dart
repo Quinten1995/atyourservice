@@ -9,6 +9,7 @@ import 'profil_dienstleister_screen.dart';
 import 'pdf_rechnung_screen.dart';
 import 'achievement_screen.dart';
 import 'premium_screen.dart';
+import 'auftraege_handel/auftraege_handel_screen.dart'; // ⬅️ NEU
 
 import '../l10n/app_localizations.dart';
 import '../l10n/status_value_extension.dart';
@@ -69,12 +70,12 @@ class _DienstleisterDashboardScreenState
 
   // --- Neu-Toggle (zeitbasiert) ---
   bool _onlyNew = false;
-  static const int _kNewWindowHours = 24; // 24h-Fenster für "Neu"
+  static const int _kNewWindowHours = 24;
 
   // --- Profil-Popup-Steuerung ---
   bool _needsProfileCompletion = false;
   bool _profilePopupShown = false;
-  String? _profilePromptText; // aus l10n
+  String? _profilePromptText;
 
   bool _isNewByTime(DateTime? createdUtc) {
     if (createdUtc == null) return false;
@@ -94,7 +95,7 @@ class _DienstleisterDashboardScreenState
   double _planRadius(String? abo) {
     switch ((abo ?? 'free').toLowerCase()) {
       case 'gold':
-        return 30.0; // aktuell so genutzt
+        return 30.0;
       case 'silver':
         return 15.0;
       default:
@@ -298,7 +299,6 @@ class _DienstleisterDashboardScreenState
           role: 'provider',
           plan: _aboTyp ?? 'free',
           locale: l10n.localeName,
-          // city später, wenn verfügbar
         );
       } catch (_) {}
 
@@ -311,7 +311,7 @@ class _DienstleisterDashboardScreenState
         });
       }
     } catch (e) {
-      final msg = e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
+      final msg = e.toString().replaceFirst(RegExp(r'^Exception:\\s*'), '');
       setState(() {
         _errorMessage = msg;
         _isLoading = false;
@@ -356,7 +356,7 @@ class _DienstleisterDashboardScreenState
             ],
           ),
           content: Text(
-            text, // nutzt denselben l10n-Text wie vorher im Hintergrund
+            text,
             style: const TextStyle(fontSize: 15.5, height: 1.35),
           ),
           actions: [
@@ -364,7 +364,7 @@ class _DienstleisterDashboardScreenState
               onPressed: () {
                 Navigator.of(ctx).maybePop();
               },
-              child: Text(l10n.cancelLabel), // <-- L10n-Key
+              child: Text(l10n.cancelLabel),
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.edit),
@@ -389,10 +389,9 @@ class _DienstleisterDashboardScreenState
                     builder: (_) => const ProfilDienstleisterScreen(),
                   ),
                 );
-                // Nach Rückkehr neu laden
                 await _ladeProfilUndAuftraege();
               },
-              label: Text(l10n.editProfileCta), // <-- L10n-Key
+              label: Text(l10n.editProfileCta),
             ),
           ],
         );
@@ -592,7 +591,7 @@ class _DienstleisterDashboardScreenState
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        l10n.filterNeu, // "Neu"
+                        l10n.filterNeu,
                         style: const TextStyle(
                           color: Colors.orange,
                           fontWeight: FontWeight.w700,
@@ -1009,9 +1008,25 @@ class _DienstleisterDashboardScreenState
         elevation: 0,
         centerTitle: true,
         foregroundColor: DienstleisterDashboardScreen.primaryColor,
+        actions: [
+          // ⬇️ NEU: Icon rechts oben → Aufträge-Handel (mit l10n-Tooltip)
+          IconButton(
+            tooltip: l10n.marketplaceTitle,
+            icon: const Icon(Icons.storefront_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AuftraegeHandelScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
+          // Hintergrund-Gradient
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -1023,6 +1038,7 @@ class _DienstleisterDashboardScreenState
               ),
             ),
           ),
+          // Deko-Kreise
           Positioned(
             top: -70,
             left: -70,
@@ -1051,6 +1067,7 @@ class _DienstleisterDashboardScreenState
               ),
             ),
           ),
+          // Inhalt
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: _isLoading

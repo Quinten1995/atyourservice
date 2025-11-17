@@ -56,10 +56,13 @@ async function getAccessToken(): Promise<string> {
     exp: now + 3600,
   };
 
-  const enc = (o: unknown) => b64url(new TextEncoder().encode(JSON.stringify(o)));
+  const enc = (o: unknown) =>
+    b64url(new TextEncoder().encode(JSON.stringify(o)));
   const unsigned = `${enc(header)}.${enc(claim)}`;
 
-  const pem = (SA.private_key as string).replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+  const pem = (SA.private_key as string)
+    .replace(/-----[^-]+-----/g, "")
+    .replace(/\s+/g, "");
   const keyData = Uint8Array.from(atob(pem), (c) => c.charCodeAt(0));
   const privateKey = await crypto.subtle.importKey(
     "pkcs8",
@@ -68,7 +71,11 @@ async function getAccessToken(): Promise<string> {
     false,
     ["sign"],
   );
-  const sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", privateKey, new TextEncoder().encode(unsigned));
+  const sig = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    privateKey,
+    new TextEncoder().encode(unsigned),
+  );
   const jwt = `${unsigned}.${b64url(sig as ArrayBuffer)}`;
 
   const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -79,7 +86,9 @@ async function getAccessToken(): Promise<string> {
       assertion: jwt,
     }),
   });
-  if (!res.ok) throw new Error(`oauth token error ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    throw new Error(`oauth token error ${res.status}: ${await res.text()}`);
+  }
   const json = await res.json();
   return json.access_token as string;
 }
@@ -143,8 +152,22 @@ async function resolveTokensFromUserIds(userIds: string[]): Promise<string[]> {
 }
 
 serve(async (req) => {
-  if (req.method !== "POST") return json({ error: "Only POST allowed" }, 405);
-  if (!SA?.project_id) return json({ error: "No project_id/SA" }, 500);
+  if (req.method !== "POST") {
+    return json({ error: "Only POST allowed" }, 405);
+  }
+  if (!SA?.project_id) {
+    return json({ error: "No project_id/SA" }, 500);
+  }
+
+  // 🔐 Optionaler Secret-Check:
+  // - Wenn SEND_PUSH_AUTH gesetzt ist UND ein Header mitgeschickt wird,
+  //   muss er stimmen.
+  // - Kein Header => erlaubt (bricht bestehende Aufrufe nicht).
+  const expected = Deno.env.get("SEND_PUSH_AUTH");
+  const provided = req.headers.get("x-send-push-auth");
+  if (expected && provided && provided !== expected) {
+    return json({ error: "unauthorized" }, 401);
+  }
 
   try {
     const payload = (await req.json()) as SendPushPayload;
@@ -155,16 +178,19 @@ serve(async (req) => {
 
     // 2) Tokens sammeln: direkt + (optional) via user_ids aus DB
     const directTokens = Array.isArray(payload.tokens) ? payload.tokens : [];
-    const fromUsers = Array.isArray(payload.user_ids) && payload.user_ids.length > 0
-      ? await resolveTokensFromUserIds(payload.user_ids)
-      : [];
-    let allTokens = [...new Set([...directTokens, ...fromUsers])].filter(Boolean);
+    const fromUsers =
+      Array.isArray(payload.user_ids) && payload.user_ids.length > 0
+        ? await resolveTokensFromUserIds(payload.user_ids)
+        : [];
+    const allTokens = [...new Set([...directTokens, ...fromUsers])].filter(
+      Boolean,
+    ) as string[];
 
     if (allTokens.length === 0) {
       return json({ error: "tokens[] required" }, 400);
     }
 
-    // 3) Android-Defaults für Heads-Up (kann via payload.android überschrieben/ergänzt werden)
+    // 3) Android-Defaults für Heads-Up (kann via payload.android überschrieben werden)
     const androidDefaults = {
       priority: "HIGH",
       notification: {
@@ -174,7 +200,7 @@ serve(async (req) => {
       },
     };
     const android: Record<string, unknown> = {
-      ...(androidDefaults as Record<string, unknown>),
+      ...androidDefaults,
       ...(payload.android ?? {}),
       notification: {
         ...(androidDefaults.notification as Record<string, unknown>),
@@ -185,7 +211,7 @@ serve(async (req) => {
     // 4) Access-Token holen & senden (parallel)
     const accessToken = await getAccessToken();
 
-    const results: Array<{ status: number; response: any }> = await Promise.all(
+    const results = await Promise.all(
       allTokens.map((t) =>
         sendToToken(
           accessToken,
@@ -195,7 +221,7 @@ serve(async (req) => {
           payload.data,
           android,
         )
-      )
+      ),
     );
 
     return json({ ok: true, count: allTokens.length, results });

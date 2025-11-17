@@ -1388,4 +1388,655 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invoiceSectionSubtitle => 'İsteğe bağlı: otomatik faturalandırma için şirket ve vergi bilgileri';
+
+  @override
+  String get marketplaceTitle => 'İş al/sat';
+
+  @override
+  String get marketplaceTabSell => 'Sat';
+
+  @override
+  String get marketplaceTabBuy => 'Satın al';
+
+  @override
+  String get marketplaceOfferCreateCta => 'Bir işi devret';
+
+  @override
+  String get marketplaceFilter => 'Filtrele';
+
+  @override
+  String get marketplaceSort => 'Sırala';
+
+  @override
+  String get marketplaceBuyNow => 'Hemen başvur';
+
+  @override
+  String get marketplaceSnackOpenForm => 'Teklif formu açılıyor…';
+
+  @override
+  String get marketplaceSnackStartCheckout => 'Ödeme başlatılıyor…';
+
+  @override
+  String marketplaceOfferTitle(int index) {
+    return 'Teklif #$index';
+  }
+
+  @override
+  String marketplaceOfferSubtitle(String category, String price, Object distanceKm) {
+    return '$category • $distanceKm km';
+  }
+
+  @override
+  String marketplaceBuyTitle(int index) {
+    return '$index. İlan · Küçük onarım';
+  }
+
+  @override
+  String marketplaceBuySubtitle(String category, String price, String distance) {
+    return 'Kategori: $category · $price/saat · $distance km';
+  }
+
+  @override
+  String get marketplaceEmptyList => 'Uygun teklif bulunamadı.';
+
+  @override
+  String get marketplaceErrorLoading => 'Liste yüklenemedi.';
+
+  @override
+  String get marketplaceAppliedSuccess => 'Başvuruldu — satıcı başvurunu görebilir.';
+
+  @override
+  String get marketplaceAlreadyApplied => 'Zaten başvurdun.';
+
+  @override
+  String marketplaceProvisionPercent(Object value) {
+    return '$value %';
+  }
+
+  @override
+  String marketplaceProvisionFixed(Object value) {
+    return '$value';
+  }
+
+  @override
+  String marketplaceChipTargetPrice(Object price) {
+    return 'Hedef fiyat: $price';
+  }
+
+  @override
+  String marketplaceChipProvision(Object value) {
+    return 'Komisyon: $value';
+  }
+
+  @override
+  String get s0Title => 'İşi devret (S0)';
+
+  @override
+  String get sectionBasics => 'Temel bilgiler';
+
+  @override
+  String get fieldTitle => 'Başlık';
+
+  @override
+  String get hintTitleExample => 'ör. Çatı yenileme, 120 m²';
+
+  @override
+  String get fieldDescription => 'Açıklama';
+
+  @override
+  String get hintDescription => 'Kısa açıklama, özellikler, malzeme dâhil/haric.';
+
+  @override
+  String get fieldLocation => 'Konum/yarıçap (şimdilik metin)';
+
+  @override
+  String get hintLocation => 'ör. Köln, 15 km';
+
+  @override
+  String get pickStartDate => 'Başlangıç tarihi seç';
+
+  @override
+  String get pickDeadline => 'Son tarih seç';
+
+  @override
+  String get labelStart => 'Başlangıç';
+
+  @override
+  String get labelDeadline => 'Son tarih';
+
+  @override
+  String get sectionS0PriceProvision => 'S0 – Fiyat & Komisyon';
+
+  @override
+  String get tooltipS0PriceProvision => 'Hedef fiyat = işin toplam fiyatı.\nKomisyon = devretme ücreti.';
+
+  @override
+  String get fieldTargetPriceEur => 'Hedef fiyat (EUR)';
+
+  @override
+  String get hintTargetPriceExample => 'ör. 12.500';
+
+  @override
+  String get helpTargetPrice => 'Alıcı tarafından üstlenilecek toplam iş bedeli.';
+
+  @override
+  String get fieldProvisionType => 'Komisyon türü';
+
+  @override
+  String get provisionTypePercent => 'Yüzde';
+
+  @override
+  String get provisionTypeFixed => 'Sabit';
+
+  @override
+  String get fieldProvisionValuePercent => 'Komisyon değeri (%)';
+
+  @override
+  String get fieldProvisionValueFixed => 'Komisyon değeri (€)';
+
+  @override
+  String get helpProvisionPercent => 'Yaygın: %5–12 (üst sınır mümkün).';
+
+  @override
+  String get helpProvisionFixed => 'Sabit komisyon tutarı.';
+
+  @override
+  String get fieldProvisionDue => 'Komisyon ne zaman ödenir?';
+
+  @override
+  String get provisionDueAward => 'ihale verildiğinde';
+
+  @override
+  String get provisionDueHandover => 'teslimde';
+
+  @override
+  String get provisionDueFinalInvoice => 'nihai faturada';
+
+  @override
+  String get provisionDueAwardHelp => 'İhale verildiğinde: komisyon, ihalenin verilmesinin hemen ardından tahakkuk eder.';
+
+  @override
+  String get provisionDueHandoverHelp => 'Teslimde: müşteri onayı ve teslimden sonra ödenir.';
+
+  @override
+  String get provisionDueFinalInvoiceHelp => 'Nihai faturada: alıcı işi tamamladığında ödenir.';
+
+  @override
+  String get sectionEvidencePlaceholder => 'Kanıtlar (yer tutucu)';
+
+  @override
+  String get btnUploadEvidence => 'Teklif/Müşteri onayı yükle';
+
+  @override
+  String get btnCreateDraft => 'Taslak oluştur';
+
+  @override
+  String get btnSaving => 'Kaydediliyor…';
+
+  @override
+  String get noteSupabaseActive => 'Not: Supabase kaydı aktif. Ödemeler ve yüklemeler daha sonra eklenecek.';
+
+  @override
+  String get formErrorRequired => 'Zorunlu alan';
+
+  @override
+  String get formErrorInvalidAmount => 'Geçersiz tutar';
+
+  @override
+  String get formErrorGreaterZero => '0\'dan büyük olmalı';
+
+  @override
+  String get formErrorRealistic => 'Lütfen gerçekçi olun';
+
+  @override
+  String get formErrorInvalidValue => 'Geçersiz değer';
+
+  @override
+  String get formErrorPercentRange => 'İzin verilen aralık: %0–30';
+
+  @override
+  String get errPickStartDate => 'Lütfen başlangıç tarihi seçin';
+
+  @override
+  String get errPickDeadline => 'Lütfen son tarih seçin';
+
+  @override
+  String get draftSaved => 'S0 taslağı kaydedildi.';
+
+  @override
+  String get genericError => 'Bir şeyler ters gitti.';
+
+  @override
+  String get btnMyDeals => 'İşlerim';
+
+  @override
+  String get myDealsTitle => 'İşlerim';
+
+  @override
+  String get myDealsEmpty => 'Henüz iş yok.';
+
+  @override
+  String get myDealsErrorLoading => 'İşlerin yüklenemedi.';
+
+  @override
+  String get filterAll => 'Tümü';
+
+  @override
+  String get filterDraft => 'Taslaklar';
+
+  @override
+  String get filterLive => 'Yayında';
+
+  @override
+  String get filterAwarded => 'Verildi';
+
+  @override
+  String get manageTitle => 'İşi yönet';
+
+  @override
+  String get manageErrorLoading => 'Ayrıntılar yüklenemedi.';
+
+  @override
+  String get btnPublish => 'Yayınla';
+
+  @override
+  String get publishSuccess => 'İş yayınlandı.';
+
+  @override
+  String get applicationsTitle => 'Başvurular';
+
+  @override
+  String get applicationsEmpty => 'Henüz başvuru yok.';
+
+  @override
+  String get applicationNote => 'Not';
+
+  @override
+  String get applicationStatusPending => 'Durum: beklemede';
+
+  @override
+  String get applicationStatusAwarded => 'Durum: verildi';
+
+  @override
+  String get btnAward => 'Ver';
+
+  @override
+  String get btnManage => 'Yönet';
+
+  @override
+  String get labelStatus => 'Durum';
+
+  @override
+  String get statusDraft => 'Taslak';
+
+  @override
+  String get statusLive => 'Yayında';
+
+  @override
+  String get statusAwarded => 'Verildi';
+
+  @override
+  String get awardSuccess => 'Başvuru başarıyla verildi.';
+
+  @override
+  String get snackNewApplication => 'Yeni başvuru alındı';
+
+  @override
+  String applicationsCount(Object count) {
+    return '$count başvuru';
+  }
+
+  @override
+  String get btnApplied => 'Başvuruldu';
+
+  @override
+  String get s0EditTitle => 'S0\'ı düzenle';
+
+  @override
+  String get publishNow => 'Kaydettikten sonra yayımla';
+
+  @override
+  String get publishNowHint => 'Etkinse, taslak kaydedildikten sonra \"Yayında\" durumuna alınır.';
+
+  @override
+  String get btnSaveChanges => 'Değişiklikleri kaydet';
+
+  @override
+  String get saved => 'Kaydedildi';
+
+  @override
+  String get marketplaceLocationLoadedFromProfile => 'Konum profilinden yüklendi — yarıçap filtresi aktif.';
+
+  @override
+  String get marketplaceNoHomeAddressHint => 'Profilde adres yok — mesafe filtresi olmadan tüm teklifler gösteriliyor.';
+
+  @override
+  String get fieldCategory => 'Kategori';
+
+  @override
+  String get categoryAll => 'Tümü';
+
+  @override
+  String get categoryRoofer => 'Çatı ustası / Çatı kaplama';
+
+  @override
+  String get categorySolar => 'PV / Güneş enerjisi';
+
+  @override
+  String get categoryHVAC => 'Isıtma / Sıhhi tesisat / HVAC';
+
+  @override
+  String get categoryElectrical => 'Elektrik';
+
+  @override
+  String get categoryDrywall => 'Alçıpan';
+
+  @override
+  String get categoryPainter => 'Boyacı';
+
+  @override
+  String get categoryTiling => 'Fayans / Seramik';
+
+  @override
+  String get categoryFlooring => 'Zemin kaplama';
+
+  @override
+  String get categoryWindowsDoors => 'Pencere & Kapı';
+
+  @override
+  String get categoryInsulationFacade => 'Yalıtım & Cephe';
+
+  @override
+  String get categoryMasonryConcrete => 'Duvarcılık & Beton';
+
+  @override
+  String get categoryCarpentryJoinery => 'Marangozluk & Doğrama';
+
+  @override
+  String get categoryLandscaping => 'Peyzaj & Bahçe';
+
+  @override
+  String get categoryScaffolding => 'İskele';
+
+  @override
+  String get categoryCleaningRestoration => 'Temizlik & Restorasyon';
+
+  @override
+  String get categoryMovingTransport => 'Taşıma & Nakliyat';
+
+  @override
+  String get sectionCustomerOk => 'Müşteri onayı';
+
+  @override
+  String get helpCustomerOk => 'Müşterinin devre onay verdiğine dair kanıt (ör. imzalı teklif, e-posta/SMS PDF/foto).';
+
+  @override
+  String get btnUploadCustomerOk => 'Müşteri onayı yükle';
+
+  @override
+  String get customerNameOptional => 'Müşteri adı (opsiyonel)';
+
+  @override
+  String get customerPhoneOptional => 'Telefon (opsiyonel)';
+
+  @override
+  String get sectionOffer => 'Teklif / Sipariş onayı';
+
+  @override
+  String get helpOfferOptional => 'Teklifin veya sipariş onayın. Opsiyonel ama alıcılar için faydalı.';
+
+  @override
+  String get btnUploadOffer => 'Teklif yükle';
+
+  @override
+  String get errCustomerOkRequired => 'Yayınlamak için en az bir müşteri onayı belgesi gerekir.';
+
+  @override
+  String get warnMissingDocsBody => 'Bilgi: Onay/teklif olmadan daha sonra yayınlayamazsın. Belgeleri istediğin zaman ekleyebilirsin.';
+
+  @override
+  String get attestLabel => 'Müşterinin devre onayını verdiğini ve tüm bilgilerin doğru olduğunu dürüstçe onaylıyorum.';
+
+  @override
+  String get attestConsequences => 'Yanlış beyanda hesap askıya alma, ödemeleri tutma ve gerekli durumlarda hukuki/cezai işlemler uygulanabilir.';
+
+  @override
+  String get errAttestRequired => 'Yayınlamak için onay kutusunu işaretlemelisin.';
+
+  @override
+  String get genericPleaseFix => 'Lütfen vurgulanan alanları düzeltin:';
+
+  @override
+  String get errAwardNeedsDoc => 'Vade \"ihale/verilişte\" ise belge/teklif zorunludur.';
+
+  @override
+  String get errNotOwner => 'Bu işin sahibi değilsiniz.';
+
+  @override
+  String get errPublishOnlyFromDraft => 'Yayınlama sadece taslak durumundan mümkündür.';
+
+  @override
+  String get publishRequirementsTitle => 'Yayınlama gereksinimleri';
+
+  @override
+  String get infoReqCustomerOk => 'En az bir müşteri onayı eklendi.';
+
+  @override
+  String get infoReqDocForAward => '\"Verilişte\": teklif/sipariş onayı yükleyin.';
+
+  @override
+  String get infoReqAttest => 'Formdaki onay kutusu işaretli.';
+
+  @override
+  String get draftChecklistTitle => 'Yayın öncesi kontrol listesi';
+
+  @override
+  String get chkTitle => 'Başlık dolduruldu';
+
+  @override
+  String get chkDescription => 'Açıklama dolduruldu';
+
+  @override
+  String get chkLocation => 'Adres/konum ayarlandı';
+
+  @override
+  String get chkTargetPrice => 'Hedef fiyat ayarlandı';
+
+  @override
+  String get chkCustomerOk => 'Müşteri onayı mevcut';
+
+  @override
+  String get chkDocIfAward => 'Belge/teklif mevcut (\"verilişte\" önerilir)';
+
+  @override
+  String get chkAttestAtPublish => 'Yayınlarken onay kutusunu işaretleyin';
+
+  @override
+  String get draftChecklistCta => 'Yönetime git';
+
+  @override
+  String get uploadSuccess => 'Yükleme başarılı.';
+
+  @override
+  String get uploadInProgress => 'Yükleniyor...';
+
+  @override
+  String get uploadFailed => 'Yükleme başarısız.';
+
+  @override
+  String get draftDefaultTitle => 'Taslak';
+
+  @override
+  String get errGeocodingFailed => 'Adres jeokodlanamadı.';
+
+  @override
+  String get provisionDueAwardLabel => 'Görevlendirme';
+
+  @override
+  String get provisionDueHandoverLabel => 'Devir';
+
+  @override
+  String get provisionDueFinalInvoiceLabel => 'Nihai fatura';
+
+  @override
+  String get sectionPreviewPublic => 'Önizleme (herkese açık)';
+
+  @override
+  String get tooltipPreviewPublic => 'Bu dosyalar satın almadan önce alıcılara görünür. Yalnızca karartılmış/anonimleştirilmiş önizlemeler yükleyin.';
+
+  @override
+  String get btnUploadPreview => 'Önizleme yükle';
+
+  @override
+  String get previewRedactionNoticeTitle => 'Önizleme hakkında önemli uyarı';
+
+  @override
+  String get previewRedactionNoticeBody => 'Önizlemeler satın alma öncesinde alıcılara görünür. Hassas verileri karartın (ör. ad, adres, telefon, sözleşme/müşteri no, imzalar, QR/çubuk kodlar). Karartılmamış kişisel veri içeren belgeler yüklemeyin.';
+
+  @override
+  String get hintPhoneExample => '+90 530 123 45 67';
+
+  @override
+  String get createDealTitle => 'Teklif oluştur';
+
+  @override
+  String get chooseDealTypeTitle => 'Teklif türünü seç';
+
+  @override
+  String get dealTypeS0Title => 'S0 – İşin tamamını devret';
+
+  @override
+  String get dealTypeS0Subtitle => 'Tüm işi başka bir hizmet sağlayıcıya devredin.';
+
+  @override
+  String get dealTypeS1Title => 'S1 – Alt kapsam/Alt yüklenici (kilometre taşları)';
+
+  @override
+  String get dealTypeS1Subtitle => 'Kilometre taşları ve kanıtlarla alt yüklenici işi.';
+
+  @override
+  String get s1Title => 'Alt yüklenici ara (S1)';
+
+  @override
+  String get sectionS1Pricing => 'Fiyatlandırma';
+
+  @override
+  String get sectionS1Provision => 'Komisyon';
+
+  @override
+  String get sectionMilestones => 'Aşamalar';
+
+  @override
+  String get pricingModeFixed => 'Sabit fiyat';
+
+  @override
+  String get pricingModeTm => 'Zaman ve Malzeme';
+
+  @override
+  String get basePriceLabel => 'Toplam bütçe (€)';
+
+  @override
+  String get hourlyRateLabel => 'Saatlik ücret (€)';
+
+  @override
+  String get expectedHoursLabel => 'Tahmini saat';
+
+  @override
+  String get dueTypeAward => 'Beauftragung';
+
+  @override
+  String get dueTypeDate => 'Tarih';
+
+  @override
+  String get dueTypeHandover => 'Teslim';
+
+  @override
+  String get dueTypeCustom => 'Özel';
+
+  @override
+  String get dueTypeCustomHelp => 'Özel vade tetikleyicisi (lütfen tarih/açıklama ekleyin).';
+
+  @override
+  String get milestoneLabel => 'Aşama';
+
+  @override
+  String get milestoneTitle => 'Aşama başlığı';
+
+  @override
+  String get milestoneDescription => 'Aşama açıklaması';
+
+  @override
+  String get milestoneAmount => 'Tutar (€)';
+
+  @override
+  String get milestonePercent => 'Yüzde (%)';
+
+  @override
+  String get milestoneDue => 'Vade';
+
+  @override
+  String get btnAddMilestonePercent => 'Aşama ekle (%)';
+
+  @override
+  String get btnAddMilestoneAmount => 'Aşama ekle (€)';
+
+  @override
+  String get milestoneEmptyHint => 'Henüz aşama yok (isteğe bağlı).';
+
+  @override
+  String get milestoneBlocking => 'Bloklayan';
+
+  @override
+  String get milestoneBlockingHelp => 'Sonraki adım açılmadan önce tamamlanması gerekir.';
+
+  @override
+  String get validationMilestoneSum => 'Aşama toplamları uymuyor: yüzde modunda toplam 100% olmalı; sabit fiyatta toplam bütçeye eşit olmalı.';
+
+  @override
+  String get btnReorder => 'Yeniden sırala';
+
+  @override
+  String get infoS1PricingHelp => 'Alt yüklenici işi için fiyatlandırma. “Sabit fiyat” = iş kapsamı için tek bir toplam bütçe. “Zaman ve malzeme” = saatlik ücret + tahmini saat; faturalama harcanan gerçek zamana göredir.';
+
+  @override
+  String get infoS1ProvisionHelp => 'Atanan her alt yüklenici için aracılık/yonetim komisyonun. Yüzde veya sabit tutar ve vade zamanını belirle.';
+
+  @override
+  String get coordChipNoCoords => 'Koordinat yok';
+
+  @override
+  String get coordMissingLabel => 'Koordinatlar (enlem/boylam)';
+
+  @override
+  String get s0DetailsMissingLabel => 'S0 ayrıntıları';
+
+  @override
+  String get s1DetailsMissingLabel => 'S1 ayrıntıları';
+
+  @override
+  String get marketplaceTypeS0 => 'S0 – İş devri';
+
+  @override
+  String get marketplaceTypeS1 => 'S1 – Taşeron arama';
+
+  @override
+  String get filterTypeAll => 'Tüm türler';
+
+  @override
+  String get filterTypeS0 => 'Yalnızca S0';
+
+  @override
+  String get filterTypeS1 => 'Yalnızca S1';
+
+  @override
+  String get badgeAwardedToYou => 'Sana verildi';
+
+  @override
+  String get badgeAwardedGiven => 'Atama yapıldı';
+
+  @override
+  String get btnAssigned => 'Atandı';
+
+  @override
+  String get marketplaceOwnDealPill => 'Senin işin';
 }

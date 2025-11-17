@@ -1388,4 +1388,655 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get invoiceSectionSubtitle => 'Optioneel: bedrijfs- en btw-gegevens voor automatische facturatie';
+
+  @override
+  String get marketplaceTitle => 'Opdrachten verhandelen';
+
+  @override
+  String get marketplaceTabSell => 'Verkopen';
+
+  @override
+  String get marketplaceTabBuy => 'Kopen';
+
+  @override
+  String get marketplaceOfferCreateCta => 'Opdracht doorgeven';
+
+  @override
+  String get marketplaceFilter => 'Filter';
+
+  @override
+  String get marketplaceSort => 'Sorteren';
+
+  @override
+  String get marketplaceBuyNow => 'Nu aanmelden';
+
+  @override
+  String get marketplaceSnackOpenForm => 'Formulier openen…';
+
+  @override
+  String get marketplaceSnackStartCheckout => 'Afrekenproces starten…';
+
+  @override
+  String marketplaceOfferTitle(int index) {
+    return 'Aanbod #$index';
+  }
+
+  @override
+  String marketplaceOfferSubtitle(String category, String price, Object distanceKm) {
+    return '$category • $distanceKm km';
+  }
+
+  @override
+  String marketplaceBuyTitle(int index) {
+    return 'Advertentie #$index · Kleine reparatie';
+  }
+
+  @override
+  String marketplaceBuySubtitle(String category, String price, String distance) {
+    return 'Categorie: $category · $price/u · $distance km';
+  }
+
+  @override
+  String get marketplaceEmptyList => 'Geen passende aanbiedingen gevonden.';
+
+  @override
+  String get marketplaceErrorLoading => 'Lijst kon niet worden geladen.';
+
+  @override
+  String get marketplaceAppliedSuccess => 'Aangemeld — de verkoper kan je aanvraag zien.';
+
+  @override
+  String get marketplaceAlreadyApplied => 'Je hebt je al aangemeld.';
+
+  @override
+  String marketplaceProvisionPercent(Object value) {
+    return '$value %';
+  }
+
+  @override
+  String marketplaceProvisionFixed(Object value) {
+    return '$value';
+  }
+
+  @override
+  String marketplaceChipTargetPrice(Object price) {
+    return 'Doelprijs: $price';
+  }
+
+  @override
+  String marketplaceChipProvision(Object value) {
+    return 'Commissie: $value';
+  }
+
+  @override
+  String get s0Title => 'Opdracht doorgeven (S0)';
+
+  @override
+  String get sectionBasics => 'Basis';
+
+  @override
+  String get fieldTitle => 'Titel';
+
+  @override
+  String get hintTitleExample => 'bijv. Dakrenovatie EHF, 120 m²';
+
+  @override
+  String get fieldDescription => 'Beschrijving';
+
+  @override
+  String get hintDescription => 'Korte beschrijving, bijzonderheden, materiaal incl./excl.';
+
+  @override
+  String get fieldLocation => 'Locatie/radius (voor nu tekst)';
+
+  @override
+  String get hintLocation => 'bijv. Keulen, 15 km';
+
+  @override
+  String get pickStartDate => 'Startdatum kiezen';
+
+  @override
+  String get pickDeadline => 'Deadline kiezen';
+
+  @override
+  String get labelStart => 'Start';
+
+  @override
+  String get labelDeadline => 'Deadline';
+
+  @override
+  String get sectionS0PriceProvision => 'S0 – Prijs & Provisie';
+
+  @override
+  String get tooltipS0PriceProvision => 'Doelprijs = totale prijs van de opdracht.\nProvisie = vergoeding voor het doorgeven.';
+
+  @override
+  String get fieldTargetPriceEur => 'Doelprijs (EUR)';
+
+  @override
+  String get hintTargetPriceExample => 'bijv. 12.500';
+
+  @override
+  String get helpTargetPrice => 'Totale waarde die de koper overneemt.';
+
+  @override
+  String get fieldProvisionType => 'Provisietype';
+
+  @override
+  String get provisionTypePercent => 'Procent';
+
+  @override
+  String get provisionTypeFixed => 'Vast';
+
+  @override
+  String get fieldProvisionValuePercent => 'Provisiewaarde (%)';
+
+  @override
+  String get fieldProvisionValueFixed => 'Provisiewaarde (€)';
+
+  @override
+  String get helpProvisionPercent => 'Gebruikelijk: 5–12% (cap mogelijk).';
+
+  @override
+  String get helpProvisionFixed => 'Vast provisiebedrag.';
+
+  @override
+  String get fieldProvisionDue => 'Wanneer is de provisie verschuldigd?';
+
+  @override
+  String get provisionDueAward => 'bij toekenning';
+
+  @override
+  String get provisionDueHandover => 'bij overdracht';
+
+  @override
+  String get provisionDueFinalInvoice => 'bij eindfactuur';
+
+  @override
+  String get provisionDueAwardHelp => 'Bij toekenning: de provisie wordt direct na de toekenning verschuldigd.';
+
+  @override
+  String get provisionDueHandoverHelp => 'Bij overdracht: na akkoord klant & overdracht.';
+
+  @override
+  String get provisionDueFinalInvoiceHelp => 'Bij eindfactuur: wanneer koper de opdracht voltooit.';
+
+  @override
+  String get sectionEvidencePlaceholder => 'Bewijzen (placeholder)';
+
+  @override
+  String get btnUploadEvidence => 'Offerte/klant-OK uploaden';
+
+  @override
+  String get btnCreateDraft => 'Concept aanmaken';
+
+  @override
+  String get btnSaving => 'Opslaan…';
+
+  @override
+  String get noteSupabaseActive => 'Let op: Supabase-opslag actief. Betalingen & uploads volgen.';
+
+  @override
+  String get formErrorRequired => 'Verplicht';
+
+  @override
+  String get formErrorInvalidAmount => 'Ongeldig bedrag';
+
+  @override
+  String get formErrorGreaterZero => 'Moet > 0 zijn';
+
+  @override
+  String get formErrorRealistic => 'Graag realistisch blijven';
+
+  @override
+  String get formErrorInvalidValue => 'Ongeldige waarde';
+
+  @override
+  String get formErrorPercentRange => 'Toegestaan: 0–30%';
+
+  @override
+  String get errPickStartDate => 'Kies een startdatum';
+
+  @override
+  String get errPickDeadline => 'Kies een deadline';
+
+  @override
+  String get draftSaved => 'S0-concept opgeslagen.';
+
+  @override
+  String get genericError => 'Er ging iets mis.';
+
+  @override
+  String get btnMyDeals => 'Mijn deals';
+
+  @override
+  String get myDealsTitle => 'Mijn deals';
+
+  @override
+  String get myDealsEmpty => 'Nog geen opdrachten.';
+
+  @override
+  String get myDealsErrorLoading => 'Je opdrachten konden niet worden geladen.';
+
+  @override
+  String get filterAll => 'Alle';
+
+  @override
+  String get filterDraft => 'Concepten';
+
+  @override
+  String get filterLive => 'Live';
+
+  @override
+  String get filterAwarded => 'Gegund';
+
+  @override
+  String get manageTitle => 'Opdracht beheren';
+
+  @override
+  String get manageErrorLoading => 'Details konden niet worden geladen.';
+
+  @override
+  String get btnPublish => 'Publiceren';
+
+  @override
+  String get publishSuccess => 'Opdracht gepubliceerd.';
+
+  @override
+  String get applicationsTitle => 'Aanmeldingen';
+
+  @override
+  String get applicationsEmpty => 'Nog geen aanmeldingen.';
+
+  @override
+  String get applicationNote => 'Notitie';
+
+  @override
+  String get applicationStatusPending => 'Status: in behandeling';
+
+  @override
+  String get applicationStatusAwarded => 'Status: gegund';
+
+  @override
+  String get btnAward => 'Gunnen';
+
+  @override
+  String get btnManage => 'Beheren';
+
+  @override
+  String get labelStatus => 'Status';
+
+  @override
+  String get statusDraft => 'Concept';
+
+  @override
+  String get statusLive => 'Live';
+
+  @override
+  String get statusAwarded => 'Gegund';
+
+  @override
+  String get awardSuccess => 'Aanmelding succesvol gegund.';
+
+  @override
+  String get snackNewApplication => 'Nieuwe aanmelding ontvangen';
+
+  @override
+  String applicationsCount(Object count) {
+    return '$count aanvragen';
+  }
+
+  @override
+  String get btnApplied => 'Aangemeld';
+
+  @override
+  String get s0EditTitle => 'S0 bewerken';
+
+  @override
+  String get publishNow => 'Na opslaan publiceren';
+
+  @override
+  String get publishNowHint => 'Indien ingeschakeld, wordt het concept na het opslaan op \"Live\" gezet.';
+
+  @override
+  String get btnSaveChanges => 'Wijzigingen opslaan';
+
+  @override
+  String get saved => 'Opgeslagen';
+
+  @override
+  String get marketplaceLocationLoadedFromProfile => 'Locatie uit je profiel geladen — radiusfilter actief.';
+
+  @override
+  String get marketplaceNoHomeAddressHint => 'Geen adres in profiel — alle aanbiedingen zonder afstandsfilter.';
+
+  @override
+  String get fieldCategory => 'Categorie';
+
+  @override
+  String get categoryAll => 'Alle';
+
+  @override
+  String get categoryRoofer => 'Dakdekker';
+
+  @override
+  String get categorySolar => 'PV / Zonne-energie';
+
+  @override
+  String get categoryHVAC => 'Verwarming / Sanitair / HVAC';
+
+  @override
+  String get categoryElectrical => 'Elektricien';
+
+  @override
+  String get categoryDrywall => 'Gipsplaten / Afbouw';
+
+  @override
+  String get categoryPainter => 'Schilder';
+
+  @override
+  String get categoryTiling => 'Tegels zetten';
+
+  @override
+  String get categoryFlooring => 'Vloerleggen';
+
+  @override
+  String get categoryWindowsDoors => 'Ramen & Deuren';
+
+  @override
+  String get categoryInsulationFacade => 'Isolatie & Gevel';
+
+  @override
+  String get categoryMasonryConcrete => 'Metsel- & Betonwerk';
+
+  @override
+  String get categoryCarpentryJoinery => 'Timmerwerk & Meubelmakerij';
+
+  @override
+  String get categoryLandscaping => 'Tuin- & Landschapsbouw';
+
+  @override
+  String get categoryScaffolding => 'Steigerbouw';
+
+  @override
+  String get categoryCleaningRestoration => 'Reiniging & Restauratie';
+
+  @override
+  String get categoryMovingTransport => 'Verhuizen & Transport';
+
+  @override
+  String get sectionCustomerOk => 'Kunden-OK';
+
+  @override
+  String get helpCustomerOk => 'Nachweis, dass der Kunde der Weitergabe zustimmt (z. B. unterschriebenes Angebot, E-Mail/SMS als PDF/Foto).';
+
+  @override
+  String get btnUploadCustomerOk => 'Kunden-OK hochladen';
+
+  @override
+  String get customerNameOptional => 'Kundenname (optional)';
+
+  @override
+  String get customerPhoneOptional => 'Telefon (optional)';
+
+  @override
+  String get sectionOffer => 'Angebot / Auftragsbestätigung';
+
+  @override
+  String get helpOfferOptional => 'Dein Angebot oder die Auftragsbestätigung. Optional, aber hilfreich für Käufer.';
+
+  @override
+  String get btnUploadOffer => 'Angebot hochladen';
+
+  @override
+  String get errCustomerOkRequired => 'Zum Veröffentlichen wird mindestens ein Kunden-OK benötigt.';
+
+  @override
+  String get warnMissingDocsBody => 'Hinweis: Ohne Kunden-OK/Angebot kannst du später nicht veröffentlichen. Du kannst die Nachweise jederzeit nachtragen.';
+
+  @override
+  String get attestLabel => 'Ich bestätige wahrheitsgemäß, dass der Kunde der Weitergabe zustimmt und alle Angaben korrekt sind.';
+
+  @override
+  String get attestConsequences => 'Bei Falschangaben behalten wir uns Sperre, Einbehalt von Auszahlungen sowie zivil- und ggf. strafrechtliche Schritte vor.';
+
+  @override
+  String get errAttestRequired => 'Zum Veröffentlichen musst du die Bestätigung ankreuzen.';
+
+  @override
+  String get genericPleaseFix => 'Corrigeer de gemarkeerde velden:';
+
+  @override
+  String get errAwardNeedsDoc => 'Als de vervaldag \"bij gunning\" is, is een document/offerte vereist.';
+
+  @override
+  String get errNotOwner => 'Je bent niet de eigenaar van deze opdracht.';
+
+  @override
+  String get errPublishOnlyFromDraft => 'Publiceren kan alleen vanuit de conceptstatus.';
+
+  @override
+  String get publishRequirementsTitle => 'Vereisten om te publiceren';
+
+  @override
+  String get infoReqCustomerOk => 'Minstens één klanttoestemming is toegevoegd.';
+
+  @override
+  String get infoReqDocForAward => 'Voor \"bij gunning\": upload offerte/orderbevestiging.';
+
+  @override
+  String get infoReqAttest => 'De bevestiging in het formulier is aangevinkt.';
+
+  @override
+  String get draftChecklistTitle => 'Checklist vóór publiceren';
+
+  @override
+  String get chkTitle => 'Titel ingevuld';
+
+  @override
+  String get chkDescription => 'Beschrijving ingevuld';
+
+  @override
+  String get chkLocation => 'Adres/locatie ingesteld';
+
+  @override
+  String get chkTargetPrice => 'Doelprijs ingesteld';
+
+  @override
+  String get chkCustomerOk => 'Klanttoestemming aanwezig';
+
+  @override
+  String get chkDocIfAward => 'Document/offerte aanwezig (aanbevolen bij \"bij gunning\")';
+
+  @override
+  String get chkAttestAtPublish => 'Bevestiging aanvinken bij publiceren';
+
+  @override
+  String get draftChecklistCta => 'Beheer openen';
+
+  @override
+  String get uploadSuccess => 'Upload geslaagd.';
+
+  @override
+  String get uploadInProgress => 'Upload bezig...';
+
+  @override
+  String get uploadFailed => 'Upload mislukt.';
+
+  @override
+  String get draftDefaultTitle => 'Concept';
+
+  @override
+  String get errGeocodingFailed => 'Adres kon niet worden gegeocodeerd.';
+
+  @override
+  String get provisionDueAwardLabel => 'Beauftragung';
+
+  @override
+  String get provisionDueHandoverLabel => 'Overdracht';
+
+  @override
+  String get provisionDueFinalInvoiceLabel => 'Eindfactuur';
+
+  @override
+  String get sectionPreviewPublic => 'Preview (publiek)';
+
+  @override
+  String get tooltipPreviewPublic => 'Deze bestanden zijn zichtbaar vóór aankoop. Upload alleen geanonimiseerde/zwartgemaakte previews.';
+
+  @override
+  String get btnUploadPreview => 'Preview uploaden';
+
+  @override
+  String get previewRedactionNoticeTitle => 'Belangrijke preview-melding';
+
+  @override
+  String get previewRedactionNoticeBody => 'Previews zijn vóór aankoop zichtbaar voor kopers. Zwartmaak gevoelige gegevens (bv. namen, adressen, telefoonnummers, contract-/klantnrs., handtekeningen, QR-/barcodes). Upload geen documenten met onbewerkte persoonsgegevens.';
+
+  @override
+  String get hintPhoneExample => '+31 6 12345678';
+
+  @override
+  String get createDealTitle => 'Handel aanmaken';
+
+  @override
+  String get chooseDealTypeTitle => 'Kies handelstype';
+
+  @override
+  String get dealTypeS0Title => 'S0 – Doorverkoop';
+
+  @override
+  String get dealTypeS0Subtitle => 'Volledige opdracht doorverkopen aan een andere dienstverlener.';
+
+  @override
+  String get dealTypeS1Title => 'S1 – Deeltaak/onderaannemer (mijlpalen)';
+
+  @override
+  String get dealTypeS1Subtitle => 'Onderopdracht met mijlpalen en bewijsstukken.';
+
+  @override
+  String get s1Title => 'Onder­aannemers zoeken (S1)';
+
+  @override
+  String get sectionS1Pricing => 'Prijsstelling';
+
+  @override
+  String get sectionS1Provision => 'Provisie';
+
+  @override
+  String get sectionMilestones => 'Mijlpalen';
+
+  @override
+  String get pricingModeFixed => 'Vaste prijs';
+
+  @override
+  String get pricingModeTm => 'Uren & Materiaal';
+
+  @override
+  String get basePriceLabel => 'Totaalbudget (€)';
+
+  @override
+  String get hourlyRateLabel => 'Uurtarief (€)';
+
+  @override
+  String get expectedHoursLabel => 'Geschatte uren';
+
+  @override
+  String get dueTypeAward => 'Beauftragung';
+
+  @override
+  String get dueTypeDate => 'Datum';
+
+  @override
+  String get dueTypeHandover => 'Overdracht';
+
+  @override
+  String get dueTypeCustom => 'Aangepast';
+
+  @override
+  String get dueTypeCustomHelp => 'Aangepaste vervaldatum (graag datum/opmerking toevoegen).';
+
+  @override
+  String get milestoneLabel => 'Mijlpaal';
+
+  @override
+  String get milestoneTitle => 'Titel van mijlpaal';
+
+  @override
+  String get milestoneDescription => 'Beschrijving van mijlpaal';
+
+  @override
+  String get milestoneAmount => 'Bedrag (€)';
+
+  @override
+  String get milestonePercent => 'Percentage (%)';
+
+  @override
+  String get milestoneDue => 'Vervaldatum';
+
+  @override
+  String get btnAddMilestonePercent => 'Mijlpaal (%) toevoegen';
+
+  @override
+  String get btnAddMilestoneAmount => 'Mijlpaal (€) toevoegen';
+
+  @override
+  String get milestoneEmptyHint => 'Nog geen mijlpalen (optioneel).';
+
+  @override
+  String get milestoneBlocking => 'Blokkerend';
+
+  @override
+  String get milestoneBlockingHelp => 'Moet voltooid zijn voordat de volgende stap vrijgegeven wordt.';
+
+  @override
+  String get validationMilestoneSum => 'Totalen kloppen niet: bij percentage moet het 100% zijn; bij vaste prijs moet het totaal gelijk zijn aan het budget.';
+
+  @override
+  String get btnReorder => 'Volgorde wijzigen';
+
+  @override
+  String get infoS1PricingHelp => 'Hoe je het werk voor onderaannemers prijst. ‘Vaste prijs’ = één totaalbudget voor het werk. ‘Uren & materiaal’ = uurtarief + geschatte uren; afrekening op werkelijk bestede tijd.';
+
+  @override
+  String get infoS1ProvisionHelp => 'Jouw provisie per toegewezen onderaannemer. Stel een percentage of vast bedrag én het betaalmoment in.';
+
+  @override
+  String get coordChipNoCoords => 'Geen coördinaten';
+
+  @override
+  String get coordMissingLabel => 'Coördinaten (lat/lng)';
+
+  @override
+  String get s0DetailsMissingLabel => 'S0-details';
+
+  @override
+  String get s1DetailsMissingLabel => 'S1-details';
+
+  @override
+  String get marketplaceTypeS0 => 'S0 – Opdracht doorgeven';
+
+  @override
+  String get marketplaceTypeS1 => 'S1 – Subzoek';
+
+  @override
+  String get filterTypeAll => 'Alle types';
+
+  @override
+  String get filterTypeS0 => 'Alleen S0';
+
+  @override
+  String get filterTypeS1 => 'Alleen S1';
+
+  @override
+  String get badgeAwardedToYou => 'Aan jou toegewezen';
+
+  @override
+  String get badgeAwardedGiven => 'Opdracht toegewezen';
+
+  @override
+  String get btnAssigned => 'Toegewezen';
+
+  @override
+  String get marketplaceOwnDealPill => 'Jouw opdracht';
 }

@@ -2702,6 +2702,1272 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Optional: company & tax details for automatic invoicing'**
   String get invoiceSectionSubtitle;
+
+  /// No description provided for @marketplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade jobs'**
+  String get marketplaceTitle;
+
+  /// No description provided for @marketplaceTabSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell'**
+  String get marketplaceTabSell;
+
+  /// No description provided for @marketplaceTabBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get marketplaceTabBuy;
+
+  /// No description provided for @marketplaceOfferCreateCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass on a job'**
+  String get marketplaceOfferCreateCta;
+
+  /// No description provided for @marketplaceFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get marketplaceFilter;
+
+  /// No description provided for @marketplaceSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get marketplaceSort;
+
+  /// No description provided for @marketplaceBuyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply now'**
+  String get marketplaceBuyNow;
+
+  /// No description provided for @marketplaceSnackOpenForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening offer form…'**
+  String get marketplaceSnackOpenForm;
+
+  /// No description provided for @marketplaceSnackStartCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting checkout…'**
+  String get marketplaceSnackStartCheckout;
+
+  /// No description provided for @marketplaceOfferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer #{index}'**
+  String marketplaceOfferTitle(int index);
+
+  /// No description provided for @marketplaceOfferSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} • {distanceKm} km'**
+  String marketplaceOfferSubtitle(String category, String price, Object distanceKm);
+
+  /// No description provided for @marketplaceBuyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing #{index} · Minor repair'**
+  String marketplaceBuyTitle(int index);
+
+  /// No description provided for @marketplaceBuySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {category} · {price}/h · {distance} km'**
+  String marketplaceBuySubtitle(String category, String price, String distance);
+
+  /// No description provided for @marketplaceEmptyList.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching offers found.'**
+  String get marketplaceEmptyList;
+
+  /// No description provided for @marketplaceErrorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the list.'**
+  String get marketplaceErrorLoading;
+
+  /// No description provided for @marketplaceAppliedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied — the seller can see your request.'**
+  String get marketplaceAppliedSuccess;
+
+  /// No description provided for @marketplaceAlreadyApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already applied.'**
+  String get marketplaceAlreadyApplied;
+
+  /// No description provided for @marketplaceProvisionPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} %'**
+  String marketplaceProvisionPercent(Object value);
+
+  /// No description provided for @marketplaceProvisionFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}'**
+  String marketplaceProvisionFixed(Object value);
+
+  /// No description provided for @marketplaceChipTargetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Target price: {price}'**
+  String marketplaceChipTargetPrice(Object price);
+
+  /// No description provided for @marketplaceChipProvision.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission: {value}'**
+  String marketplaceChipProvision(Object value);
+
+  /// No description provided for @s0Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pass on job (S0)'**
+  String get s0Title;
+
+  /// No description provided for @sectionBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'Basics'**
+  String get sectionBasics;
+
+  /// No description provided for @fieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get fieldTitle;
+
+  /// No description provided for @hintTitleExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Roof renovation SFH, 120 m²'**
+  String get hintTitleExample;
+
+  /// No description provided for @fieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get fieldDescription;
+
+  /// No description provided for @hintDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Short description, specifics, materials incl./excl.'**
+  String get hintDescription;
+
+  /// No description provided for @fieldLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location/Radius (text for now)'**
+  String get fieldLocation;
+
+  /// No description provided for @hintLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Cologne, 15 km'**
+  String get hintLocation;
+
+  /// No description provided for @pickStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select start date'**
+  String get pickStartDate;
+
+  /// No description provided for @pickDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Select deadline'**
+  String get pickDeadline;
+
+  /// No description provided for @labelStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get labelStart;
+
+  /// No description provided for @labelDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get labelDeadline;
+
+  /// No description provided for @sectionS0PriceProvision.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 – Price & Commission'**
+  String get sectionS0PriceProvision;
+
+  /// No description provided for @tooltipS0PriceProvision.
+  ///
+  /// In en, this message translates to:
+  /// **'Target price = Total price of the job.\nCommission = Fee for passing on the job.'**
+  String get tooltipS0PriceProvision;
+
+  /// No description provided for @fieldTargetPriceEur.
+  ///
+  /// In en, this message translates to:
+  /// **'Target price (EUR)'**
+  String get fieldTargetPriceEur;
+
+  /// No description provided for @hintTargetPriceExample.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 12,500'**
+  String get hintTargetPriceExample;
+
+  /// No description provided for @helpTargetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Total contract value that the buyer takes over.'**
+  String get helpTargetPrice;
+
+  /// No description provided for @fieldProvisionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission type'**
+  String get fieldProvisionType;
+
+  /// No description provided for @provisionTypePercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Percent'**
+  String get provisionTypePercent;
+
+  /// No description provided for @provisionTypeFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed'**
+  String get provisionTypeFixed;
+
+  /// No description provided for @fieldProvisionValuePercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission value (%)'**
+  String get fieldProvisionValuePercent;
+
+  /// No description provided for @fieldProvisionValueFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission value (€)'**
+  String get fieldProvisionValueFixed;
+
+  /// No description provided for @helpProvisionPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical: 5–12% (cap possible).'**
+  String get helpProvisionPercent;
+
+  /// No description provided for @helpProvisionFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed commission amount.'**
+  String get helpProvisionFixed;
+
+  /// No description provided for @fieldProvisionDue.
+  ///
+  /// In en, this message translates to:
+  /// **'When is the commission due?'**
+  String get fieldProvisionDue;
+
+  /// No description provided for @provisionDueAward.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon award'**
+  String get provisionDueAward;
+
+  /// No description provided for @provisionDueHandover.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon handover'**
+  String get provisionDueHandover;
+
+  /// No description provided for @provisionDueFinalInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon final invoice'**
+  String get provisionDueFinalInvoice;
+
+  /// No description provided for @provisionDueAwardHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon award: commission is due immediately after the award.'**
+  String get provisionDueAwardHelp;
+
+  /// No description provided for @provisionDueHandoverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon handover: due after customer OK & handover.'**
+  String get provisionDueHandoverHelp;
+
+  /// No description provided for @provisionDueFinalInvoiceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Upon final invoice: when the buyer’s provider completes the job.'**
+  String get provisionDueFinalInvoiceHelp;
+
+  /// No description provided for @sectionEvidencePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence (placeholder)'**
+  String get sectionEvidencePlaceholder;
+
+  /// No description provided for @btnUploadEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload offer/customer approval'**
+  String get btnUploadEvidence;
+
+  /// No description provided for @btnCreateDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Create as draft'**
+  String get btnCreateDraft;
+
+  /// No description provided for @btnSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get btnSaving;
+
+  /// No description provided for @noteSupabaseActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Note: Supabase storage active. Payment & uploads coming later.'**
+  String get noteSupabaseActive;
+
+  /// No description provided for @formErrorRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required field'**
+  String get formErrorRequired;
+
+  /// No description provided for @formErrorInvalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid amount'**
+  String get formErrorInvalidAmount;
+
+  /// No description provided for @formErrorGreaterZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be > 0'**
+  String get formErrorGreaterZero;
+
+  /// No description provided for @formErrorRealistic.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep it realistic'**
+  String get formErrorRealistic;
+
+  /// No description provided for @formErrorInvalidValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid value'**
+  String get formErrorInvalidValue;
+
+  /// No description provided for @formErrorPercentRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed range: 0–30%'**
+  String get formErrorPercentRange;
+
+  /// No description provided for @errPickStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a start date'**
+  String get errPickStartDate;
+
+  /// No description provided for @errPickDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose an end date/deadline'**
+  String get errPickDeadline;
+
+  /// No description provided for @draftSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 draft saved.'**
+  String get draftSaved;
+
+  /// No description provided for @genericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong.'**
+  String get genericError;
+
+  /// No description provided for @btnMyDeals.
+  ///
+  /// In en, this message translates to:
+  /// **'My deals'**
+  String get btnMyDeals;
+
+  /// No description provided for @myDealsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My deals'**
+  String get myDealsTitle;
+
+  /// No description provided for @myDealsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No jobs yet.'**
+  String get myDealsEmpty;
+
+  /// No description provided for @myDealsErrorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your jobs could not be loaded.'**
+  String get myDealsErrorLoading;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get filterDraft;
+
+  /// No description provided for @filterLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get filterLive;
+
+  /// No description provided for @filterAwarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded'**
+  String get filterAwarded;
+
+  /// No description provided for @manageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage job'**
+  String get manageTitle;
+
+  /// No description provided for @manageErrorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Details could not be loaded.'**
+  String get manageErrorLoading;
+
+  /// No description provided for @btnPublish.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get btnPublish;
+
+  /// No description provided for @publishSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Job published.'**
+  String get publishSuccess;
+
+  /// No description provided for @applicationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Applications'**
+  String get applicationsTitle;
+
+  /// No description provided for @applicationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No applications yet.'**
+  String get applicationsEmpty;
+
+  /// No description provided for @applicationNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get applicationNote;
+
+  /// No description provided for @applicationStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: pending'**
+  String get applicationStatusPending;
+
+  /// No description provided for @applicationStatusAwarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: awarded'**
+  String get applicationStatusAwarded;
+
+  /// No description provided for @btnAward.
+  ///
+  /// In en, this message translates to:
+  /// **'Award'**
+  String get btnAward;
+
+  /// No description provided for @btnManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get btnManage;
+
+  /// No description provided for @labelStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get labelStatus;
+
+  /// No description provided for @statusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get statusDraft;
+
+  /// No description provided for @statusLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get statusLive;
+
+  /// No description provided for @statusAwarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded'**
+  String get statusAwarded;
+
+  /// No description provided for @awardSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Application awarded successfully.'**
+  String get awardSuccess;
+
+  /// No description provided for @snackNewApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'New application received'**
+  String get snackNewApplication;
+
+  /// No description provided for @applicationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} applications'**
+  String applicationsCount(Object count);
+
+  /// No description provided for @btnApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied'**
+  String get btnApplied;
+
+  /// No description provided for @s0EditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit handover (S0)'**
+  String get s0EditTitle;
+
+  /// No description provided for @publishNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish after saving'**
+  String get publishNow;
+
+  /// No description provided for @publishNowHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If enabled, the draft will be set to Live after saving.'**
+  String get publishNowHint;
+
+  /// No description provided for @btnSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get btnSaveChanges;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @marketplaceLocationLoadedFromProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Location loaded from your profile — radius filter active.'**
+  String get marketplaceLocationLoadedFromProfile;
+
+  /// No description provided for @marketplaceNoHomeAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No address in profile — showing all offers without distance filter.'**
+  String get marketplaceNoHomeAddressHint;
+
+  /// Required job category field
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get fieldCategory;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get categoryAll;
+
+  /// No description provided for @categoryRoofer.
+  ///
+  /// In en, this message translates to:
+  /// **'Roofer'**
+  String get categoryRoofer;
+
+  /// No description provided for @categorySolar.
+  ///
+  /// In en, this message translates to:
+  /// **'PV / Solar'**
+  String get categorySolar;
+
+  /// No description provided for @categoryHVAC.
+  ///
+  /// In en, this message translates to:
+  /// **'Heating / Plumbing / HVAC'**
+  String get categoryHVAC;
+
+  /// No description provided for @categoryElectrical.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrical'**
+  String get categoryElectrical;
+
+  /// No description provided for @categoryDrywall.
+  ///
+  /// In en, this message translates to:
+  /// **'Drywall'**
+  String get categoryDrywall;
+
+  /// No description provided for @categoryPainter.
+  ///
+  /// In en, this message translates to:
+  /// **'Painter'**
+  String get categoryPainter;
+
+  /// No description provided for @categoryTiling.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiling'**
+  String get categoryTiling;
+
+  /// No description provided for @categoryFlooring.
+  ///
+  /// In en, this message translates to:
+  /// **'Flooring'**
+  String get categoryFlooring;
+
+  /// No description provided for @categoryWindowsDoors.
+  ///
+  /// In en, this message translates to:
+  /// **'Windows & Doors'**
+  String get categoryWindowsDoors;
+
+  /// No description provided for @categoryInsulationFacade.
+  ///
+  /// In en, this message translates to:
+  /// **'Insulation & Façade'**
+  String get categoryInsulationFacade;
+
+  /// No description provided for @categoryMasonryConcrete.
+  ///
+  /// In en, this message translates to:
+  /// **'Masonry & Concrete'**
+  String get categoryMasonryConcrete;
+
+  /// No description provided for @categoryCarpentryJoinery.
+  ///
+  /// In en, this message translates to:
+  /// **'Carpentry & Joinery'**
+  String get categoryCarpentryJoinery;
+
+  /// No description provided for @categoryLandscaping.
+  ///
+  /// In en, this message translates to:
+  /// **'Landscaping'**
+  String get categoryLandscaping;
+
+  /// No description provided for @categoryScaffolding.
+  ///
+  /// In en, this message translates to:
+  /// **'Scaffolding'**
+  String get categoryScaffolding;
+
+  /// No description provided for @categoryCleaningRestoration.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning & Restoration'**
+  String get categoryCleaningRestoration;
+
+  /// No description provided for @categoryMovingTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving & Transport'**
+  String get categoryMovingTransport;
+
+  /// No description provided for @sectionCustomerOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Kunden-OK'**
+  String get sectionCustomerOk;
+
+  /// No description provided for @helpCustomerOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Nachweis, dass der Kunde der Weitergabe zustimmt (z. B. unterschriebenes Angebot, E-Mail/SMS als PDF/Foto).'**
+  String get helpCustomerOk;
+
+  /// No description provided for @btnUploadCustomerOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Kunden-OK hochladen'**
+  String get btnUploadCustomerOk;
+
+  /// No description provided for @customerNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Kundenname (optional)'**
+  String get customerNameOptional;
+
+  /// No description provided for @customerPhoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Telefon (optional)'**
+  String get customerPhoneOptional;
+
+  /// No description provided for @sectionOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Angebot / Auftragsbestätigung'**
+  String get sectionOffer;
+
+  /// No description provided for @helpOfferOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Dein Angebot oder die Auftragsbestätigung. Optional, aber hilfreich für Käufer.'**
+  String get helpOfferOptional;
+
+  /// No description provided for @btnUploadOffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Angebot hochladen'**
+  String get btnUploadOffer;
+
+  /// No description provided for @errCustomerOkRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Zum Veröffentlichen wird mindestens ein Kunden-OK benötigt.'**
+  String get errCustomerOkRequired;
+
+  /// No description provided for @warnMissingDocsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hinweis: Ohne Kunden-OK/Angebot kannst du später nicht veröffentlichen. Du kannst die Nachweise jederzeit nachtragen.'**
+  String get warnMissingDocsBody;
+
+  /// No description provided for @attestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ich bestätige wahrheitsgemäß, dass der Kunde der Weitergabe zustimmt und alle Angaben korrekt sind.'**
+  String get attestLabel;
+
+  /// No description provided for @attestConsequences.
+  ///
+  /// In en, this message translates to:
+  /// **'Bei Falschangaben behalten wir uns Sperre, Einbehalt von Auszahlungen sowie zivil- und ggf. strafrechtliche Schritte vor.'**
+  String get attestConsequences;
+
+  /// No description provided for @errAttestRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Zum Veröffentlichen musst du die Bestätigung ankreuzen.'**
+  String get errAttestRequired;
+
+  /// No description provided for @genericPleaseFix.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fix the highlighted fields:'**
+  String get genericPleaseFix;
+
+  /// No description provided for @errAwardNeedsDoc.
+  ///
+  /// In en, this message translates to:
+  /// **'If due \"on award\", at least one document/offer is required.'**
+  String get errAwardNeedsDoc;
+
+  /// No description provided for @errNotOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not the owner of this job.'**
+  String get errNotOwner;
+
+  /// No description provided for @errPublishOnlyFromDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Publishing is only possible from draft status.'**
+  String get errPublishOnlyFromDraft;
+
+  /// No description provided for @publishRequirementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Requirements to publish'**
+  String get publishRequirementsTitle;
+
+  /// No description provided for @infoReqCustomerOk.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one customer OK is attached.'**
+  String get infoReqCustomerOk;
+
+  /// No description provided for @infoReqDocForAward.
+  ///
+  /// In en, this message translates to:
+  /// **'For \"on award\": upload offer/order confirmation.'**
+  String get infoReqDocForAward;
+
+  /// No description provided for @infoReqAttest.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmation in the form is checked.'**
+  String get infoReqAttest;
+
+  /// No description provided for @draftChecklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-publish checklist'**
+  String get draftChecklistTitle;
+
+  /// No description provided for @chkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title filled in'**
+  String get chkTitle;
+
+  /// No description provided for @chkDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description filled in'**
+  String get chkDescription;
+
+  /// No description provided for @chkLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Address/location set'**
+  String get chkLocation;
+
+  /// No description provided for @chkTargetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Target price set'**
+  String get chkTargetPrice;
+
+  /// No description provided for @chkCustomerOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer OK present'**
+  String get chkCustomerOk;
+
+  /// No description provided for @chkDocIfAward.
+  ///
+  /// In en, this message translates to:
+  /// **'Document/offer present (recommended if due \"on award\")'**
+  String get chkDocIfAward;
+
+  /// No description provided for @chkAttestAtPublish.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick the confirmation at publish'**
+  String get chkAttestAtPublish;
+
+  /// No description provided for @draftChecklistCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Open management'**
+  String get draftChecklistCta;
+
+  /// No description provided for @uploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload successful.'**
+  String get uploadSuccess;
+
+  /// No description provided for @uploadInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get uploadInProgress;
+
+  /// No description provided for @uploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed.'**
+  String get uploadFailed;
+
+  /// No description provided for @draftDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get draftDefaultTitle;
+
+  /// No description provided for @errGeocodingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Address could not be geocoded.'**
+  String get errGeocodingFailed;
+
+  /// No description provided for @provisionDueAwardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Award'**
+  String get provisionDueAwardLabel;
+
+  /// No description provided for @provisionDueHandoverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Handover'**
+  String get provisionDueHandoverLabel;
+
+  /// No description provided for @provisionDueFinalInvoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Final invoice'**
+  String get provisionDueFinalInvoiceLabel;
+
+  /// No description provided for @sectionPreviewPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview (public)'**
+  String get sectionPreviewPublic;
+
+  /// No description provided for @tooltipPreviewPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'These files are visible to buyers before purchase. Upload only redacted/anonimized previews.'**
+  String get tooltipPreviewPublic;
+
+  /// No description provided for @btnUploadPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload preview'**
+  String get btnUploadPreview;
+
+  /// No description provided for @previewRedactionNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Important preview notice'**
+  String get previewRedactionNoticeTitle;
+
+  /// No description provided for @previewRedactionNoticeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Previews are visible to buyers before purchase. Redact sensitive data (e.g., names, addresses, phone numbers, contract/customer IDs, signatures, QR/barcodes). Do not upload documents containing unredacted personal data.'**
+  String get previewRedactionNoticeBody;
+
+  /// No description provided for @hintPhoneExample.
+  ///
+  /// In en, this message translates to:
+  /// **'+44 7700 900123'**
+  String get hintPhoneExample;
+
+  /// No description provided for @createDealTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Deal'**
+  String get createDealTitle;
+
+  /// No description provided for @chooseDealTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose deal type'**
+  String get chooseDealTypeTitle;
+
+  /// No description provided for @dealTypeS0Title.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 – Resell full job'**
+  String get dealTypeS0Title;
+
+  /// No description provided for @dealTypeS0Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell the entire job to another provider.'**
+  String get dealTypeS0Subtitle;
+
+  /// No description provided for @dealTypeS1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'S1 – Sub-scope/Subcontract (Milestones)'**
+  String get dealTypeS1Title;
+
+  /// No description provided for @dealTypeS1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subcontract with milestones & evidence.'**
+  String get dealTypeS1Subtitle;
+
+  /// No description provided for @s1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Find subcontractors (S1)'**
+  String get s1Title;
+
+  /// No description provided for @sectionS1Pricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Pricing'**
+  String get sectionS1Pricing;
+
+  /// No description provided for @sectionS1Provision.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get sectionS1Provision;
+
+  /// No description provided for @sectionMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get sectionMilestones;
+
+  /// No description provided for @pricingModeFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed price'**
+  String get pricingModeFixed;
+
+  /// No description provided for @pricingModeTm.
+  ///
+  /// In en, this message translates to:
+  /// **'Time & Material'**
+  String get pricingModeTm;
+
+  /// No description provided for @basePriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total budget (€)'**
+  String get basePriceLabel;
+
+  /// No description provided for @hourlyRateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hourly rate (€)'**
+  String get hourlyRateLabel;
+
+  /// No description provided for @expectedHoursLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated hours'**
+  String get expectedHoursLabel;
+
+  /// No description provided for @dueTypeAward.
+  ///
+  /// In en, this message translates to:
+  /// **'Award'**
+  String get dueTypeAward;
+
+  /// No description provided for @dueTypeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dueTypeDate;
+
+  /// No description provided for @dueTypeHandover.
+  ///
+  /// In en, this message translates to:
+  /// **'Handover'**
+  String get dueTypeHandover;
+
+  /// No description provided for @dueTypeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get dueTypeCustom;
+
+  /// No description provided for @dueTypeCustomHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom due trigger (please provide a date/comment).'**
+  String get dueTypeCustomHelp;
+
+  /// No description provided for @milestoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone'**
+  String get milestoneLabel;
+
+  /// No description provided for @milestoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone title'**
+  String get milestoneTitle;
+
+  /// No description provided for @milestoneDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone description'**
+  String get milestoneDescription;
+
+  /// No description provided for @milestoneAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (€)'**
+  String get milestoneAmount;
+
+  /// No description provided for @milestonePercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Percent (%)'**
+  String get milestonePercent;
+
+  /// No description provided for @milestoneDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get milestoneDue;
+
+  /// No description provided for @btnAddMilestonePercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Add milestone (%)'**
+  String get btnAddMilestonePercent;
+
+  /// No description provided for @btnAddMilestoneAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add milestone (€)'**
+  String get btnAddMilestoneAmount;
+
+  /// No description provided for @milestoneEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No milestones yet (optional).'**
+  String get milestoneEmptyHint;
+
+  /// No description provided for @milestoneBlocking.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking'**
+  String get milestoneBlocking;
+
+  /// No description provided for @milestoneBlockingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be completed before the next step is unlocked.'**
+  String get milestoneBlockingHelp;
+
+  /// No description provided for @validationMilestoneSum.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone totals don’t add up: use 100% for percent mode or match the total budget for fixed price.'**
+  String get validationMilestoneSum;
+
+  /// No description provided for @btnReorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get btnReorder;
+
+  /// No description provided for @infoS1PricingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How you price the subcontracted work. “Fixed price” = one total budget for the scope. “Time & materials” = hourly rate + estimated hours; billing is based on actual time spent.'**
+  String get infoS1PricingHelp;
+
+  /// No description provided for @infoS1ProvisionHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your finder/management fee per awarded subcontractor. Set a percentage or fixed amount and when it becomes due.'**
+  String get infoS1ProvisionHelp;
+
+  /// No description provided for @coordChipNoCoords.
+  ///
+  /// In en, this message translates to:
+  /// **'No coordinates'**
+  String get coordChipNoCoords;
+
+  /// No description provided for @coordMissingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates (lat/lng)'**
+  String get coordMissingLabel;
+
+  /// No description provided for @s0DetailsMissingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 details'**
+  String get s0DetailsMissingLabel;
+
+  /// No description provided for @s1DetailsMissingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'S1 details'**
+  String get s1DetailsMissingLabel;
+
+  /// No description provided for @marketplaceTypeS0.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 – Hand-off'**
+  String get marketplaceTypeS0;
+
+  /// No description provided for @marketplaceTypeS1.
+  ///
+  /// In en, this message translates to:
+  /// **'S1 – Subcontractor search'**
+  String get marketplaceTypeS1;
+
+  /// No description provided for @filterTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All types'**
+  String get filterTypeAll;
+
+  /// No description provided for @filterTypeS0.
+  ///
+  /// In en, this message translates to:
+  /// **'S0 only'**
+  String get filterTypeS0;
+
+  /// No description provided for @filterTypeS1.
+  ///
+  /// In en, this message translates to:
+  /// **'S1 only'**
+  String get filterTypeS1;
+
+  /// No description provided for @badgeAwardedToYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded to you'**
+  String get badgeAwardedToYou;
+
+  /// No description provided for @badgeAwardedGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded'**
+  String get badgeAwardedGiven;
+
+  /// No description provided for @btnAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded'**
+  String get btnAssigned;
+
+  /// No description provided for @marketplaceOwnDealPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Your deal'**
+  String get marketplaceOwnDealPill;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -68,6 +68,10 @@ dependencies:
   pub_semver: ^2.2.0
   url_launcher: ^6.3.2
 
+  # === Datei-Picker / Uploads ===
+  file_picker: ^10.3.3
+  mime: ^1.0.5  # für lookupMimeType(...) beim Upload
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

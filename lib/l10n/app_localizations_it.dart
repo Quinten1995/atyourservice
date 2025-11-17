@@ -1388,4 +1388,655 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get invoiceSectionSubtitle => 'Opzionale: dati aziendali e fiscali per la fatturazione automatica';
+
+  @override
+  String get marketplaceTitle => 'Scambia incarichi';
+
+  @override
+  String get marketplaceTabSell => 'Vendi';
+
+  @override
+  String get marketplaceTabBuy => 'Acquista';
+
+  @override
+  String get marketplaceOfferCreateCta => 'Passa un incarico';
+
+  @override
+  String get marketplaceFilter => 'Filtra';
+
+  @override
+  String get marketplaceSort => 'Ordina';
+
+  @override
+  String get marketplaceBuyNow => 'Candidati ora';
+
+  @override
+  String get marketplaceSnackOpenForm => 'Apertura del modulo offerta…';
+
+  @override
+  String get marketplaceSnackStartCheckout => 'Avvio del checkout…';
+
+  @override
+  String marketplaceOfferTitle(int index) {
+    return 'Offerta n.$index';
+  }
+
+  @override
+  String marketplaceOfferSubtitle(String category, String price, Object distanceKm) {
+    return '$category • $distanceKm km';
+  }
+
+  @override
+  String marketplaceBuyTitle(int index) {
+    return 'Annuncio n.$index · Piccola riparazione';
+  }
+
+  @override
+  String marketplaceBuySubtitle(String category, String price, String distance) {
+    return 'Categoria: $category · $price/h · $distance km';
+  }
+
+  @override
+  String get marketplaceEmptyList => 'Nessuna offerta trovata.';
+
+  @override
+  String get marketplaceErrorLoading => 'Impossibile caricare l’elenco.';
+
+  @override
+  String get marketplaceAppliedSuccess => 'Candidatura inviata — il venditore può vederla.';
+
+  @override
+  String get marketplaceAlreadyApplied => 'Ti sei già candidato.';
+
+  @override
+  String marketplaceProvisionPercent(Object value) {
+    return '$value %';
+  }
+
+  @override
+  String marketplaceProvisionFixed(Object value) {
+    return '$value';
+  }
+
+  @override
+  String marketplaceChipTargetPrice(Object price) {
+    return 'Prezzo obiettivo: $price';
+  }
+
+  @override
+  String marketplaceChipProvision(Object value) {
+    return 'Provvigione: $value';
+  }
+
+  @override
+  String get s0Title => 'Trasferisci incarico (S0)';
+
+  @override
+  String get sectionBasics => 'Base';
+
+  @override
+  String get fieldTitle => 'Titolo';
+
+  @override
+  String get hintTitleExample => 'es. Ristrutturazione tetto, 120 m²';
+
+  @override
+  String get fieldDescription => 'Descrizione';
+
+  @override
+  String get hintDescription => 'Breve descrizione, particolarità, materiali incl./escl.';
+
+  @override
+  String get fieldLocation => 'Luogo/raggio (per ora testo)';
+
+  @override
+  String get hintLocation => 'es. Colonia, 15 km';
+
+  @override
+  String get pickStartDate => 'Seleziona data inizio';
+
+  @override
+  String get pickDeadline => 'Seleziona scadenza';
+
+  @override
+  String get labelStart => 'Inizio';
+
+  @override
+  String get labelDeadline => 'Scadenza';
+
+  @override
+  String get sectionS0PriceProvision => 'S0 – Prezzo & Provvigione';
+
+  @override
+  String get tooltipS0PriceProvision => 'Prezzo obiettivo = prezzo totale dell’incarico.\nProvvigione = compenso per il passaggio.';
+
+  @override
+  String get fieldTargetPriceEur => 'Prezzo obiettivo (EUR)';
+
+  @override
+  String get hintTargetPriceExample => 'es. 12.500';
+
+  @override
+  String get helpTargetPrice => 'Valore totale rilevato dall’acquirente.';
+
+  @override
+  String get fieldProvisionType => 'Tipo di provvigione';
+
+  @override
+  String get provisionTypePercent => 'Percentuale';
+
+  @override
+  String get provisionTypeFixed => 'Fisso';
+
+  @override
+  String get fieldProvisionValuePercent => 'Valore provvigione (%)';
+
+  @override
+  String get fieldProvisionValueFixed => 'Valore provvigione (€)';
+
+  @override
+  String get helpProvisionPercent => 'Tipico: 5–12% (cap possibile).';
+
+  @override
+  String get helpProvisionFixed => 'Importo fisso della provvigione.';
+
+  @override
+  String get fieldProvisionDue => 'Quando è dovuta la provvigione?';
+
+  @override
+  String get provisionDueAward => 'all’assegnazione';
+
+  @override
+  String get provisionDueHandover => 'alla consegna';
+
+  @override
+  String get provisionDueFinalInvoice => 'alla fattura finale';
+
+  @override
+  String get provisionDueAwardHelp => 'All’assegnazione: la commissione è dovuta subito dopo l’assegnazione.';
+
+  @override
+  String get provisionDueHandoverHelp => 'Alla consegna: dopo OK del cliente e consegna.';
+
+  @override
+  String get provisionDueFinalInvoiceHelp => 'Alla fattura finale: quando l’acquirente conclude il lavoro.';
+
+  @override
+  String get sectionEvidencePlaceholder => 'Prove (placeholder)';
+
+  @override
+  String get btnUploadEvidence => 'Carica offerta/OK cliente';
+
+  @override
+  String get btnCreateDraft => 'Crea bozza';
+
+  @override
+  String get btnSaving => 'Salvataggio…';
+
+  @override
+  String get noteSupabaseActive => 'Nota: archiviazione Supabase attiva. Pagamenti & upload seguiranno.';
+
+  @override
+  String get formErrorRequired => 'Obbligatorio';
+
+  @override
+  String get formErrorInvalidAmount => 'Importo non valido';
+
+  @override
+  String get formErrorGreaterZero => 'Deve essere > 0';
+
+  @override
+  String get formErrorRealistic => 'Rimani realistico';
+
+  @override
+  String get formErrorInvalidValue => 'Valore non valido';
+
+  @override
+  String get formErrorPercentRange => 'Consentito: 0–30%';
+
+  @override
+  String get errPickStartDate => 'Seleziona una data di inizio';
+
+  @override
+  String get errPickDeadline => 'Seleziona una scadenza';
+
+  @override
+  String get draftSaved => 'Bozza S0 salvata.';
+
+  @override
+  String get genericError => 'Qualcosa è andato storto.';
+
+  @override
+  String get btnMyDeals => 'I miei deal';
+
+  @override
+  String get myDealsTitle => 'I miei deal';
+
+  @override
+  String get myDealsEmpty => 'Nessun incarico al momento.';
+
+  @override
+  String get myDealsErrorLoading => 'Impossibile caricare i tuoi incarichi.';
+
+  @override
+  String get filterAll => 'Tutti';
+
+  @override
+  String get filterDraft => 'Bozze';
+
+  @override
+  String get filterLive => 'Online';
+
+  @override
+  String get filterAwarded => 'Aggiudicati';
+
+  @override
+  String get manageTitle => 'Gestisci incarico';
+
+  @override
+  String get manageErrorLoading => 'Impossibile caricare i dettagli.';
+
+  @override
+  String get btnPublish => 'Pubblica';
+
+  @override
+  String get publishSuccess => 'Incarico pubblicato.';
+
+  @override
+  String get applicationsTitle => 'Candidature';
+
+  @override
+  String get applicationsEmpty => 'Ancora nessuna candidatura.';
+
+  @override
+  String get applicationNote => 'Nota';
+
+  @override
+  String get applicationStatusPending => 'Stato: in attesa';
+
+  @override
+  String get applicationStatusAwarded => 'Stato: aggiudicato';
+
+  @override
+  String get btnAward => 'Aggiudica';
+
+  @override
+  String get btnManage => 'Gestisci';
+
+  @override
+  String get labelStatus => 'Stato';
+
+  @override
+  String get statusDraft => 'Bozza';
+
+  @override
+  String get statusLive => 'Online';
+
+  @override
+  String get statusAwarded => 'Aggiudicato';
+
+  @override
+  String get awardSuccess => 'Candidatura aggiudicata con successo.';
+
+  @override
+  String get snackNewApplication => 'Nuova candidatura ricevuta';
+
+  @override
+  String applicationsCount(Object count) {
+    return '$count candidature';
+  }
+
+  @override
+  String get btnApplied => 'Candidato';
+
+  @override
+  String get s0EditTitle => 'Modifica S0';
+
+  @override
+  String get publishNow => 'Pubblica dopo il salvataggio';
+
+  @override
+  String get publishNowHint => 'Se attivato, la bozza verrà impostata su «Live» dopo il salvataggio.';
+
+  @override
+  String get btnSaveChanges => 'Salva modifiche';
+
+  @override
+  String get saved => 'Salvato';
+
+  @override
+  String get marketplaceLocationLoadedFromProfile => 'Posizione dal profilo — filtro raggio attivo.';
+
+  @override
+  String get marketplaceNoHomeAddressHint => 'Nessun indirizzo nel profilo — mostro tutte le offerte senza filtro distanza.';
+
+  @override
+  String get fieldCategory => 'Categoria';
+
+  @override
+  String get categoryAll => 'Tutte';
+
+  @override
+  String get categoryRoofer => 'Lattoniere / Coperture';
+
+  @override
+  String get categorySolar => 'FV / Solare';
+
+  @override
+  String get categoryHVAC => 'Riscaldamento / Idraulica / HVAC';
+
+  @override
+  String get categoryElectrical => 'Elettrico';
+
+  @override
+  String get categoryDrywall => 'Cartongesso';
+
+  @override
+  String get categoryPainter => 'Imbianchino';
+
+  @override
+  String get categoryTiling => 'Posa piastrelle';
+
+  @override
+  String get categoryFlooring => 'Posa pavimenti';
+
+  @override
+  String get categoryWindowsDoors => 'Finestre & Porte';
+
+  @override
+  String get categoryInsulationFacade => 'Isolamento & Facciate';
+
+  @override
+  String get categoryMasonryConcrete => 'Muratura & Calcestruzzo';
+
+  @override
+  String get categoryCarpentryJoinery => 'Carpenteria & Falegnameria';
+
+  @override
+  String get categoryLandscaping => 'Giardinaggio / Paesaggistica';
+
+  @override
+  String get categoryScaffolding => 'Ponteggi';
+
+  @override
+  String get categoryCleaningRestoration => 'Pulizie & Restauro';
+
+  @override
+  String get categoryMovingTransport => 'Traslochi & Trasporti';
+
+  @override
+  String get sectionCustomerOk => 'Consenso del cliente';
+
+  @override
+  String get helpCustomerOk => 'Prova che il cliente accetta il trasferimento (es. offerta firmata, email/SMS in PDF/foto).';
+
+  @override
+  String get btnUploadCustomerOk => 'Carica consenso cliente';
+
+  @override
+  String get customerNameOptional => 'Nome cliente (opzionale)';
+
+  @override
+  String get customerPhoneOptional => 'Telefono (opzionale)';
+
+  @override
+  String get sectionOffer => 'Offerta / Conferma d’ordine';
+
+  @override
+  String get helpOfferOptional => 'La tua offerta o conferma. Opzionale ma utile per gli acquirenti.';
+
+  @override
+  String get btnUploadOffer => 'Carica offerta';
+
+  @override
+  String get errCustomerOkRequired => 'È richiesto almeno un documento di consenso per pubblicare.';
+
+  @override
+  String get warnMissingDocsBody => 'Attenzione: senza consenso/offerta non potrai pubblicare più tardi. Puoi aggiungere i documenti in qualsiasi momento.';
+
+  @override
+  String get attestLabel => 'Confermo veridicamente che il cliente ha acconsentito al trasferimento e che tutte le informazioni sono corrette.';
+
+  @override
+  String get attestConsequences => 'In caso di dichiarazioni false possiamo sospendere l’account, trattenere i pagamenti e avviare azioni civili e, ove applicabile, penali.';
+
+  @override
+  String get errAttestRequired => 'Devi spuntare la conferma per pubblicare.';
+
+  @override
+  String get genericPleaseFix => 'Correggi i campi evidenziati:';
+
+  @override
+  String get errAwardNeedsDoc => 'Se la scadenza è \"alla aggiudicazione\", è richiesto un documento/offerta.';
+
+  @override
+  String get errNotOwner => 'Non sei il proprietario di questo incarico.';
+
+  @override
+  String get errPublishOnlyFromDraft => 'La pubblicazione è possibile solo dallo stato bozza.';
+
+  @override
+  String get publishRequirementsTitle => 'Requisiti per pubblicare';
+
+  @override
+  String get infoReqCustomerOk => 'È allegato almeno un consenso del cliente.';
+
+  @override
+  String get infoReqDocForAward => 'Per \"alla aggiudicazione\": carica offerta/conferma d’ordine.';
+
+  @override
+  String get infoReqAttest => 'La conferma nel modulo è selezionata.';
+
+  @override
+  String get draftChecklistTitle => 'Checklist prima della pubblicazione';
+
+  @override
+  String get chkTitle => 'Titolo compilato';
+
+  @override
+  String get chkDescription => 'Descrizione compilata';
+
+  @override
+  String get chkLocation => 'Indirizzo/località impostati';
+
+  @override
+  String get chkTargetPrice => 'Prezzo obiettivo impostato';
+
+  @override
+  String get chkCustomerOk => 'Consenso cliente presente';
+
+  @override
+  String get chkDocIfAward => 'Documento/offerta presente (consigliato se \"alla aggiudicazione\")';
+
+  @override
+  String get chkAttestAtPublish => 'Spunta la conferma al momento della pubblicazione';
+
+  @override
+  String get draftChecklistCta => 'Apri gestione';
+
+  @override
+  String get uploadSuccess => 'Caricamento riuscito.';
+
+  @override
+  String get uploadInProgress => 'Caricamento in corso...';
+
+  @override
+  String get uploadFailed => 'Caricamento non riuscito.';
+
+  @override
+  String get draftDefaultTitle => 'Bozza';
+
+  @override
+  String get errGeocodingFailed => 'Impossibile geocodificare l’indirizzo.';
+
+  @override
+  String get provisionDueAwardLabel => 'Assegnazione';
+
+  @override
+  String get provisionDueHandoverLabel => 'Consegna';
+
+  @override
+  String get provisionDueFinalInvoiceLabel => 'Fattura finale';
+
+  @override
+  String get sectionPreviewPublic => 'Anteprima (pubblica)';
+
+  @override
+  String get tooltipPreviewPublic => 'Questi file sono visibili agli acquirenti prima dell’acquisto. Carica solo anteprime oscurate/anonimizzate.';
+
+  @override
+  String get btnUploadPreview => 'Carica anteprima';
+
+  @override
+  String get previewRedactionNoticeTitle => 'Avviso importante sull’anteprima';
+
+  @override
+  String get previewRedactionNoticeBody => 'Le anteprime sono visibili agli acquirenti prima dell’acquisto. Oscura i dati sensibili (nomi, indirizzi, numeri di telefono, n. contratto/cliente, firme, codici QR/a barre). Non caricare documenti con dati personali non oscurati.';
+
+  @override
+  String get hintPhoneExample => '+39 347 123 4567';
+
+  @override
+  String get createDealTitle => 'Crea offerta';
+
+  @override
+  String get chooseDealTypeTitle => 'Scegli il tipo di offerta';
+
+  @override
+  String get dealTypeS0Title => 'S0 – Rivendere l’incarico';
+
+  @override
+  String get dealTypeS0Subtitle => 'Cedere l’intero incarico a un altro fornitore.';
+
+  @override
+  String get dealTypeS1Title => 'S1 – Sotto-lavoro/Subappalto (milestone)';
+
+  @override
+  String get dealTypeS1Subtitle => 'Subappalto con milestone e prove.';
+
+  @override
+  String get s1Title => 'Cercare subappaltatori (S1)';
+
+  @override
+  String get sectionS1Pricing => 'Prezzi';
+
+  @override
+  String get sectionS1Provision => 'Provvigione';
+
+  @override
+  String get sectionMilestones => 'Traguardi';
+
+  @override
+  String get pricingModeFixed => 'Prezzo fisso';
+
+  @override
+  String get pricingModeTm => 'Tempo & Materiali';
+
+  @override
+  String get basePriceLabel => 'Budget totale (€)';
+
+  @override
+  String get hourlyRateLabel => 'Tariffa oraria (€)';
+
+  @override
+  String get expectedHoursLabel => 'Ore stimate';
+
+  @override
+  String get dueTypeAward => 'Aggiudicazione';
+
+  @override
+  String get dueTypeDate => 'Data';
+
+  @override
+  String get dueTypeHandover => 'Consegna';
+
+  @override
+  String get dueTypeCustom => 'Personalizzato';
+
+  @override
+  String get dueTypeCustomHelp => 'Scadenza personalizzata (indicare data/commento).';
+
+  @override
+  String get milestoneLabel => 'Traguardo';
+
+  @override
+  String get milestoneTitle => 'Titolo del traguardo';
+
+  @override
+  String get milestoneDescription => 'Descrizione del traguardo';
+
+  @override
+  String get milestoneAmount => 'Importo (€)';
+
+  @override
+  String get milestonePercent => 'Percentuale (%)';
+
+  @override
+  String get milestoneDue => 'Scadenza';
+
+  @override
+  String get btnAddMilestonePercent => 'Aggiungi traguardo (%)';
+
+  @override
+  String get btnAddMilestoneAmount => 'Aggiungi traguardo (€)';
+
+  @override
+  String get milestoneEmptyHint => 'Nessun traguardo ancora (opzionale).';
+
+  @override
+  String get milestoneBlocking => 'Bloccante';
+
+  @override
+  String get milestoneBlockingHelp => 'Da completare prima di sbloccare il passo successivo.';
+
+  @override
+  String get validationMilestoneSum => 'I totali dei traguardi non tornano: serve 100% nel modo percentuale, oppure somma pari al budget nel prezzo fisso.';
+
+  @override
+  String get btnReorder => 'Riordina';
+
+  @override
+  String get infoS1PricingHelp => 'Come prezzi il lavoro in subappalto. «Prezzo fisso» = un budget totale per il lotto. «Tempo e materiali» = tariffa oraria + ore stimate; la fatturazione reale è a consuntivo.';
+
+  @override
+  String get infoS1ProvisionHelp => 'La tua provvigione per ogni subappaltatore aggiudicato. Imposta percentuale o importo fisso e la relativa scadenza.';
+
+  @override
+  String get coordChipNoCoords => 'Nessuna coordinata';
+
+  @override
+  String get coordMissingLabel => 'Coordinate (lat/lng)';
+
+  @override
+  String get s0DetailsMissingLabel => 'Dettagli S0';
+
+  @override
+  String get s1DetailsMissingLabel => 'Dettagli S1';
+
+  @override
+  String get marketplaceTypeS0 => 'S0 – Girare incarico';
+
+  @override
+  String get marketplaceTypeS1 => 'S1 – Ricerca subappalto';
+
+  @override
+  String get filterTypeAll => 'Tutti i tipi';
+
+  @override
+  String get filterTypeS0 => 'Solo S0';
+
+  @override
+  String get filterTypeS1 => 'Solo S1';
+
+  @override
+  String get badgeAwardedToYou => 'Assegnato a te';
+
+  @override
+  String get badgeAwardedGiven => 'Assegnato';
+
+  @override
+  String get btnAssigned => 'Assegnato';
+
+  @override
+  String get marketplaceOwnDealPill => 'Il tuo incarico';
 }
